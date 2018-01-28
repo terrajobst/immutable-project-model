@@ -1,0 +1,65 @@
+﻿<Window x:Class="Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:gantt="http://schemas.syncfusion.com/wpf"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="350"
+        Width="525"
+        Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <gantt:GanttControl x:Name="GanttControl"
+                            Grid.Row="0"
+                            UseAutoUpdateHierarchy="False"
+                            ItemsSource="{Binding Path=Tasks}">
+            <gantt:GanttControl.TaskAttributeMapping>
+                <gantt:TaskAttributeMapping TaskIdMapping="Id"
+                                            TaskNameMapping="Name"
+                                            StartDateMapping="StartDate"
+                                            FinishDateMapping="EndDate"
+                                            DurationMapping="Duration"
+                                            PredecessorMapping="Predecessors" />
+            </gantt:GanttControl.TaskAttributeMapping>
+        </gantt:GanttControl>
+        <GridSplitter Grid.Row="1"
+                      HorizontalAlignment="Stretch" />
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <TextBlock Padding="8"
+                           Background="LightGray"
+                           FontWeight="DemiBold"
+                           Text="Tasks" />
+                <DataGrid x:Name="TaskDataGrid"
+                          AutoGenerateColumns="False"
+                          GridLinesVisibility="None"
+                          SelectionUnit="Cell"
+                          ItemsSource="{Binding Path=Rows}" />
+            </StackPanel>
+            <GridSplitter Grid.Row="1"
+                          HorizontalAlignment="Stretch" />
+            <StackPanel Grid.Row="2">
+                <TextBlock Padding="8"
+                           Background="LightGray"
+                           FontWeight="DemiBold"
+                           Text="Assignments" />
+                <DataGrid x:Name="AssignmentDataGrid"
+                          AutoGenerateColumns="False"
+                          GridLinesVisibility="None"
+                          SelectionUnit="Cell"
+                          ItemsSource="{Binding Path=Rows}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
