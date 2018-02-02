@@ -92,6 +92,26 @@ namespace Immutable.ProjectModel
             return project;
         }
 
+        private static ProjectData ComputeWork(this ProjectData project)
+        {
+            var tasks = project.Tasks.Values;
+            var assignments = project.Assignments.Values;
+
+            foreach (var task in tasks)
+            {
+                var taskAssignments = assignments.Where(a => a.TaskId == task.Id);
+                if (taskAssignments.Any())
+                {
+                    var workHours = taskAssignments.Sum(a => a.Work.TotalHours);
+                    var work = TimeSpan.FromHours(workHours);
+                    var newTask = task.SetValue(TaskFields.Work, work);
+                    project = project.UpdateTask(newTask);
+                }
+            }
+
+            return project;
+        }
+
         private static ProjectData ComputeDuration(this ProjectData project)
         {
             var calendar = project.Information.Calendar;
@@ -321,7 +341,7 @@ namespace Immutable.ProjectModel
 
             if (allAssignments.Length == 1)
             {
-                var work = task.Work != TimeSpan.Zero ? task.Work : task.Duration;
+                var work = GetWork(project, task);
                 assignment = assignment.SetValue(AssignmentFields.Work, work);
                 project = project.UpdateAssignment(assignment);
             }
