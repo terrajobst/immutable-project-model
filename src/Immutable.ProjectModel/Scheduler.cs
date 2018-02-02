@@ -9,12 +9,13 @@ namespace Immutable.ProjectModel
     {
         public static ProjectData Schedule(ProjectData project)
         {
-            return project.ComputeEarlyStartAndFinish()
-                          .ComputeLateStartAndFinish()
+            return project.ForwardPass()
+                          .BackwardPass()
+                          .ComputeWork()
                           .ComputeDuration();
         }
 
-        private static ProjectData ComputeEarlyStartAndFinish(this ProjectData project)
+        private static ProjectData ForwardPass(this ProjectData project)
         {
             var computedTasks = new HashSet<TaskId>();
             var toBeScheduled = new Queue<TaskId>(project.Tasks.Keys);
@@ -51,7 +52,7 @@ namespace Immutable.ProjectModel
             return project;
         }
 
-        private static ProjectData ComputeLateStartAndFinish(this ProjectData project)
+        private static ProjectData BackwardPass(this ProjectData project)
         {
             var computedTasks = new HashSet<TaskId>();
             var successorsById = project.Tasks
