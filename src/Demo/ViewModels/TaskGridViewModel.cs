@@ -15,7 +15,7 @@ namespace Demo.ViewModels
             Workspace = workspace;
             Workspace.CurrentChanged += Workspace_CurrentChanged;
             Rows = new ObservableCollection<TaskGridRowViewModel>();
-            Update(Workspace.Current, Workspace.Current.GetChanges(Project.Empty));
+            Update(Workspace.Current, Workspace.Current.GetChanges(Project.Create()));
         }
 
         public ProjectWorkspace Workspace { get; }

@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+
 using Demo.ViewModels;
 
 using Immutable.ProjectModel;
@@ -24,8 +25,7 @@ namespace Demo
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var project = CreateProject();
-            var workspace = new ProjectWorkspace(project);
+            var workspace = new ProjectWorkspace(Project.Create());
             workspace.CurrentChanged += Workspace_CurrentChanged;
 
             GanttControl.DataContext = new GanttViewModel(workspace);
@@ -54,6 +54,8 @@ namespace Demo
             }
 
             AssignmentDataGrid.DataContext = new AssignmentGridViewModel(workspace);
+
+            workspace.ApplyChanges(CreateProject());
         }
 
         private static DataGridColumn CreateColumn(string name, string header, FieldDefinition field)
@@ -92,7 +94,9 @@ namespace Demo
             var immoResourceId = ResourceId.Create();
             var thomasResourceId = ResourceId.Create();
 
-            return Project.Empty
+            return Project.Create()
+                          .WithName("Some Software Project")
+                          .WithStartDate(new DateTimeOffset(2018, 1, 29, 0, 0, 0, DateTimeOffset.Now.Offset))
                           .AddNewTask(designTaskId)
                               .WithName("Design")
                               .WithDuration(TimeSpan.FromDays(5)).Project
@@ -120,6 +124,7 @@ namespace Demo
 
         private void Workspace_CurrentChanged(object sender, ProjectChangedEventArgs e)
         {
+            Title = e.NewProject.Name;
             HighlightChangedCells(TaskDataGrid, e.Changes.ChangedTasks);
             HighlightChangedCells(AssignmentDataGrid, e.Changes.ChangedAssignments);
         }

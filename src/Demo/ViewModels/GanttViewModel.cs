@@ -17,7 +17,7 @@ namespace Demo.ViewModels
             Workspace.CurrentChanged += Workspace_CurrentChanged;
 
             Tasks = new ObservableCollection<GanttTaskViewModel>();
-            Update(workspace.Current, workspace.Current.GetChanges(Project.Empty));
+            Update(workspace.Current, workspace.Current.GetChanges(Project.Create()));
         }
 
         public ProjectWorkspace Workspace { get; }

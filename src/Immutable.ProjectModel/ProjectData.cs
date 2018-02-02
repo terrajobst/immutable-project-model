@@ -5,18 +5,26 @@ namespace Immutable.ProjectModel
 {
     internal sealed class ProjectData
     {
-        public static ProjectData Empty = new ProjectData(ImmutableDictionary<TaskId, TaskData>.Empty,
-                                                          ImmutableDictionary<ResourceId, ResourceData>.Empty,
-                                                          ImmutableDictionary<AssignmentId, AssignmentData>.Empty);
+        public static ProjectData Create()
+        {
+            return new ProjectData(ProjectInformationData.Create(),
+                                   ImmutableDictionary<TaskId, TaskData>.Empty,
+                                   ImmutableDictionary<ResourceId, ResourceData>.Empty,
+                                   ImmutableDictionary<AssignmentId, AssignmentData>.Empty);
+        }
 
-        private ProjectData(ImmutableDictionary<TaskId, TaskData> tasks,
+        private ProjectData(ProjectInformationData information,
+                            ImmutableDictionary<TaskId, TaskData> tasks,
                             ImmutableDictionary<ResourceId, ResourceData> resources,
                             ImmutableDictionary<AssignmentId, AssignmentData> assignments)
         {
+            Information = information;
             Tasks = tasks;
             Resources = resources;
             Assignments = assignments;
         }
+
+        public ProjectInformationData Information { get; }
 
         public ImmutableDictionary<TaskId, TaskData> Tasks { get; }
 
@@ -24,23 +32,30 @@ namespace Immutable.ProjectModel
 
         public ImmutableDictionary<AssignmentId, AssignmentData> Assignments { get; }
 
-        public ProjectData With(ImmutableDictionary<TaskId, TaskData> tasks,
+        public ProjectData With(ProjectInformationData information,
+                                ImmutableDictionary<TaskId, TaskData> tasks,
                                 ImmutableDictionary<ResourceId, ResourceData> resources,
                                 ImmutableDictionary<AssignmentId, AssignmentData> assignments)
         {
-            if (tasks == Tasks &&
+            if (information == Information &&
+                tasks == Tasks &&
                 resources == Resources &&
                 assignments == Assignments)
             {
                 return this;
             }
 
-            return new ProjectData(tasks, resources, assignments);
+            return new ProjectData(information, tasks, resources, assignments);
+        }
+
+        public ProjectData WithInformation(ProjectInformationData information)
+        {
+            return With(information, Tasks, Resources, Assignments);
         }
 
         private ProjectData WithTasks(ImmutableDictionary<TaskId, TaskData> tasks)
         {
-            return With(tasks, Resources, Assignments);
+            return With(Information, tasks, Resources, Assignments);
         }
 
         public ProjectData AddTask(TaskData task)
@@ -67,7 +82,7 @@ namespace Immutable.ProjectModel
             foreach (var assignment in Assignments.Values.Where(a => a.TaskId == taskId))
                 newAssignments = newAssignments.Remove(assignment.Id);
 
-            return With(newTasks, Resources, newAssignments);
+            return With(Information, newTasks, Resources, newAssignments);
         }
 
         public ProjectData UpdateTask(TaskData task)
@@ -77,7 +92,7 @@ namespace Immutable.ProjectModel
 
         private ProjectData WithResources(ImmutableDictionary<ResourceId, ResourceData> resources)
         {
-            return With(Tasks, resources, Assignments);
+            return With(Information, Tasks, resources, Assignments);
         }
 
         public ProjectData AddResource(ResourceData resource)
@@ -94,7 +109,7 @@ namespace Immutable.ProjectModel
             foreach (var assignment in Assignments.Values.Where(a => a.ResourceId == resourceId))
                 newAssignments = newAssignments.Remove(assignment.Id);
 
-            return With(Tasks, newResources, newAssignments);
+            return With(Information, Tasks, newResources, newAssignments);
         }
 
         public ProjectData UpdateResource(ResourceData resource)
@@ -104,7 +119,7 @@ namespace Immutable.ProjectModel
 
         private ProjectData WithAssignments(ImmutableDictionary<AssignmentId, AssignmentData> assignments)
         {
-            return With(Tasks, Resources, assignments);
+            return With(Information, Tasks, Resources, assignments);
         }
 
         public ProjectData AddAssignment(AssignmentData assignment)

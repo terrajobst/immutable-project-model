@@ -33,11 +33,11 @@ namespace Immutable.ProjectModel
                     var predecessors = task.PredecessorIds.Select(id => project.Tasks[id]);
 
                     var earlyStart = predecessors.Select(p => p.EarlyFinish)
-                                                 .DefaultIfEmpty(DateTimeOffset.Now.Date)
+                                                 .DefaultIfEmpty(project.Information.StartDate)
                                                  .Max();
 
                     var work = GetWork(project, task);
-                    ComputeFinish(ref earlyStart, out var earlyFinish, work);
+                    ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, work);
 
                     task = task.SetValue(TaskFields.EarlyStart, earlyStart)
                                .SetValue(TaskFields.EarlyFinish, earlyFinish);
@@ -77,7 +77,7 @@ namespace Immutable.ProjectModel
                                                .Min();
 
                     var work = GetWork(project, task);
-                    ComputeStart(out var lateStart, ref lateFinish, work);
+                    ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, work);
 
                     task = task.SetValue(TaskFields.LateStart, lateStart)
                                .SetValue(TaskFields.LateFinish, lateFinish);
@@ -93,7 +93,7 @@ namespace Immutable.ProjectModel
 
         private static ProjectData ComputeDuration(this ProjectData project)
         {
-            var calendar = Calendar.Default;
+            var calendar = project.Information.Calendar;
             var tasks = project.Tasks.Values;
 
             foreach (var task in tasks)
@@ -116,10 +116,8 @@ namespace Immutable.ProjectModel
             return task.Work;
         }
 
-        private static void ComputeFinish(ref DateTimeOffset start, out DateTimeOffset end, TimeSpan work)
+        private static void ComputeFinish(Calendar calendar, ref DateTimeOffset start, out DateTimeOffset end, TimeSpan work)
         {
-            var calendar = Calendar.Default;
-
             if (work == TimeSpan.Zero)
             {
                 end = start;
@@ -130,10 +128,8 @@ namespace Immutable.ProjectModel
             end = AddWork(calendar, start, work);
         }
 
-        private static void ComputeStart(out DateTimeOffset start, ref DateTimeOffset end, TimeSpan work)
+        private static void ComputeStart(Calendar calendar, out DateTimeOffset start, ref DateTimeOffset end, TimeSpan work)
         {
-            var calendar = Calendar.Default;
-
             if (work == TimeSpan.Zero)
             {
                 start = end;

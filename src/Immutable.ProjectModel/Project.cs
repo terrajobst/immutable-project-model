@@ -12,7 +12,10 @@ namespace Immutable.ProjectModel
         private ImmutableDictionary<ResourceData, Resource> _resources = ImmutableDictionary<ResourceData, Resource>.Empty;
         private ImmutableDictionary<AssignmentData, Assignment> _assignments = ImmutableDictionary<AssignmentData, Assignment>.Empty;
 
-        public static Project Empty = new Project(ProjectData.Empty);
+        public static Project Create()
+        {
+            return new Project(ProjectData.Create());
+        }
 
         private Project(ProjectData data)
         {
@@ -20,6 +23,12 @@ namespace Immutable.ProjectModel
         }
 
         internal ProjectData Data { get; }
+
+        public string Name => Data.Information.Name;
+
+        public DateTimeOffset StartDate => Data.Information.StartDate;
+
+        public Calendar Calendar => Data.Information.Calendar;
 
         public IEnumerable<Task> Tasks => Data.Tasks.Keys.Select(GetTask).OrderBy(t => t.Ordinal);
 
@@ -78,6 +87,33 @@ namespace Immutable.ProjectModel
             Debug.Assert(Scheduler.Schedule(data) == data);
 
             return new Project(data);
+        }
+
+        public Project WithName(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            var information = Data.Information.WithName(name);
+            var data = Data.WithInformation(information);
+            return UpdateProject(data);
+        }
+
+        public Project WithStartDate(DateTimeOffset startDate)
+        {
+            var information = Data.Information.WithStartDate(startDate);
+            var data = Data.WithInformation(information);
+            return UpdateProject(data);
+        }
+
+        public Project WithCalendar(Calendar calendar)
+        {
+            if (calendar == null)
+                throw new ArgumentNullException(nameof(calendar));
+
+            var information = Data.Information.WithCalendar(calendar);
+            var data = Data.WithInformation(information);
+            return UpdateProject(data);
         }
 
         public Task AddNewTask(TaskId taskId = default)
