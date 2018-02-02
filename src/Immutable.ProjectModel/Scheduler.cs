@@ -120,7 +120,7 @@ namespace Immutable.ProjectModel
             foreach (var task in tasks)
             {
                 var work = GetWork(calendar, task.EarlyStart, task.EarlyFinish);
-                var duration = TimeSpan.FromDays(work.TotalHours / 8.0);
+                var duration = GetDuration(project, work);
                 var newTask = task.SetValue(TaskFields.Duration, duration);
                 project = project.UpdateTask(newTask);
             }
@@ -132,7 +132,7 @@ namespace Immutable.ProjectModel
         {
             var hasAssignments = project.Assignments.Values.Any(a => a.TaskId == task.Id);
             if (!hasAssignments || task.Work == TimeSpan.Zero)
-                return TimeSpan.FromHours(task.Duration.TotalDays * 8);
+                return GetWork(project, task.Duration);
 
             return task.Work;
         }
@@ -278,6 +278,16 @@ namespace Immutable.ProjectModel
             return result;
         }
 
+        private static TimeSpan GetWork(ProjectData project, TimeSpan duration)
+        {
+            return TimeSpan.FromHours(duration.TotalDays * 8.0);
+        }
+
+        private static TimeSpan GetDuration(ProjectData project, TimeSpan work)
+        {
+            return TimeSpan.FromDays(work.TotalHours / 8.0);
+        }
+
         public static ProjectData SetTaskWork(ProjectData project, TaskData task, TimeSpan work)
         {
             task = task.SetValue(TaskFields.Work, work);
@@ -321,17 +331,22 @@ namespace Immutable.ProjectModel
             return project;
         }
 
-        public static ProjectData SetAssignmentWork(ProjectData project, AssignmentData assignment, TimeSpan work)
+        public static ProjectData SetTaskDuration(ProjectData project, TaskData task, TimeSpan duration)
         {
-            var task = project.Tasks[assignment.TaskId];
-            var assignmentWorkDelata = work - assignment.Work;
+            var hasAssignments = project.Assignments.Values.Any(a => a.TaskId == task.Id);
 
-            var taskWork = task.Work + assignmentWorkDelata;
-            var newTask = task.SetValue(TaskFields.Work, taskWork);
-            var newAssignment = assignment.SetValue(AssignmentFields.Work, work);
+            if (!hasAssignments)
+            {
+                task = task.SetValue(TaskFields.Duration, duration);
+                project = project.UpdateTask(task);
+                return project;
+            }
 
-            return project.UpdateTask(newTask)
-                          .UpdateAssignment(newAssignment);
+            // We need to perform this per assignment. But we currently don't schedule
+            // assignments themselves.
+
+            var work = GetWork(project, duration);
+            return SetTaskWork(project, task, work);
         }
 
         public static ProjectData InitializeAssignment(ProjectData project, AssignmentData assignment)
@@ -361,6 +376,19 @@ namespace Immutable.ProjectModel
             }
 
             return project;
+        }
+
+        public static ProjectData SetAssignmentWork(ProjectData project, AssignmentData assignment, TimeSpan work)
+        {
+            var task = project.Tasks[assignment.TaskId];
+            var assignmentWorkDelata = work - assignment.Work;
+
+            var taskWork = task.Work + assignmentWorkDelata;
+            var newTask = task.SetValue(TaskFields.Work, taskWork);
+            var newAssignment = assignment.SetValue(AssignmentFields.Work, work);
+
+            return project.UpdateTask(newTask)
+                          .UpdateAssignment(newAssignment);
         }
     }
 }
