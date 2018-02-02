@@ -11,7 +11,8 @@ namespace Immutable.ProjectModel
             public override string Format(object value)
             {
                 var actualValue = (TimeSpan)value;
-                return $"{actualValue.TotalDays:N2} days";
+                var days = Math.Round(actualValue.TotalDays, 2, MidpointRounding.AwayFromZero);
+                return $"{days} days";
             }
 
             public override bool TryParse(string text, out object value)
