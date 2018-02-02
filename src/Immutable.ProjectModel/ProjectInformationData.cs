@@ -1,20 +1,26 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Immutable.ProjectModel
 {
     internal sealed class ProjectInformationData
     {
-        public static ProjectInformationData Create()
+        public static ProjectInformationData Create(ProjectId id)
         {
-            return new ProjectInformationData(string.Empty, DateTimeOffset.Now.Date, Calendar.Default);
+            Debug.Assert(!id.IsDefault);
+
+            return new ProjectInformationData(id, string.Empty, DateTimeOffset.Now.Date, Calendar.Default);
         }
 
-        private ProjectInformationData(string name, DateTimeOffset startDate, Calendar calendar)
+        private ProjectInformationData(ProjectId id, string name, DateTimeOffset startDate, Calendar calendar)
         {
+            Id = id;
             Name = name;
             StartDate = startDate;
             Calendar = calendar;
         }
+
+        public ProjectId Id { get; }
 
         public string Name { get; }
 
@@ -29,7 +35,7 @@ namespace Immutable.ProjectModel
                 calendar == Calendar)
                 return this;
 
-            return new ProjectInformationData(name, startDate, calendar);
+            return new ProjectInformationData(Id, name, startDate, calendar);
         }
 
         public ProjectInformationData WithName(string name)

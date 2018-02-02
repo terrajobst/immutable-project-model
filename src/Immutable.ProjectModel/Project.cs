@@ -12,9 +12,11 @@ namespace Immutable.ProjectModel
         private ImmutableDictionary<ResourceData, Resource> _resources = ImmutableDictionary<ResourceData, Resource>.Empty;
         private ImmutableDictionary<AssignmentData, Assignment> _assignments = ImmutableDictionary<AssignmentData, Assignment>.Empty;
 
-        public static Project Create()
+        public static Project Create(ProjectId id = default)
         {
-            return new Project(ProjectData.Create());
+            id = id.CreateIfDefault();
+            var data = ProjectData.Create(id);
+            return new Project(data);
         }
 
         private Project(ProjectData data)
@@ -23,6 +25,8 @@ namespace Immutable.ProjectModel
         }
 
         internal ProjectData Data { get; }
+
+        public ProjectId Id => Data.Information.Id;
 
         public string Name => Data.Information.Name;
 

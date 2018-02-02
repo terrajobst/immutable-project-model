@@ -5,9 +5,9 @@ namespace Immutable.ProjectModel
 {
     internal sealed class ProjectData
     {
-        public static ProjectData Create()
+        public static ProjectData Create(ProjectId id)
         {
-            return new ProjectData(ProjectInformationData.Create(),
+            return new ProjectData(ProjectInformationData.Create(id),
                                    ImmutableDictionary<TaskId, TaskData>.Empty,
                                    ImmutableDictionary<ResourceId, ResourceData>.Empty,
                                    ImmutableDictionary<AssignmentId, AssignmentData>.Empty);
