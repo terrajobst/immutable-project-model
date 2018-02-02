@@ -88,7 +88,7 @@ namespace Immutable.ProjectModel
                 return this;
 
             data = Scheduler.Schedule(data);
-            Debug.Assert(Scheduler.Schedule(data) == data);
+            Debug.Assert(Scheduler.Schedule(data) == data, "scheduling isn't idempotent");
 
             return new Project(data);
         }
