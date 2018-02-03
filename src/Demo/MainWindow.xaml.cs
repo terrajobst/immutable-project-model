@@ -18,6 +18,9 @@ namespace Demo
 {
     public partial class MainWindow : Window
     {
+        private List<TaskField> _taskFields = new List<TaskField>();
+        private List<AssignmentField> _assignmentFields = new List<AssignmentField>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -39,6 +42,7 @@ namespace Demo
                 var name = $"Item[{index}]";
                 var column = CreateColumn(name, field.Name, field);
                 TaskDataGrid.Columns.Add(column);
+                _taskFields.Add(field);
             }
 
             TaskDataGrid.DataContext = new TaskGridViewModel(workspace);
@@ -49,6 +53,7 @@ namespace Demo
                 var name = $"Item[{index}]";
                 var column = CreateColumn(name, field.Name, field);
                 AssignmentDataGrid.Columns.Add(column);
+                _assignmentFields.Add(field);
             }
 
             AssignmentDataGrid.DataContext = new AssignmentGridViewModel(workspace);
@@ -117,7 +122,7 @@ namespace Demo
             HighlightChangedCells(AssignmentDataGrid, e.Changes.ChangedAssignments);
         }
 
-        private static void HighlightChangedCells(DataGrid dataGrid, ImmutableArray<TaskChanges> changedTasks)
+        private void HighlightChangedCells(DataGrid dataGrid, ImmutableArray<TaskChanges> changedTasks)
         {
             var viewModel = dataGrid.DataContext as TaskGridViewModel;
             if (viewModel == null)
@@ -132,9 +137,9 @@ namespace Demo
                 if (!changesById.TryGetValue(taskId, out var changedFields))
                     changedFields = empty;
 
-                for (var columnIndex = 0; columnIndex < TaskFields.All.Length; columnIndex++)
+                for (var columnIndex = 0; columnIndex < _taskFields.Count; columnIndex++)
                 {
-                    var field = TaskFields.All[columnIndex];
+                    var field = _taskFields[columnIndex];
                     var cell = GetCell(dataGrid, rowIndex, columnIndex);
                     if (cell != null)
                         HighlightCell(cell, changedFields.Contains(field));
@@ -142,7 +147,7 @@ namespace Demo
             }
         }
 
-        private static void HighlightChangedCells(DataGrid dataGrid, ImmutableArray<AssignmentChanges> changedAssignments)
+        private void HighlightChangedCells(DataGrid dataGrid, ImmutableArray<AssignmentChanges> changedAssignments)
         {
             var viewModel = dataGrid.DataContext as AssignmentGridViewModel;
             if (viewModel == null)
@@ -157,9 +162,9 @@ namespace Demo
                 if (!changesById.TryGetValue(assignmentId, out var changedFields))
                     changedFields = empty;
 
-                for (var columnIndex = 0; columnIndex < AssignmentFields.All.Length; columnIndex++)
+                for (var columnIndex = 0; columnIndex < _assignmentFields.Count; columnIndex++)
                 {
-                    var field = AssignmentFields.All[columnIndex];
+                    var field = _assignmentFields[columnIndex];
                     var cell = GetCell(dataGrid, rowIndex, columnIndex);
                     if (cell != null)
                         HighlightCell(cell, changedFields.Contains(field));
