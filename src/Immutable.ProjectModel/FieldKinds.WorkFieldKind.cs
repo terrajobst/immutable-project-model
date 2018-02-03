@@ -24,7 +24,7 @@ namespace Immutable.ProjectModel
 
                     text = text.Trim();
 
-                    if (int.TryParse(text, out var actualValue))
+                    if (double.TryParse(text, out var actualValue))
                     {
                         value = TimeSpan.FromHours(actualValue);
                         return true;
