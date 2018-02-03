@@ -38,5 +38,25 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             return AssertField(AssignmentFields.Finish, value);
         }
+
+        public AssignmentAssert AssertEarlyStart(DateTimeOffset value)
+        {
+            return AssertField(AssignmentFields.EarlyStart, value);
+        }
+
+        public AssignmentAssert AssertEarlyFinish(DateTimeOffset value)
+        {
+            return AssertField(AssignmentFields.EarlyFinish, value);
+        }
+
+        public AssignmentAssert AssertLateStart(DateTimeOffset value)
+        {
+            return AssertField(AssignmentFields.LateStart, value);
+        }
+
+        public AssignmentAssert AssertLateFinish(DateTimeOffset value)
+        {
+            return AssertField(AssignmentFields.LateFinish, value);
+        }
     }
 }

@@ -118,7 +118,8 @@ namespace Immutable.ProjectModel
 
                         foreach (var assignment in assignments)
                         {
-                            ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, assignment.Work);
+                            var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
+                            ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, time);
 
                             var newAssignment = assignment.SetValue(AssignmentFields.LateStart, lateStart)
                                                           .SetValue(AssignmentFields.LateFinish, lateFinish);
