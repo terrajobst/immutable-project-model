@@ -60,16 +60,17 @@ namespace Immutable.ProjectModel
                                             .SelectMany(s => s.PredecessorIds, (s, pId) => (predecessor: pId, successor: s.Id))
                                             .ToLookup(t => t.predecessor, t => t.successor);
 
-            var toBeScheduled = new Queue<TaskData>(project.Tasks.Values);
+            var toBeScheduled = new Queue<TaskId>(project.Tasks.Keys);
 
             while (toBeScheduled.Count > 0)
             {
-                var task = toBeScheduled.Dequeue();
+                var taskId = toBeScheduled.Dequeue();
+                var task = project.Tasks[taskId];
                 var successors = successorsById[task.Id];
                 var allSuccessorsComputed = successors.All(id => computedTasks.Contains(id));
                 if (!allSuccessorsComputed)
                 {
-                    toBeScheduled.Enqueue(task);
+                    toBeScheduled.Enqueue(taskId);
                 }
                 else
                 {
