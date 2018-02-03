@@ -37,8 +37,7 @@ namespace Demo
 
                 var index = TaskFields.All.IndexOf(field);
                 var name = $"Item[{index}]";
-                var header = field.Name.Replace("Task.", string.Empty);
-                var column = CreateColumn(name, header, field);
+                var column = CreateColumn(name, field.Name, field);
                 TaskDataGrid.Columns.Add(column);
             }
 
@@ -48,8 +47,7 @@ namespace Demo
             {
                 var index = AssignmentFields.All.IndexOf(field);
                 var name = $"Item[{index}]";
-                var header = field.Name.Replace("Assignment.", string.Empty);
-                var column = CreateColumn(name, header, field);
+                var column = CreateColumn(name, field.Name, field);
                 AssignmentDataGrid.Columns.Add(column);
             }
 
