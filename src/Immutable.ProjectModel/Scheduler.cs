@@ -444,12 +444,5 @@ namespace Immutable.ProjectModel
             return project.UpdateTask(newTask)
                           .UpdateAssignment(newAssignment);
         }
-
-        public static ProjectData SetAssignmentUnits(ProjectData project, AssignmentData assignment, double units)
-        {
-            assignment = assignment.SetValue(AssignmentFields.Units, units);
-            project = project.UpdateAssignment(assignment);
-            return project;
-        }
     }
 }
