@@ -380,6 +380,7 @@ namespace Immutable.ProjectModel
 
         public static ProjectData SetTaskDuration(ProjectData project, TaskData task, TimeSpan duration)
         {
+            var oldDuration = task.Duration;
             task = task.SetValue(TaskFields.Duration, duration);
             project = project.UpdateTask(task);
 
@@ -387,11 +388,16 @@ namespace Immutable.ProjectModel
             if (!hasAssignments)
                 return project;
 
-            // We need to perform this per assignment. But we currently don't schedule
-            // assignments themselves.
-
+            var oldWork = GetWork(project, oldDuration);
             var work = GetWork(project, duration);
-            return SetTaskWork(project, task, work);
+
+            foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == task.Id))
+            {
+                if (assignment.EarlyFinish == task.EarlyFinish)
+                    project = SetAssignmentWork(project, assignment, work);
+            }
+
+            return project;
         }
 
         public static ProjectData AddAssignment(ProjectData project, AssignmentId assignmentId, TaskId taskId, ResourceId resourceId)
