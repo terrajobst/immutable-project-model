@@ -43,7 +43,7 @@ namespace Immutable.ProjectModel
                                                                               .Where(a => a.TaskId == Id)
                                                                               .Select(a => Project.GetAssignment(a.Id));
 
-        public bool IsOnCriticalPath => GetValue(TaskFields.IsOnCriticalPath);
+        public bool IsCritical => GetValue(TaskFields.IsCritical);
 
         public IEnumerable<TaskField> SetFields => Data.SetFields;
 
