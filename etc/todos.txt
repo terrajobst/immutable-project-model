@@ -1,0 +1,18 @@
+# To-Do List
+
+## Basics
+
+* Add assignment units
+* Add effort driven
+* Add task type
+* Add other predecessor types
+* Add scheduling from the back
+
+## Settings
+
+We should add all the project settings, such as hours per day, hours per week,
+days per month.
+
+Project has a default star time and default finish times for tasks. Are those
+used or are tasks scheduled based on the calendar? What happens if our calendar
+starts at 9 AM but the default start time is still 8 AM?

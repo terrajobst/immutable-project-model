@@ -39,6 +39,10 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(TaskFields.Work);
 
+        public DateTimeOffset Start => GetValue(TaskFields.Start);
+
+        public DateTimeOffset Finish => GetValue(TaskFields.Finish);
+
         public DateTimeOffset EarlyStart => GetValue(TaskFields.EarlyStart);
 
         public DateTimeOffset EarlyFinish => GetValue(TaskFields.EarlyFinish);
@@ -75,6 +79,12 @@ namespace Immutable.ProjectModel
             {
                 if (field == TaskFields.Id)
                     return Id;
+
+                if (field == TaskFields.Start)
+                    return EarlyStart;
+
+                if (field == TaskFields.Finish)
+                    return EarlyFinish;
 
                 if (field == TaskFields.IsCritical)
                     return EarlyFinish == LateFinish;

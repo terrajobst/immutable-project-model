@@ -33,6 +33,10 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
+        public DateTimeOffset Start => GetValue(AssignmentFields.Start);
+
+        public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
+
         public DateTimeOffset EarlyStart => GetValue(AssignmentFields.EarlyStart);
 
         public DateTimeOffset EarlyFinish => GetValue(AssignmentFields.EarlyFinish);
@@ -83,6 +87,12 @@ namespace Immutable.ProjectModel
 
                 if (field == AssignmentFields.ResourceId)
                     return ResourceId;
+
+                if (field == AssignmentFields.Start)
+                    return EarlyStart;
+
+                if (field == AssignmentFields.Finish)
+                    return EarlyFinish;
             }
 
             if (!Fields.TryGetValue(field, out var result))
