@@ -137,12 +137,7 @@ namespace Demo
                     var field = TaskFields.All[columnIndex];
                     var cell = GetCell(dataGrid, rowIndex, columnIndex);
                     if (cell != null)
-                    {
-                        if (changedFields.Contains(field))
-                            cell.Background = Brushes.LightBlue;
-                        else
-                            cell.ClearValue(BackgroundProperty);
-                    }
+                        HighlightCell(cell, changedFields.Contains(field));
                 }
             }
         }
@@ -167,13 +162,22 @@ namespace Demo
                     var field = AssignmentFields.All[columnIndex];
                     var cell = GetCell(dataGrid, rowIndex, columnIndex);
                     if (cell != null)
-                    {
-                        if (changedFields.Contains(field))
-                            cell.Background = Brushes.LightBlue;
-                        else
-                            cell.ClearValue(BackgroundProperty);
-                    }
+                        HighlightCell(cell, changedFields.Contains(field));
                 }
+            }
+        }
+
+        private static void HighlightCell(DataGridCell cell, bool isHighlighted)
+        {
+            if (isHighlighted)
+            {
+                cell.Background = Brushes.LightBlue;
+                cell.Foreground = Brushes.Black;
+            }
+            else
+            {
+                cell.ClearValue(BackgroundProperty);
+                cell.ClearValue(ForegroundProperty);
             }
         }
 
