@@ -18,7 +18,7 @@ namespace Immutable.ProjectModel
         public static readonly TaskField<DateTimeOffset> EarlyFinish = new TaskField<DateTimeOffset>("EarlyFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> LateStart = new TaskField<DateTimeOffset>("LateStart", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> LateFinish = new TaskField<DateTimeOffset>("LateFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly TaskField<ImmutableArray<TaskId>> PredecessorIds = new TaskField<ImmutableArray<TaskId>>("PredecessorIds", FieldKinds.TaskIdArray, FieldFlags.ImpactsScheduling, ImmutableArray<TaskId>.Empty);
+        public static readonly TaskField<ImmutableArray<TaskId>> PredecessorIds = new TaskField<ImmutableArray<TaskId>>("PredecessorIds", FieldKinds.TaskIdArray, FieldFlags.None, ImmutableArray<TaskId>.Empty);
         public static readonly TaskField<bool> IsCritical = new TaskField<bool>("IsCritical", FieldKinds.YesNo, FieldFlags.ReadOnly | FieldFlags.Virtual);
 
         public static readonly ImmutableArray<TaskField> All = typeof(TaskFields).GetFields(BindingFlags.Static | BindingFlags.Public)

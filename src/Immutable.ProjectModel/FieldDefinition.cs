@@ -44,8 +44,6 @@ namespace Immutable.ProjectModel
 
         public bool IsReadOnly => (Flags & FieldFlags.ReadOnly) == FieldFlags.ReadOnly;
 
-        public bool ImpactsScheduling => (Flags & FieldFlags.ImpactsScheduling) == FieldFlags.ImpactsScheduling;
-
         public override string ToString() => Name;
     }
 }
