@@ -14,6 +14,16 @@ namespace Immutable.ProjectModel
             WorkingDay.CreateNonWorking(DayOfWeek.Sunday)
         );
 
+        public static WorkingWeek TwentyFourSeven = Create(
+            WorkingDay.CreateTwentyFour(DayOfWeek.Monday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Tuesday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Wednesday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Thursday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Friday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Saturday),
+            WorkingDay.CreateTwentyFour(DayOfWeek.Sunday)
+        );
+
         public static WorkingWeek Create(WorkingDay monday,
                                          WorkingDay tuesday,
                                          WorkingDay wednesday,
@@ -81,13 +91,13 @@ namespace Immutable.ProjectModel
         private readonly WorkingDay _saturday;
         private readonly WorkingDay _sunday;
 
-        public WorkingWeek(WorkingDay monday,
-                           WorkingDay tuesday,
-                           WorkingDay wednesday,
-                           WorkingDay thursday,
-                           WorkingDay friday,
-                           WorkingDay saturday,
-                           WorkingDay sunday)
+        private WorkingWeek(WorkingDay monday,
+                            WorkingDay tuesday,
+                            WorkingDay wednesday,
+                            WorkingDay thursday,
+                            WorkingDay friday,
+                            WorkingDay saturday,
+                            WorkingDay sunday)
         {
             _monday = monday;
             _tuesday = tuesday;
@@ -135,6 +145,21 @@ namespace Immutable.ProjectModel
                         return _sunday;
                 }
             }
+        }
+
+        public WorkingWeek WithDay(WorkingDay day)
+        {
+            if (day == null)
+                throw new ArgumentNullException(nameof(day));
+
+            var monday = day.DayOfWeek == DayOfWeek.Monday ? day : this[DayOfWeek.Monday];
+            var tuesday = day.DayOfWeek == DayOfWeek.Tuesday ? day : this[DayOfWeek.Tuesday];
+            var wednesday = day.DayOfWeek == DayOfWeek.Wednesday ? day : this[DayOfWeek.Wednesday];
+            var thursday = day.DayOfWeek == DayOfWeek.Thursday ? day : this[DayOfWeek.Thursday];
+            var friday = day.DayOfWeek == DayOfWeek.Friday ? day : this[DayOfWeek.Friday];
+            var saturday = day.DayOfWeek == DayOfWeek.Saturday ? day : this[DayOfWeek.Saturday];
+            var sunday = day.DayOfWeek == DayOfWeek.Sunday ? day : this[DayOfWeek.Sunday];
+            return new WorkingWeek(monday, tuesday, wednesday, thursday, friday, saturday, sunday);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Immutable.ProjectModel
 {
@@ -25,6 +26,15 @@ namespace Immutable.ProjectModel
             return Create(dayOfWeek, eigthToFive);
         }
 
+        public static WorkingDay CreateTwentyFour(DayOfWeek dayOfWeek)
+        {
+            var twentyFour = ImmutableArray.Create(
+                WorkingTime.Create(TimeSpan.FromHours(0), TimeSpan.FromHours(24))
+            );
+
+            return Create(dayOfWeek, twentyFour);
+        }
+
         private WorkingDay(DayOfWeek dayOfWeek, ImmutableArray<WorkingTime> workingTimes)
         {
             DayOfWeek = dayOfWeek;
@@ -36,5 +46,10 @@ namespace Immutable.ProjectModel
         public bool IsNonWorking => WorkingTimes.IsDefaultOrEmpty;
 
         public ImmutableArray<WorkingTime> WorkingTimes { get; }
+
+        public override string ToString()
+        {
+            return String.Join(", ", WorkingTimes);
+        }
     }
 }

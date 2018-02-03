@@ -32,5 +32,10 @@ namespace Immutable.ProjectModel
         public WorkingTime WithFrom(TimeSpan from) => With(from, To);
 
         public WorkingTime WithTo(TimeSpan to) => With(From, to);
+
+        public override string ToString()
+        {
+            return $"{From.Hours:D2}:{From.Minutes:D2} - {To.Hours:D2}:{To.Minutes:D2}";
+        }
     }
 }

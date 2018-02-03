@@ -217,14 +217,9 @@ namespace Immutable.ProjectModel
             {
                 var workingTime = GetNextWorkingTime(calendar, ref result);
                 if (workingTime > work)
-                {
                     workingTime = work;
-                }
-                else
-                {
-                    result += workingTime;
-                }
 
+                result += workingTime;
                 work -= workingTime;
             }
             while (work > TimeSpan.Zero);
@@ -240,14 +235,9 @@ namespace Immutable.ProjectModel
             {
                 var workingTime = GetPreviousWorkingTime(calendar, ref result);
                 if (workingTime > work)
-                {
                     workingTime = work;
-                }
-                else
-                {
-                    result -= workingTime;
-                }
 
+                result -= workingTime;
                 work -= workingTime;
             }
             while (work > TimeSpan.Zero);
@@ -413,7 +403,9 @@ namespace Immutable.ProjectModel
 
             if (allAssignments.Length == 0)
             {
-                var work = GetWork(project, task);
+                var work = task.Work != TimeSpan.Zero
+                            ? task.Work
+                            : GetWork(project, task);
 
                 task = task.SetValue(TaskFields.Work, work);
                 project = project.UpdateTask(task);
