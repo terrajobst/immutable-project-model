@@ -23,6 +23,8 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
+        public double Units => GetValue(AssignmentFields.Units);
+
         public DateTimeOffset Start => GetValue(AssignmentFields.Start);
 
         public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
@@ -74,6 +76,11 @@ namespace Immutable.ProjectModel
         public Assignment WithWork(TimeSpan work)
         {
             return SetValue(AssignmentFields.Work, work);
+        }
+
+        public Assignment WithUnits(double units)
+        {
+            return SetValue(AssignmentFields.Units, units);
         }
     }
 }

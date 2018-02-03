@@ -53,7 +53,8 @@ namespace Immutable.ProjectModel
 
                         foreach (var assignment in assignments)
                         {
-                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, assignment.Work);
+                            var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
+                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, time);
 
                             var newAssignment = assignment.SetValue(AssignmentFields.EarlyStart, earlyStart)
                                                           .SetValue(AssignmentFields.EarlyFinish, earlyFinish);
@@ -394,7 +395,10 @@ namespace Immutable.ProjectModel
             foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == task.Id))
             {
                 if (assignment.Finish == task.Finish)
-                    project = SetAssignmentWork(project, assignment, work);
+                {
+                    var assignmentWork = TimeSpan.FromHours(work.TotalHours * assignment.Units);
+                    project = SetAssignmentWork(project, assignment, assignmentWork);
+                }
             }
 
             return project;
@@ -438,14 +442,21 @@ namespace Immutable.ProjectModel
         public static ProjectData SetAssignmentWork(ProjectData project, AssignmentData assignment, TimeSpan work)
         {
             var task = project.Tasks[assignment.TaskId];
-            var assignmentWorkDelata = work - assignment.Work;
+            var assignmentWorkDelta = work - assignment.Work;
 
-            var taskWork = task.Work + assignmentWorkDelata;
+            var taskWork = task.Work + assignmentWorkDelta;
             var newTask = task.SetValue(TaskFields.Work, taskWork);
             var newAssignment = assignment.SetValue(AssignmentFields.Work, work);
 
             return project.UpdateTask(newTask)
                           .UpdateAssignment(newAssignment);
+        }
+
+        public static ProjectData SetAssignmentUnits(ProjectData project, AssignmentData assignment, double units)
+        {
+            assignment = assignment.SetValue(AssignmentFields.Units, units);
+            project = project.UpdateAssignment(assignment);
+            return project;
         }
     }
 }

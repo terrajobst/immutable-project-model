@@ -2,7 +2,6 @@
 
 ## Basics
 
-* Add assignment units
 * Add effort driven
 * Add task type
 * Add other predecessor types
