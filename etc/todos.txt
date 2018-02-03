@@ -21,6 +21,6 @@
 We should add all the project settings, such as hours per day, hours per week,
 days per month.
 
-Project has a default star time and default finish times for tasks. Are those
-used or are tasks scheduled based on the calendar? What happens if our calendar
-starts at 9 AM but the default start time is still 8 AM?
+Project has a default start time and default finish times for tasks. However,
+those don't seem to be used unless the task is manually scheduled; task dates
+snap to the calendar being used.
