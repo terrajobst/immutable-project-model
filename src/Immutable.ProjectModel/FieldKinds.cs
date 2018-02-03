@@ -9,7 +9,7 @@ namespace Immutable.ProjectModel
         public static readonly FieldKind TaskId = new PassthruFieldKind(typeof(TaskId));
         public static readonly FieldKind TaskIdArray = new PassthruFieldKind(typeof(ImmutableArray<TaskId>));
         public static readonly FieldKind Int32 = new PassthruFieldKind(typeof(int));
-        public static readonly FieldKind Boolean = new PassthruFieldKind(typeof(bool));
+        public static readonly FieldKind YesNo = new YesNoFieldKind();
         public static readonly FieldKind Text = new TextFieldKind();
         public static readonly FieldKind DateTime = new DateTimeOffsetFieldKind();
         public static readonly FieldKind Work = new WorkFieldKind();

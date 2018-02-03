@@ -60,16 +60,6 @@ namespace Demo
         {
             var mode = field.IsReadOnly ? BindingMode.OneTime : BindingMode.TwoWay;
 
-            if (field.Type == typeof(bool))
-            {
-                return new DataGridCheckBoxColumn()
-                {
-                    Binding = new Binding(name),
-                    Header = header,
-                    IsReadOnly = field.IsReadOnly
-                };
-            }
-
             var column = new DataGridTextColumn
             {
                 Binding = new Binding(name)
