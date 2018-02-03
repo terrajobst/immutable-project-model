@@ -184,9 +184,8 @@ namespace Immutable.ProjectModel
             if (GetResource(resourceId) == null)
                 throw new ArgumentException($"The project doesn't contain a resource with ID {resourceId}.", nameof(resourceId));
 
-            var assignmentData = AssignmentData.Create(assignmentId, taskId, resourceId);
-            var projectData = Scheduler.InitializeAssignment(Data.AddAssignment(assignmentData), assignmentData);
-            return UpdateProject(projectData).GetAssignment(assignmentData.Id);
+            var projectData = Scheduler.AddAssignment(Data, assignmentId, taskId, resourceId);
+            return UpdateProject(projectData).GetAssignment(assignmentId);
         }
 
         public Project RemoveAssignment(AssignmentId assignmentId)
