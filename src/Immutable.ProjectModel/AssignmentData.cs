@@ -47,9 +47,9 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset LateFinish => GetValue(AssignmentFields.LateFinish);
 
-        public ImmutableDictionary<AssignmentField, object> Fields { get; }
+        private ImmutableDictionary<AssignmentField, object> Fields { get; }
 
-        public AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)
+        private AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)
         {
             if (fields == Fields)
                 return this;

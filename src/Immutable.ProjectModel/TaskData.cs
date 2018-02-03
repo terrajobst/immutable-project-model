@@ -23,16 +23,6 @@ namespace Immutable.ProjectModel
 
         public TaskId Id { get; }
 
-        private ImmutableDictionary<TaskField, object> Fields { get; }
-
-        private TaskData WithFields(ImmutableDictionary<TaskField, object> fields)
-        {
-            if (fields == Fields)
-                return this;
-
-            return new TaskData(Id, fields);
-        }
-
         public string Name => GetValue(TaskFields.Name);
 
         public TimeSpan Duration => GetValue(TaskFields.Duration);
@@ -54,6 +44,16 @@ namespace Immutable.ProjectModel
         public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
 
         public IEnumerable<TaskField> SetFields => TaskFields.All.Where(HasValue);
+
+        private ImmutableDictionary<TaskField, object> Fields { get; }
+
+        private TaskData WithFields(ImmutableDictionary<TaskField, object> fields)
+        {
+            if (fields == Fields)
+                return this;
+
+            return new TaskData(Id, fields);
+        }
 
         public bool HasValue(TaskField field)
         {

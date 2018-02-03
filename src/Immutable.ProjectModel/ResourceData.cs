@@ -23,6 +23,8 @@ namespace Immutable.ProjectModel
 
         public ResourceId Id { get; }
 
+        public IEnumerable<ResourceField> SetFields => ResourceFields.All.Where(HasValue);
+
         private ImmutableDictionary<ResourceField, object> Fields { get; }
 
         private ResourceData WithFields(ImmutableDictionary<ResourceField, object> fields)
@@ -32,8 +34,6 @@ namespace Immutable.ProjectModel
 
             return new ResourceData(Id, fields);
         }
-
-        public IEnumerable<ResourceField> SetFields => ResourceFields.All.Where(HasValue);
 
         public bool HasValue(ResourceField field)
         {
