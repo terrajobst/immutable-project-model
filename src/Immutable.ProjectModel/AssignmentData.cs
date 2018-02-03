@@ -33,6 +33,14 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
+        public DateTimeOffset EarlyStart => GetValue(AssignmentFields.EarlyStart);
+
+        public DateTimeOffset EarlyFinish => GetValue(AssignmentFields.EarlyFinish);
+
+        public DateTimeOffset LateStart => GetValue(AssignmentFields.LateStart);
+
+        public DateTimeOffset LateFinish => GetValue(AssignmentFields.LateFinish);
+
         public ImmutableDictionary<AssignmentField, object> Fields { get; }
 
         public AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)
