@@ -37,15 +37,38 @@ namespace Immutable.ProjectModel
                                                  .DefaultIfEmpty(project.Information.StartDate)
                                                  .Max();
 
-                    var work = GetWork(project, task);
-                    ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, work);
+                    var assignments = project.Assignments.Values.Where(a => a.TaskId == taskId);
+                    if (!assignments.Any())
+                    {
+                        var work = GetWork(project, task);
+                        ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, work);
 
-                    task = task.SetValue(TaskFields.EarlyStart, earlyStart)
-                               .SetValue(TaskFields.EarlyFinish, earlyFinish);
+                        task = task.SetValue(TaskFields.EarlyStart, earlyStart)
+                                   .SetValue(TaskFields.EarlyFinish, earlyFinish);
+                        project = project.UpdateTask(task);
+                    }
+                    else
+                    {
+                        var taskEarlyFinish = DateTimeOffset.MinValue;
 
-                    project = project.UpdateTask(task);
+                        foreach (var assignment in assignments)
+                        {
+                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, assignment.Work);
 
-                    computedTasks.Add(task.Id);
+                            var newAssignment = assignment.SetValue(AssignmentFields.EarlyStart, earlyStart)
+                                                          .SetValue(AssignmentFields.EarlyFinish, earlyFinish);
+                            project = project.UpdateAssignment(newAssignment);
+
+                            if (earlyFinish > taskEarlyFinish)
+                                taskEarlyFinish = earlyFinish;
+                        }
+
+                        task = task.SetValue(TaskFields.EarlyStart, earlyStart)
+                                   .SetValue(TaskFields.EarlyFinish, taskEarlyFinish);
+                        project = project.UpdateTask(task);
+                    }
+
+                    computedTasks.Add(taskId);
                 }
             }
 
@@ -78,13 +101,36 @@ namespace Immutable.ProjectModel
                                                .DefaultIfEmpty(task.EarlyFinish)
                                                .Min();
 
-                    var work = GetWork(project, task);
-                    ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, work);
+                    var assignments = project.Assignments.Values.Where(a => a.TaskId == taskId);
+                    if (!assignments.Any())
+                    {
+                        var work = GetWork(project, task);
+                        ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, work);
 
-                    task = task.SetValue(TaskFields.LateStart, lateStart)
-                               .SetValue(TaskFields.LateFinish, lateFinish);
+                        task = task.SetValue(TaskFields.LateStart, lateStart)
+                                   .SetValue(TaskFields.LateFinish, lateFinish);
+                        project = project.UpdateTask(task);
+                    }
+                    else
+                    {
+                        var taskLateStart = DateTimeOffset.MaxValue;
 
-                    project = project.UpdateTask(task);
+                        foreach (var assignment in assignments)
+                        {
+                            ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, assignment.Work);
+
+                            var newAssignment = assignment.SetValue(AssignmentFields.LateStart, lateStart)
+                                                          .SetValue(AssignmentFields.LateFinish, lateFinish);
+                            project = project.UpdateAssignment(newAssignment);
+
+                            if (lateStart < taskLateStart)
+                                taskLateStart = lateStart;
+                        }
+
+                        task = task.SetValue(TaskFields.LateStart, taskLateStart)
+                                   .SetValue(TaskFields.LateFinish, lateFinish);
+                        project = project.UpdateTask(task);
+                    }
 
                     computedTasks.Add(task.Id);
                 }
