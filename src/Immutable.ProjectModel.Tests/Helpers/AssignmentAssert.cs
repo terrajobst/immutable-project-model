@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace Immutable.ProjectModel.Tests
+namespace Immutable.ProjectModel.Tests.Helpers
 {
     internal sealed class AssignmentAssert
     {

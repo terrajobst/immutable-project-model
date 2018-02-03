@@ -1,5 +1,7 @@
 using System;
 
+using Immutable.ProjectModel.Tests.Helpers;
+
 using Xunit;
 
 namespace Immutable.ProjectModel.Tests
