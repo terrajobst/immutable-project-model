@@ -23,6 +23,18 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
+        public DateTimeOffset Start => GetValue(AssignmentFields.Start);
+
+        public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
+
+        public DateTimeOffset EarlyStart => GetValue(AssignmentFields.EarlyStart);
+
+        public DateTimeOffset EarlyFinish => GetValue(AssignmentFields.EarlyFinish);
+
+        public DateTimeOffset LateStart => GetValue(AssignmentFields.LateStart);
+
+        public DateTimeOffset LateFinish => GetValue(AssignmentFields.LateFinish);
+
         public IEnumerable<AssignmentField> SetFields => Data.SetFields;
 
         public bool HasValue(AssignmentField field)
