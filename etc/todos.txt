@@ -2,10 +2,19 @@
 
 ## Basics
 
+* Add hierarchical tasks
 * Add effort driven
 * Add task type
 * Add other predecessor types
 * Add scheduling from the back
+* Add actual work
+* Add percent complete
+
+## UI
+
+* Adding & removing tasks
+* Adding & removing assignments
+* Adding & removing resources
 
 ## Settings
 
