@@ -23,13 +23,13 @@ namespace Immutable.ProjectModel.Tests
             ProjectAssert.For(project)
                          .ForTask(0)
                               .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertEarlyStart(new DateTime(2018, 1, 29, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0))
                               .AssertWork(TimeSpan.Zero).Project
                          .ForTask(1)
                               .AssertDuration(TimeSpan.FromDays(5))
-                              .AssertEarlyStart(new DateTime(2018, 2, 12, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
                               .AssertWork(TimeSpan.Zero);
         }
 
@@ -52,13 +52,13 @@ namespace Immutable.ProjectModel.Tests
             ProjectAssert.For(project)
                          .ForTask(0)
                               .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertEarlyStart(new DateTime(2018, 1, 29, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0))
                               .AssertWork(TimeSpan.Zero).Project
                          .ForTask(1)
                               .AssertDuration(TimeSpan.FromDays(5))
-                              .AssertEarlyStart(new DateTime(2018, 2, 12, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
                               .AssertWork(TimeSpan.FromHours(120));
         }
 
@@ -81,13 +81,13 @@ namespace Immutable.ProjectModel.Tests
             ProjectAssert.For(project)
                          .ForTask(0)
                               .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertEarlyStart(new DateTime(2018, 1, 29, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0))
                               .AssertWork(TimeSpan.Zero).Project
                          .ForTask(1)
                               .AssertDuration(TimeSpan.FromDays(5))
-                              .AssertEarlyStart(new DateTime(2018, 2, 12, 8, 0, 0))
-                              .AssertEarlyFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                              .AssertStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
                               .AssertWork(TimeSpan.Zero);
         }
     }

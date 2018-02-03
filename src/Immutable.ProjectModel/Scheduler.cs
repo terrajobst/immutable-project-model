@@ -166,7 +166,7 @@ namespace Immutable.ProjectModel
 
             foreach (var task in tasks)
             {
-                var work = GetWork(calendar, task.EarlyStart, task.EarlyFinish);
+                var work = GetWork(calendar, task.Start, task.Finish);
                 var duration = GetDuration(project, work);
                 var newTask = task.SetValue(TaskFields.Duration, duration);
                 project = project.UpdateTask(newTask);
@@ -393,7 +393,7 @@ namespace Immutable.ProjectModel
 
             foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == task.Id))
             {
-                if (assignment.EarlyFinish == task.EarlyFinish)
+                if (assignment.Finish == task.Finish)
                     project = SetAssignmentWork(project, assignment, work);
             }
 

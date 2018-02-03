@@ -44,13 +44,13 @@ namespace Demo.ViewModels
 
         public DateTime StartDate
         {
-            get => Current.GetValue(TaskFields.EarlyStart).LocalDateTime;
+            get => Current.GetValue(TaskFields.Start).LocalDateTime;
             set { }
         }
 
         public DateTime EndDate
         {
-            get => Current.GetValue(TaskFields.EarlyFinish).LocalDateTime;
+            get => Current.GetValue(TaskFields.Finish).LocalDateTime;
             set { }
         }
 
@@ -80,9 +80,9 @@ namespace Demo.ViewModels
             {
                 if (fieldChange.Field == TaskFields.Name)
                     OnPropertyChanged("Name");
-                else if (fieldChange.Field == TaskFields.EarlyStart)
+                else if (fieldChange.Field == TaskFields.Start)
                     OnPropertyChanged("StartDate");
-                else if (fieldChange.Field == TaskFields.EarlyFinish)
+                else if (fieldChange.Field == TaskFields.Finish)
                     OnPropertyChanged("EndDate");
                 else if (fieldChange.Field == TaskFields.Duration)
                     OnPropertyChanged("Duration");

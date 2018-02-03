@@ -24,34 +24,24 @@ namespace Immutable.ProjectModel.Tests
             return this;
         }
 
-        public TaskAssert AssertWork(TimeSpan work)
+        public TaskAssert AssertWork(TimeSpan value)
         {
-            return AssertField(TaskFields.Work, work);
+            return AssertField(TaskFields.Work, value);
         }
 
-        public TaskAssert AssertDuration(TimeSpan duration)
+        public TaskAssert AssertDuration(TimeSpan value)
         {
-            return AssertField(TaskFields.Duration, duration);
+            return AssertField(TaskFields.Duration, value);
         }
 
-        public TaskAssert AssertEarlyStart(DateTimeOffset earlyStart)
+        public TaskAssert AssertStart(DateTimeOffset value)
         {
-            return AssertField(TaskFields.EarlyStart, earlyStart);
+            return AssertField(TaskFields.Start, value);
         }
 
-        public TaskAssert AssertEarlyFinish(DateTimeOffset earlyFinish)
+        public TaskAssert AssertFinish(DateTimeOffset value)
         {
-            return AssertField(TaskFields.EarlyFinish, earlyFinish);
-        }
-
-        public TaskAssert WithLatetart(DateTimeOffset lateStart)
-        {
-            return AssertField(TaskFields.LateStart, lateStart);
-        }
-
-        public TaskAssert WithLateFinish(DateTimeOffset lateFinish)
-        {
-            return AssertField(TaskFields.LateFinish, lateFinish);
+            return AssertField(TaskFields.Finish, value);
         }
     }
 }
