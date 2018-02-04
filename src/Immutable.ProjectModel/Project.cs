@@ -190,7 +190,7 @@ namespace Immutable.ProjectModel
 
         public Project RemoveAssignment(AssignmentId assignmentId)
         {
-            var projectData = Data.RemoveAssignment(assignmentId);
+            var projectData = Scheduler.RemoveAssignment(Data, assignmentId);
             return UpdateProject(projectData);
         }
 

@@ -131,6 +131,7 @@ namespace Immutable.ProjectModel.Tests
                                  .AddNewTask(taskId)
                                     .WithDuration(TimeSpan.FromDays(5)).Project
                                  .AddNewResource(resourceId).Project
+                                 .AddNewAssignment(taskId, resourceId).Project
                                  .RemoveAssignment(taskId, resourceId);
 
             ProjectAssert.For(project)

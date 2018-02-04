@@ -432,6 +432,23 @@ namespace Immutable.ProjectModel
             return project;
         }
 
+        public static ProjectData RemoveAssignment(ProjectData project, AssignmentId assignmentId)
+        {
+            if (!project.Assignments.TryGetValue(assignmentId, out var assignment))
+                return project;
+
+            project = project.RemoveAssignment(assignmentId);
+
+            var hasAnyAssignmentsLeft = project.Assignments.Values.Any(a => a.TaskId == assignment.TaskId);
+            if (!hasAnyAssignmentsLeft)
+            {
+                var task = project.Tasks[assignment.TaskId];
+                project = SetTaskWork(project, task, TimeSpan.Zero);
+            }
+
+            return project;
+        }
+
         public static ProjectData SetAssignmentWork(ProjectData project, AssignmentData assignment, TimeSpan work)
         {
             var task = project.Tasks[assignment.TaskId];
