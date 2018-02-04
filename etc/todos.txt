@@ -2,6 +2,7 @@
 
 ## Basics
 
+* Disallow cycles in predecessors
 * Add hierarchical tasks
 * Add effort driven
 * Add task type
@@ -12,15 +13,18 @@
 
 ## UI
 
+* Allow selecting columns
+* Handle errors
 * Adding & removing tasks
 * Adding & removing assignments
 * Adding & removing resources
 
 ## Settings
 
-We should add all the project settings, such as hours per day, hours per week,
-days per month.
-
-Project has a default start time and default finish times for tasks. However,
-those don't seem to be used unless the task is manually scheduled; task dates
-snap to the calendar being used.
+* Creating custom types for duration and work so we can store the unit (minutes,
+  hours, days, week, months) and whether it was estimated
+* We should add all the project settings, such as hours per day, hours per week,
+  days per month.
+  - Note: Project has a default start time and default finish times for tasks.
+    However, those don't seem to be used unless the task is manually scheduled;
+    task dates snap to the calendar being used.
