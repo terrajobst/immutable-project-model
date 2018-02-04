@@ -96,7 +96,6 @@ namespace Demo
                           .AddNewTask(implementationTaskId)
                               .WithName("Implementation")
                               .WithDuration(TimeSpan.FromDays(10))
-                              .WithWork(TimeSpan.FromHours(40))
                               .AddPredecessorId(designTaskId).Project
                           .AddNewTask(migrationTaskId)
                               .WithName("Migration")
