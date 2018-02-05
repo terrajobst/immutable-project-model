@@ -89,12 +89,6 @@ namespace Immutable.ProjectModel
 
                 if (field == AssignmentFields.ResourceId)
                     return ResourceId;
-
-                if (field == AssignmentFields.Start)
-                    return EarlyStart;
-
-                if (field == AssignmentFields.Finish)
-                    return EarlyFinish;
             }
 
             if (!Fields.TryGetValue(field, out var result))

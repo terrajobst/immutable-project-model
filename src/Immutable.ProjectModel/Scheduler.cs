@@ -11,7 +11,7 @@ namespace Immutable.ProjectModel
         {
             return project.ForwardPass()
                           .BackwardPass()
-                          .ComputeDuration();
+                          .Finalize();
         }
 
         private static ProjectData ForwardPass(this ProjectData project)
@@ -140,17 +140,32 @@ namespace Immutable.ProjectModel
             return project;
         }
 
-        private static ProjectData ComputeDuration(this ProjectData project)
+        private static ProjectData Finalize(this ProjectData project)
         {
             var calendar = project.Information.Calendar;
             var tasks = project.Tasks.Values;
 
             foreach (var task in tasks)
             {
-                var work = GetWork(calendar, task.Start, task.Finish);
+                // Set Start & Finish
+                var newTask = task.SetValue(TaskFields.Start, task.EarlyStart)
+                                  .SetValue(TaskFields.Finish, task.EarlyFinish);
+
+                // Set duration
+                var work = GetWork(calendar, newTask.Start, newTask.Finish);
                 var duration = GetDuration(project, work);
-                var newTask = task.SetValue(TaskFields.Duration, duration);
+                newTask = newTask.SetValue(TaskFields.Duration, duration);
+
                 project = project.UpdateTask(newTask);
+            }
+
+            var assignments = project.Assignments.Values;
+
+            foreach (var assignment in assignments)
+            {
+                var newAssignment = assignment.SetValue(AssignmentFields.Start, assignment.EarlyStart)
+                                              .SetValue(AssignmentFields.Finish, assignment.EarlyFinish);
+                project = project.UpdateAssignment(newAssignment);
             }
 
             return project;
