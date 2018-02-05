@@ -67,13 +67,23 @@ namespace Immutable.ProjectModel
         {
             var newTasks = Tasks.Remove(taskId);
 
-            foreach (var task in Tasks.Values)
+            var ordinal = 0;
+
+            foreach (var task in Tasks.Values.OrderBy(t => t.Ordinal))
             {
                 if (task.Id == taskId)
                     continue;
 
-                var predecessors = task.PredecessorIds.Remove(taskId);
-                var newTask = task.SetValue(TaskFields.PredecessorIds, predecessors);
+                var newTask = task;
+
+                // Update Ordinal
+                newTask = newTask.SetValue(TaskFields.Ordinal, ordinal);
+                ordinal++;
+
+                // Update PredecessorIds
+                var predecessors = newTask.PredecessorIds.Remove(taskId);
+                newTask = newTask.SetValue(TaskFields.PredecessorIds, predecessors);
+
                 newTasks = newTasks.SetItem(newTask.Id, newTask);
             }
 

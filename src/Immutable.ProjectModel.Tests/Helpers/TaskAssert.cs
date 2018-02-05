@@ -24,6 +24,11 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return this;
         }
 
+        public TaskAssert AssertOrdinal(int value)
+        {
+            return AssertField(TaskFields.Ordinal, value);
+        }
+
         public TaskAssert AssertWork(TimeSpan value)
         {
             return AssertField(TaskFields.Work, value);

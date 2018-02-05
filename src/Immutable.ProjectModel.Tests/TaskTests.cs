@@ -148,5 +148,29 @@ namespace Immutable.ProjectModel.Tests
                               .AssertStart(new DateTime(2018, 2, 9, 17, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0));
         }
+
+        [Fact]
+        public void Task_Removing_UpdatesOrdinal()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddNewTask(taskId1)
+                                    .Project
+                                 .AddNewTask(taskId2)
+                                    .Project
+                                 .AddNewTask(taskId3)
+                                    .Project
+                                 .RemoveTask(taskId2);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                              .AssertOrdinal(0)
+                              .Project
+                         .ForTask(taskId3)
+                              .AssertOrdinal(1);
+        }
     }
 }

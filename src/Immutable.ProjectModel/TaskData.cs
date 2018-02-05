@@ -23,6 +23,8 @@ namespace Immutable.ProjectModel
 
         public TaskId Id { get; }
 
+        public int Ordinal => GetValue(TaskFields.Ordinal);
+
         public string Name => GetValue(TaskFields.Name);
 
         public TimeSpan Duration => GetValue(TaskFields.Duration);
