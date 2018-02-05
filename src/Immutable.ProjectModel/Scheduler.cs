@@ -156,6 +156,10 @@ namespace Immutable.ProjectModel
                 var duration = GetDuration(project, work);
                 newTask = newTask.SetValue(TaskFields.Duration, duration);
 
+                // Set criticality
+                var isCritical = newTask.EarlyFinish == newTask.LateFinish;
+                newTask = newTask.SetValue(TaskFields.IsCritical, isCritical);
+
                 project = project.UpdateTask(newTask);
             }
 

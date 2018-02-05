@@ -79,9 +79,6 @@ namespace Immutable.ProjectModel
             {
                 if (field == TaskFields.Id)
                     return Id;
-                
-                if (field == TaskFields.IsCritical)
-                    return EarlyFinish == LateFinish;
             }
 
             if (!Fields.TryGetValue(field, out var result))
