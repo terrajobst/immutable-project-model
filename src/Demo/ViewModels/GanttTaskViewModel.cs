@@ -34,7 +34,7 @@ namespace Demo.ViewModels
 
         public Task Current => Workspace.Current.GetTask(TaskId);
 
-        public int Id => Current.GetValue(TaskFields.Ordinal);
+        public int Id => Current?.GetValue(TaskFields.Ordinal) ?? 0;
 
         public string Name
         {
@@ -113,7 +113,7 @@ namespace Demo.ViewModels
 
         private void Predecessors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (_syncingPredecessors)
+            if (_syncingPredecessors || Current == null)
                 return;
 
             var ordinals = Predecessors.Select(p => p.GanttTaskIndex);

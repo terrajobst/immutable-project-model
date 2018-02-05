@@ -49,14 +49,14 @@ namespace Demo.ViewModels
 
             foreach (var taskId in changes.RemovedTasks)
             {
-                var taskViewModel = Tasks.SingleOrDefault(vm => vm.Current.Id == taskId);
+                var taskViewModel = Tasks.SingleOrDefault(vm => vm.TaskId == taskId);
                 if (taskViewModel != null)
                     Tasks.Remove(taskViewModel);
             }
 
             foreach (var taskChanges in changes.ChangedTasks)
             {
-                var taskViewModel = Tasks.SingleOrDefault(vm => vm.Current.Id == taskChanges.Id);
+                var taskViewModel = Tasks.SingleOrDefault(vm => vm.TaskId == taskChanges.Id);
                 if (taskViewModel != null)
                     taskViewModel.Update(taskChanges);
             }

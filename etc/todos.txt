@@ -13,11 +13,7 @@
 
 ## UI
 
-* Allow selecting columns
 * Handle errors
-* Adding & removing tasks
-* Adding & removing assignments
-* Adding & removing resources
 
 ## Settings
 

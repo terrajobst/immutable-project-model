@@ -35,12 +35,43 @@
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="4" />
                 <RowDefinition Height="1*" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <TextBlock Padding="8"
-                           Background="LightGray"
-                           FontWeight="DemiBold"
-                           Text="Tasks" />
+                <Grid Background="LightGray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Padding="8"
+                               FontWeight="DemiBold"
+                               Text="Tasks" />
+                    <Button x:Name="TaskGridAddButton"
+                            Grid.Column="1"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="+"
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="TaskGridAddButton_Click" />
+                    <Button x:Name="TaskGridRemoveButton"
+                            Grid.Column="2"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="-"
+                            Click="TaskGridRemoveButton_Click" />
+                    <Button x:Name="TaskGridSelectColumnsButton"
+                            Grid.Column="3"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="..."
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="TaskGridSelectColumnsButton_Click" />
+                </Grid>
                 <DataGrid x:Name="TaskDataGrid"
                           AutoGenerateColumns="False"
                           GridLinesVisibility="None"
@@ -50,10 +81,81 @@
             <GridSplitter Grid.Row="1"
                           HorizontalAlignment="Stretch" />
             <StackPanel Grid.Row="2">
-                <TextBlock Padding="8"
-                           Background="LightGray"
-                           FontWeight="DemiBold"
-                           Text="Assignments" />
+                <Grid Background="LightGray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Padding="8"
+                               FontWeight="DemiBold"
+                               Text="Resources" />
+                    <Button x:Name="ResourceGridAddButton"
+                            Grid.Column="1"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="+"
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="ResourceGridAddButton_Click" />
+                    <Button x:Name="ResourceGridRemoveButton"
+                            Grid.Column="2"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="-"
+                            Click="ResourceGridRemoveButton_Click" />
+                    <Button x:Name="ResourceGridSelectColumnsButton"
+                            Grid.Column="3"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="..."
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="ResourceGridSelectColumnsButton_Click" />
+                </Grid>
+                <DataGrid x:Name="ResourceDataGrid"
+                          AutoGenerateColumns="False"
+                          GridLinesVisibility="None"
+                          SelectionUnit="Cell"
+                          ItemsSource="{Binding Path=Rows}" />
+            </StackPanel>
+            <GridSplitter Grid.Row="3"
+                          HorizontalAlignment="Stretch" />
+            <StackPanel Grid.Row="4">
+                <Grid Background="LightGray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Padding="8"
+                               FontWeight="DemiBold"
+                               Text="Assignments" />
+                    <Button x:Name="AssignmentGridAddButton"
+                            Grid.Column="1"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="+"
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="AssignmentGridAddButton_Click" />
+                    <Button x:Name="AssignmentGridRemoveButton"
+                            Grid.Column="2"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="-"
+                            Click="AssignmentGridRemoveButton_Click" />
+                    <Button x:Name="AssignmentGridSelectColumnsButton"
+                            Grid.Column="3"
+                            Margin="0,4,4,4"
+                            MinWidth="25"
+                            Content="..."
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Click="AssignmentGridSelectColumnsButton_Click" />
+                </Grid>
                 <DataGrid x:Name="AssignmentDataGrid"
                           AutoGenerateColumns="False"
                           GridLinesVisibility="None"
