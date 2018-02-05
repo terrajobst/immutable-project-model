@@ -236,6 +236,8 @@ namespace Demo
             _workspace = new ProjectWorkspace(Project.Create());
             _workspace.CurrentChanged += Workspace_CurrentChanged;
 
+            UndoRedoPanel.DataContext = new UndoRedoViewModel(_workspace);
+
             GanttControl.DataContext = new GanttViewModel(_workspace);
 
             _taskFields.AddRange(TaskFields.All);

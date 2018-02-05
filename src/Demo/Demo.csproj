@@ -66,6 +66,7 @@
     <Compile Include="ViewModels\ResourceGridViewModel.cs" />
     <Compile Include="ViewModels\TaskGridRowViewModel.cs" />
     <Compile Include="ViewModels\TaskGridViewModel.cs" />
+    <Compile Include="ViewModels\UndoRedoViewModel.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Dialogs\ColumnChooser\ColumnChooserDialog.xaml">
       <SubType>Designer</SubType>
