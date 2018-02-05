@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Immutable;
 using Immutable.ProjectModel.Tests.Helpers;
 
 using Xunit;
@@ -171,6 +171,25 @@ namespace Immutable.ProjectModel.Tests
                               .Project
                          .ForTask(taskId3)
                               .AssertOrdinal(1);
+        }
+
+        [Fact]
+        public void Task_Removing_UpdatesPredecessors()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddNewTask(taskId1)
+                                    .Project
+                                 .AddNewTask(taskId2)
+                                    .AddPredecessorId(taskId1)
+                                    .Project
+                                 .RemoveTask(taskId1);
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
         }
     }
 }
