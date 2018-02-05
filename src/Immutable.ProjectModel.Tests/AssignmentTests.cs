@@ -9,7 +9,7 @@ namespace Immutable.ProjectModel.Tests
     public class AssignmentTests
     {
         [Fact]
-        public void Assignment_GetsWorkFromTaskDuration()
+        public void Assignment_Work_InitializedFrom_Task_Duration()
         {
             var taskId = TaskId.Create();
             var resourceId = ResourceId.Create();
@@ -34,7 +34,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Assignment_GetsWorkFromTaskWork()
+        public void Assignment_Work_InitializedFrom_Task_Work()
         {
             var taskId = TaskId.Create();
             var resourceId = ResourceId.Create();
@@ -60,7 +60,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Assignment_AddingAnotherAssignment_IncreasesWork()
+        public void Assignment_Addition_Increases_Task_Work()
         {
             var taskId = TaskId.Create();
             var resourceId1 = ResourceId.Create();
@@ -92,7 +92,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Assignment_RemovingAnotherAssignment_DecreasesWork()
+        public void Assignment_Removal_Decreases_Task_Work()
         {
             var taskId = TaskId.Create();
             var resourceId1 = ResourceId.Create();
@@ -121,7 +121,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Assignment_RemovingAllAssignments_SetsTasksWorkToZero()
+        public void Assignment_Removal_Clears_Task_Work()
         {
             var taskId = TaskId.Create();
             var resourceId = ResourceId.Create();
@@ -143,77 +143,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Assignment_SettingTaskWork_IncreasesProportionally()
-        {
-            var taskId = TaskId.Create();
-            var resourceId1 = ResourceId.Create();
-            var resourceId2 = ResourceId.Create();
-
-            var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
-                                 .AddNewTask(taskId).Project
-                                 .AddNewResource(resourceId1).Project
-                                 .AddNewResource(resourceId2).Project
-                                 .AddNewAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(40)).Project
-                                 .AddNewAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(80)).Project
-                                 .GetTask(taskId)
-                                    .WithWork(TimeSpan.FromHours(150)).Project;
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(12.5))
-                              .AssertWork(TimeSpan.FromHours(150))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 21, 12, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(50))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 13, 10, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(100))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 21, 12, 0, 0));
-        }
-
-        [Fact]
-        public void Assignment_SettingTaskDuration_IncreasesLongest()
-        {
-            var taskId = TaskId.Create();
-            var resourceId1 = ResourceId.Create();
-            var resourceId2 = ResourceId.Create();
-
-            var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
-                                 .AddNewTask(taskId).Project
-                                 .AddNewResource(resourceId1).Project
-                                 .AddNewResource(resourceId2).Project
-                                 .AddNewAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(40)).Project
-                                 .AddNewAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(80)).Project
-                                 .GetTask(taskId)
-                                    .WithDuration(TimeSpan.FromDays(12)).Project;
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(12))
-                              .AssertWork(TimeSpan.FromHours(136))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 20, 17, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(40))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(96))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 20, 17, 0, 0));
-        }
-
-        [Fact]
-        public void Assignment_HonorsUnits()
+        public void Assignment_Units()
         {
             var taskId = TaskId.Create();
             var resourceId1 = ResourceId.Create();
@@ -246,42 +176,6 @@ namespace Immutable.ProjectModel.Tests
                               .AssertWork(TimeSpan.FromHours(20))
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 7, 12, 0, 0));
-        }
-
-        [Fact]
-        public void Assignment_SettingTaskDuration_HonorsUnits()
-        {
-            var taskId = TaskId.Create();
-            var resourceId1 = ResourceId.Create();
-            var resourceId2 = ResourceId.Create();
-
-            var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
-                                 .AddNewTask(taskId).Project
-                                 .AddNewResource(resourceId1).Project
-                                 .AddNewResource(resourceId2).Project
-                                 .AddNewAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(40))
-                                    .WithUnits(.5).Project
-                                 .AddNewAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(80)).Project
-                                 .GetTask(taskId)
-                                    .WithDuration(TimeSpan.FromDays(12)).Project;
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(12))
-                              .AssertWork(TimeSpan.FromHours(144))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 20, 17, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(48))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 20, 17, 0, 0)).Project
-                         .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(96))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 20, 17, 0, 0));
         }
     }
 }

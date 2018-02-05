@@ -9,7 +9,7 @@ namespace Immutable.ProjectModel.Tests
     public class ResourceTests
     {
         [Fact]
-        public void Resource_RemovingResources_SetsTasksWorkToZero()
+        public void Resource_Removal_Decreases_Task_Work()
         {
             var taskId = TaskId.Create();
             var resourceId = ResourceId.Create();
