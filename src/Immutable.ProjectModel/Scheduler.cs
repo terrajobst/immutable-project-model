@@ -11,7 +11,6 @@ namespace Immutable.ProjectModel
         {
             return project.ForwardPass()
                           .BackwardPass()
-                          .ComputeWork()
                           .ComputeDuration();
         }
 
@@ -135,26 +134,6 @@ namespace Immutable.ProjectModel
                     }
 
                     computedTasks.Add(task.Id);
-                }
-            }
-
-            return project;
-        }
-
-        private static ProjectData ComputeWork(this ProjectData project)
-        {
-            var tasks = project.Tasks.Values;
-            var assignments = project.Assignments.Values;
-
-            foreach (var task in tasks)
-            {
-                var taskAssignments = assignments.Where(a => a.TaskId == task.Id);
-                if (taskAssignments.Any())
-                {
-                    var workHours = taskAssignments.Sum(a => a.Work.TotalHours);
-                    var work = TimeSpan.FromHours(workHours);
-                    var newTask = task.SetValue(TaskFields.Work, work);
-                    project = project.UpdateTask(newTask);
                 }
             }
 
@@ -439,12 +418,8 @@ namespace Immutable.ProjectModel
 
             project = project.RemoveAssignment(assignmentId);
 
-            var hasAnyAssignmentsLeft = project.Assignments.Values.Any(a => a.TaskId == assignment.TaskId);
-            if (!hasAnyAssignmentsLeft)
-            {
-                var task = project.Tasks[assignment.TaskId];
-                project = SetTaskWork(project, task, TimeSpan.Zero);
-            }
+            var task = project.Tasks[assignment.TaskId];
+            project = SetTaskWork(project, task, task.Work - assignment.Work);
 
             return project;
         }

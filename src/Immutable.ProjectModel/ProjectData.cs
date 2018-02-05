@@ -103,13 +103,12 @@ namespace Immutable.ProjectModel
         public ProjectData RemoveResource(ResourceId resourceId)
         {
             var newResources = Resources.Remove(resourceId);
-
-            var newAssignments = Assignments;
+            var result = WithResources(newResources);
 
             foreach (var assignment in Assignments.Values.Where(a => a.ResourceId == resourceId))
-                newAssignments = newAssignments.Remove(assignment.Id);
+                result = Scheduler.RemoveAssignment(result, assignment.Id);
 
-            return With(Information, Tasks, newResources, newAssignments);
+            return result;
         }
 
         public ProjectData UpdateResource(ResourceData resource)
