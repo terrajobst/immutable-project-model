@@ -236,7 +236,8 @@ namespace Demo
             _workspace = new ProjectWorkspace(Project.Create());
             _workspace.CurrentChanged += Workspace_CurrentChanged;
 
-            UndoRedoPanel.DataContext = new UndoRedoViewModel(_workspace);
+            var undoRedoViewModel = new UndoRedoViewModel(_workspace);
+            UndoRedoPanel.DataContext = undoRedoViewModel;
 
             GanttControl.DataContext = new GanttViewModel(_workspace);
 
@@ -254,6 +255,7 @@ namespace Demo
             AssignmentDataGrid.DataContext = new AssignmentGridViewModel(_workspace);
 
             _workspace.ApplyChanges(CreateProject());
+            undoRedoViewModel.Reset();
         }
 
         private void Workspace_CurrentChanged(object sender, ProjectChangedEventArgs e)

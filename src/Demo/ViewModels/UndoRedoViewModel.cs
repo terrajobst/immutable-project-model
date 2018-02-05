@@ -24,6 +24,13 @@ namespace Demo.ViewModels
 
         public ProjectWorkspace Workspace { get; }
 
+        public void Reset()
+        {
+            _undoStack.Clear();
+            _redoStack.Clear();
+            UpdateCommandState();
+        }
+
         public ICommand UndoCommand => _undoCommand;
 
         public ICommand RedoCommand => _redoCommand;
