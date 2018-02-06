@@ -18,11 +18,16 @@ namespace Immutable.ProjectModel.Tests.Helpers
             _project = project;
         }
 
-        public TaskAssert HasTask(TaskId taskId)
+        public ProjectAssert HasTask(TaskId id)
         {
-            var task = _project.GetTask(taskId);
-            Assert.True(task != null, $"The project {_project.Name} doesn't contain a task with ID {taskId}");
-            return new TaskAssert(this, task);
+            return ForTask(id).Project;
+        }
+
+        public ProjectAssert HasNoTask(TaskId id)
+        {
+            var task = _project.GetTask(id);
+            Assert.True(task == null, $"The project {_project.Name} contains a task {id} but shouldn't.");
+            return this;
         }
 
         public TaskAssert ForTask(TaskId id)
@@ -37,6 +42,37 @@ namespace Immutable.ProjectModel.Tests.Helpers
             var task = _project.Tasks.SingleOrDefault(t => t.Ordinal == ordinal);
             Assert.True(task != null, $"The project {_project.Name} doesn't contain a task with ordinal {ordinal}");
             return new TaskAssert(this, task);
+        }
+
+        public ProjectAssert HasResource(ResourceId id)
+        {
+            return ForResource(id).Project;
+        }
+
+        public ProjectAssert HasNoResource(ResourceId id)
+        {
+            var resource = _project.GetResource(id);
+            Assert.True(resource == null, $"The project {_project.Name} contains a resource {id} but shouldn't.");
+            return this;
+        }
+
+        public ResourceAssert ForResource(ResourceId id)
+        {
+            var resource = _project.GetResource(id);
+            Assert.True(resource != null, $"The project {_project.Name} doesn't contain a resource with ID {id}");
+            return new ResourceAssert(this, resource);
+        }
+
+        public ProjectAssert HasAssignment(TaskId taskId, ResourceId resourceId)
+        {
+            return ForAssignment(taskId, resourceId).Project;
+        }
+
+        public ProjectAssert HasNoAssignment(TaskId taskId, ResourceId resourceId)
+        {
+            var assignment = _project.GetAssignment(taskId, resourceId);
+            Assert.True(assignment == null, $"The project {_project.Name} contains an assignment for task {taskId} and resource {resourceId} but shouldn't.");
+            return this;
         }
 
         public AssignmentAssert ForAssignment(TaskId taskId, ResourceId resourceId)

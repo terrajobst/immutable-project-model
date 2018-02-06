@@ -297,5 +297,34 @@ namespace Immutable.ProjectModel.Tests
                          .ForTask(0)
                               .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
         }
+
+        [Fact]
+        public void Task_Removal_RemovesAssignments()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddNewTask(taskId1)
+                                    .Project
+                                 .AddNewTask(taskId2)
+                                    .AddPredecessorId(taskId1)
+                                    .Project
+                                 .AddNewResource(resourceId)
+                                    .Project
+                                 .AddNewAssignment(taskId1, resourceId)
+                                    .Project
+                                 .AddNewAssignment(taskId2, resourceId)
+                                    .Project
+                                 .RemoveTask(taskId1);
+
+            ProjectAssert.For(project)
+                         .HasNoTask(taskId1)
+                         .HasTask(taskId2)
+                         .HasResource(resourceId)
+                         .HasNoAssignment(taskId1, resourceId)
+                         .HasAssignment(taskId2, resourceId);
+        }
     }
 }
