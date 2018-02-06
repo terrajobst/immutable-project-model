@@ -71,12 +71,12 @@
                     </Grid.RowDefinitions>
                     <TextBox Grid.Row="0"
                              Margin="0,0,0,4"
-                             Text="{Binding Path=SelectedFilter}" />
+                             Text="{Binding Path=SelectedFilter, UpdateSourceTrigger=PropertyChanged}" />
                     <ListBox x:Name="SelectedListBox"
                              Grid.Row="1"
                              VirtualizingPanel.VirtualizationMode="Standard"
                              SelectionMode="Extended"
-                             ItemsSource="{Binding Path=SelectedColumns, UpdateSourceTrigger=PropertyChanged}"
+                             ItemsSource="{Binding Path=SelectedColumns}"
                              MouseDoubleClick="SelectedListBox_MouseDoubleClick" />
                 </Grid>
             </Grid>
