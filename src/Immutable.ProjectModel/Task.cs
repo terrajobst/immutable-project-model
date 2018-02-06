@@ -35,6 +35,16 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset LateFinish => GetValue(TaskFields.LateFinish);
 
+        public TimeSpan StartSlack => GetValue(TaskFields.StartSlack);
+
+        public TimeSpan FinishSlack => GetValue(TaskFields.FinishSlack);
+
+        public TimeSpan TotalSlack => GetValue(TaskFields.TotalSlack);
+
+        public TimeSpan FreeSlack => GetValue(TaskFields.FreeSlack);
+
+        public bool IsCritical => GetValue(TaskFields.IsCritical);
+
         public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
 
         public IEnumerable<Task> Predecessors => PredecessorIds.Select(id => Project.GetTask(id));
@@ -42,8 +52,6 @@ namespace Immutable.ProjectModel
         public IEnumerable<Assignment> Assignments => Project.Data.Assignments.Values
                                                                               .Where(a => a.TaskId == Id)
                                                                               .Select(a => Project.GetAssignment(a.Id));
-
-        public bool IsCritical => GetValue(TaskFields.IsCritical);
 
         public IEnumerable<TaskField> SetFields => Data.SetFields;
 

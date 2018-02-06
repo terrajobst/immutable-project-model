@@ -43,6 +43,14 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset LateFinish => GetValue(TaskFields.LateFinish);
 
+        public TimeSpan StartSlack => GetValue(TaskFields.StartSlack);
+
+        public TimeSpan FinishSlack => GetValue(TaskFields.FinishSlack);
+
+        public TimeSpan TotalSlack => GetValue(TaskFields.TotalSlack);
+
+        public TimeSpan FreeSlack => GetValue(TaskFields.FreeSlack);
+
         public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
 
         public IEnumerable<TaskField> SetFields => TaskFields.All.Where(HasValue);

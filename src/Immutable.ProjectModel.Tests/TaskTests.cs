@@ -321,6 +321,81 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Slack_IsCritical()
+        {
+            var taskIdA = TaskId.Create();
+            var taskIdB = TaskId.Create();
+            var taskIdC = TaskId.Create();
+            var taskIdD = TaskId.Create();
+            var taskIdE = TaskId.Create();
+            var taskIdF = TaskId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .AddNewTask(taskIdA)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddNewTask(taskIdB)
+                                    .WithDuration(TimeSpan.FromDays(4))
+                                    .AddPredecessorId(taskIdA).Project
+                                 .AddNewTask(taskIdC)
+                                    .WithDuration(TimeSpan.FromDays(5))
+                                    .AddPredecessorId(taskIdA).Project
+                                 .AddNewTask(taskIdD)
+                                    .WithDuration(TimeSpan.FromDays(6))
+                                    .AddPredecessorId(taskIdB).Project
+                                 .AddNewTask(taskIdE)
+                                    .WithDuration(TimeSpan.FromDays(3))
+                                    .AddPredecessorId(taskIdC).Project
+                                 .AddNewTask(taskIdF)
+                                    .WithDuration(TimeSpan.FromDays(4))
+                                    .AddPredecessorId(taskIdD)
+                                    .AddPredecessorId(taskIdE).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskIdA)
+                              .AssertStartSlack(TimeSpan.Zero)
+                              .AssertFinishSlack(TimeSpan.Zero)
+                              .AssertTotalSlack(TimeSpan.Zero)
+                              .AssertFreeSlack(TimeSpan.Zero)
+                              .AssertIsCritical(true)
+                              .Project
+                         .ForTask(taskIdB)
+                              .AssertStartSlack(TimeSpan.Zero)
+                              .AssertFinishSlack(TimeSpan.Zero)
+                              .AssertTotalSlack(TimeSpan.Zero)
+                              .AssertFreeSlack(TimeSpan.Zero)
+                              .AssertIsCritical(true)
+                              .Project
+                         .ForTask(taskIdC)
+                              .AssertStartSlack(TimeSpan.FromDays(2))
+                              .AssertFinishSlack(TimeSpan.FromDays(2))
+                              .AssertTotalSlack(TimeSpan.FromDays(2))
+                              .AssertFreeSlack(TimeSpan.Zero)
+                              .AssertIsCritical(false)
+                              .Project
+                         .ForTask(taskIdD)
+                              .AssertStartSlack(TimeSpan.Zero)
+                              .AssertFinishSlack(TimeSpan.Zero)
+                              .AssertTotalSlack(TimeSpan.Zero)
+                              .AssertFreeSlack(TimeSpan.Zero)
+                              .AssertIsCritical(true)
+                              .Project
+                         .ForTask(taskIdE)
+                              .AssertStartSlack(TimeSpan.FromDays(2))
+                              .AssertFinishSlack(TimeSpan.FromDays(2))
+                              .AssertTotalSlack(TimeSpan.FromDays(2))
+                              .AssertFreeSlack(TimeSpan.FromDays(2))
+                              .AssertIsCritical(false)
+                              .Project
+                         .ForTask(taskIdF)
+                              .AssertStartSlack(TimeSpan.Zero)
+                              .AssertFinishSlack(TimeSpan.Zero)
+                              .AssertTotalSlack(TimeSpan.Zero)
+                              .AssertFreeSlack(TimeSpan.Zero)
+                              .AssertIsCritical(true);
+        }
+
+        [Fact]
         public void Task_Removal_UpdatesOrdinal()
         {
             var taskId1 = TaskId.Create();

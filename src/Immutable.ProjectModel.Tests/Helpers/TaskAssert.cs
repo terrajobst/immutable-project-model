@@ -78,6 +78,31 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.LateFinish, value);
         }
 
+        public TaskAssert AssertStartSlack(TimeSpan value)
+        {
+            return AssertField(TaskFields.StartSlack, value);
+        }
+
+        public TaskAssert AssertFinishSlack(TimeSpan value)
+        {
+            return AssertField(TaskFields.FinishSlack, value);
+        }
+
+        public TaskAssert AssertTotalSlack(TimeSpan value)
+        {
+            return AssertField(TaskFields.TotalSlack, value);
+        }
+
+        public TaskAssert AssertFreeSlack(TimeSpan value)
+        {
+            return AssertField(TaskFields.FreeSlack, value);
+        }
+
+        public TaskAssert AssertIsCritical(bool value)
+        {
+            return AssertField(TaskFields.IsCritical, value);
+        }
+
         public TaskAssert AssertPredecessorIds(ImmutableArray<TaskId> value)
         {
             return AssertField(TaskFields.PredecessorIds, value, (v, av) => v.SequenceEqual(av));

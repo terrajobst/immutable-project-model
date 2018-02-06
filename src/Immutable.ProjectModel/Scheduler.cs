@@ -139,11 +139,19 @@ namespace Immutable.ProjectModel
         private static ProjectData Finalize(this ProjectData project)
         {
             var calendar = project.Information.Calendar;
-            var tasks = project.Tasks.Values;
 
-            foreach (var task in tasks)
+            var projectEnd = project.Tasks.Values.Select(t => t.EarlyFinish)
+                                    .DefaultIfEmpty()
+                                    .Max();
+
+            var successorsById = project.Tasks
+                                .Values
+                                .SelectMany(s => s.PredecessorIds, (s, pId) => (predecessor: pId, successor: s.Id))
+                                .ToLookup(t => t.predecessor, t => t.successor);
+
+            foreach (var task in project.Tasks.Values)
             {
-                // Set Start & Finish
+                // Set Start & finish
                 var newTask = task.SetValue(TaskFields.Start, task.EarlyStart)
                                   .SetValue(TaskFields.Finish, task.EarlyFinish);
 
@@ -152,8 +160,31 @@ namespace Immutable.ProjectModel
                 var duration = GetDuration(project, work);
                 newTask = newTask.SetValue(TaskFields.Duration, duration);
 
+                project = project.UpdateTask(newTask);
+            }
+
+            foreach (var task in project.Tasks.Values)
+            {
+                var newTask = task;
+
+                // Set start slack, finish slack, and start slack
+                var startSlack = GetDuration(project, GetWork(calendar, task.EarlyStart, task.LateStart));
+                var finishSlack = GetDuration(project, GetWork(calendar, task.EarlyFinish, task.LateFinish));
+                var totalSlack = startSlack <= finishSlack ? startSlack : finishSlack;
+                newTask = newTask.SetValue(TaskFields.StartSlack, startSlack)
+                                 .SetValue(TaskFields.FinishSlack, finishSlack)
+                                 .SetValue(TaskFields.TotalSlack, totalSlack);
+
+                // Set free slack
+                var successors = successorsById[newTask.Id].Select(id => project.Tasks[id]);
+                var minumumEarlyStartOfSuccessors = successors.Select(t => t.EarlyStart)
+                                                              .DefaultIfEmpty(projectEnd)
+                                                              .Min();
+                var freeSlack = GetDuration(project, GetWork(project.Information.Calendar, newTask.EarlyStart, minumumEarlyStartOfSuccessors)) - newTask.Duration;
+                newTask = newTask.SetValue(TaskFields.FreeSlack, freeSlack);
+
                 // Set criticality
-                var isCritical = newTask.EarlyFinish == newTask.LateFinish;
+                var isCritical = newTask.TotalSlack == TimeSpan.Zero;
                 newTask = newTask.SetValue(TaskFields.IsCritical, isCritical);
 
                 project = project.UpdateTask(newTask);

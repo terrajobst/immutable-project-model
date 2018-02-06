@@ -18,8 +18,12 @@ namespace Immutable.ProjectModel
         public static readonly TaskField<DateTimeOffset> EarlyFinish = new TaskField<DateTimeOffset>("EarlyFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> LateStart = new TaskField<DateTimeOffset>("LateStart", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> LateFinish = new TaskField<DateTimeOffset>("LateFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly TaskField<ImmutableArray<TaskId>> PredecessorIds = new TaskField<ImmutableArray<TaskId>>("PredecessorIds", FieldKinds.TaskIdArray, FieldFlags.None, ImmutableArray<TaskId>.Empty);
+        public static readonly TaskField<TimeSpan> StartSlack = new TaskField<TimeSpan>("StartSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
+        public static readonly TaskField<TimeSpan> FinishSlack = new TaskField<TimeSpan>("FinishSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
+        public static readonly TaskField<TimeSpan> TotalSlack = new TaskField<TimeSpan>("TotalSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
+        public static readonly TaskField<TimeSpan> FreeSlack = new TaskField<TimeSpan>("FreeSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
         public static readonly TaskField<bool> IsCritical = new TaskField<bool>("IsCritical", FieldKinds.YesNo, FieldFlags.ReadOnly);
+        public static readonly TaskField<ImmutableArray<TaskId>> PredecessorIds = new TaskField<ImmutableArray<TaskId>>("PredecessorIds", FieldKinds.TaskIdArray, FieldFlags.None, ImmutableArray<TaskId>.Empty);
 
         public static readonly ImmutableArray<TaskField> All = typeof(TaskFields).GetFields(BindingFlags.Static | BindingFlags.Public)
                                                                                  .Select(f => f.GetValue(null))
