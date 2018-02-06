@@ -256,6 +256,71 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_EarylyStart_EarylyFinish_LateStart_LateFinish()
+        {
+            var taskId3 = TaskId.Create();
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .AddNewTask()
+                                    .WithDuration(TimeSpan.FromDays(10)).Project
+                                 .AddNewTask()
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddNewTask(taskId3)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddNewTask()
+                                    .WithDuration(TimeSpan.FromDays(3))
+                                    .AddPredecessorId(taskId3).Project
+                                 .AddNewTask()
+                                    .WithDuration(TimeSpan.FromDays(7)).Project;
+
+            ProjectAssert.For(project)
+                             .ForTask(0)
+                                  .AssertDuration(TimeSpan.FromDays(10))
+                                  .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                                  .AssertEarlyStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertEarlyFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                                  .AssertLateStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertLateFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                                  .Project
+                             .ForTask(1)
+                                  .AssertDuration(TimeSpan.FromDays(5))
+                                  .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                                  .AssertEarlyStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertEarlyFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                                  .AssertLateStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                                  .AssertLateFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                                  .Project
+                            .ForTask(2)
+                                  .AssertDuration(TimeSpan.FromDays(5))
+                                  .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                                  .AssertEarlyStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertEarlyFinish(new DateTime(2018, 2, 9, 17, 0, 0))
+                                  .AssertLateStart(new DateTime(2018, 2, 7, 8, 0, 0))
+                                  .AssertLateFinish(new DateTime(2018, 2, 13, 17, 0, 0))
+                                  .Project
+                            .ForTask(3)
+                                  .AssertDuration(TimeSpan.FromDays(3))
+                                  .AssertStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                                  .AssertFinish(new DateTime(2018, 2, 14, 17, 0, 0))
+                                  .AssertEarlyStart(new DateTime(2018, 2, 12, 8, 0, 0))
+                                  .AssertEarlyFinish(new DateTime(2018, 2, 14, 17, 0, 0))
+                                  .AssertLateStart(new DateTime(2018, 2, 14, 8, 0, 0))
+                                  .AssertLateFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                                  .Project
+                            .ForTask(4)
+                                  .AssertDuration(TimeSpan.FromDays(7))
+                                  .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertFinish(new DateTime(2018, 2, 13, 17, 0, 0))
+                                  .AssertEarlyStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                                  .AssertEarlyFinish(new DateTime(2018, 2, 13, 17, 0, 0))
+                                  .AssertLateStart(new DateTime(2018, 2, 8, 8, 0, 0))
+                                  .AssertLateFinish(new DateTime(2018, 2, 16, 17, 0, 0));
+        }
+
+        [Fact]
         public void Task_Removal_UpdatesOrdinal()
         {
             var taskId1 = TaskId.Create();

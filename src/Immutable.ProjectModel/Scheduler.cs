@@ -77,6 +77,10 @@ namespace Immutable.ProjectModel
 
         private static ProjectData BackwardPass(this ProjectData project)
         {
+            var projectEnd = project.Tasks.Values.Select(t => t.EarlyFinish)
+                                                 .DefaultIfEmpty()
+                                                 .Max();
+
             var computedTasks = new HashSet<TaskId>();
             var successorsById = project.Tasks
                                             .Values
@@ -98,7 +102,7 @@ namespace Immutable.ProjectModel
                 else
                 {
                     var lateFinish = successors.Select(id => project.Tasks[id].LateStart)
-                                               .DefaultIfEmpty(task.EarlyFinish)
+                                               .DefaultIfEmpty(projectEnd)
                                                .Min();
 
                     var assignments = project.Assignments.Values.Where(a => a.TaskId == taskId);
