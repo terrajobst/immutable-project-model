@@ -60,6 +60,42 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Assignment_Units()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .AddNewTask(taskId).Project
+                                 .AddNewResource(resourceId1).Project
+                                 .AddNewResource(resourceId2).Project
+                                 .AddNewAssignment(taskId, resourceId1)
+                                    .WithWork(TimeSpan.FromHours(40))
+                                    .WithUnits(.5).Project
+                                 .AddNewAssignment(taskId, resourceId2)
+                                    .WithWork(TimeSpan.FromHours(20)).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(TimeSpan.FromDays(10))
+                              .AssertWork(TimeSpan.FromHours(60))
+                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                              .Project
+                         .ForAssignment(taskId, resourceId1)
+                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
+                              .Project
+                         .ForAssignment(taskId, resourceId2)
+                              .AssertWork(TimeSpan.FromHours(20))
+                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 7, 12, 0, 0));
+        }
+
+        [Fact]
         public void Assignment_Start_Finish()
         {
             var taskId = TaskId.Create();
@@ -186,42 +222,6 @@ namespace Immutable.ProjectModel.Tests
                               .AssertWork(TimeSpan.Zero)
                               .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
-        }
-
-        [Fact]
-        public void Assignment_Units()
-        {
-            var taskId = TaskId.Create();
-            var resourceId1 = ResourceId.Create();
-            var resourceId2 = ResourceId.Create();
-
-            var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
-                                 .AddNewTask(taskId).Project
-                                 .AddNewResource(resourceId1).Project
-                                 .AddNewResource(resourceId2).Project
-                                 .AddNewAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(40))
-                                    .WithUnits(.5).Project
-                                 .AddNewAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(20)).Project;
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertWork(TimeSpan.FromHours(60))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
-                              .Project
-                         .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(40))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
-                              .Project
-                         .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(20))
-                              .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
-                              .AssertFinish(new DateTime(2018, 2, 7, 12, 0, 0));
         }
     }
 }

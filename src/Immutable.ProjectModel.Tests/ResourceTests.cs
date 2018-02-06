@@ -61,6 +61,5 @@ namespace Immutable.ProjectModel.Tests
                          .HasNoAssignment(taskId1, resourceId1)
                          .HasAssignment(taskId2, resourceId2);
         }
-
     }
 }
