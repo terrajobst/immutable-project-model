@@ -39,14 +39,6 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
 
-        public DateTimeOffset EarlyStart => GetValue(AssignmentFields.EarlyStart);
-
-        public DateTimeOffset EarlyFinish => GetValue(AssignmentFields.EarlyFinish);
-
-        public DateTimeOffset LateStart => GetValue(AssignmentFields.LateStart);
-
-        public DateTimeOffset LateFinish => GetValue(AssignmentFields.LateFinish);
-
         private ImmutableDictionary<AssignmentField, object> Fields { get; }
 
         private AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)

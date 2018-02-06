@@ -14,10 +14,6 @@ namespace Immutable.ProjectModel
         public static readonly AssignmentField<double> Units = new AssignmentField<double>("Units", FieldKinds.Percentage, defaultValue:1.0);
         public static readonly AssignmentField<DateTimeOffset> Start = new AssignmentField<DateTimeOffset>("Start", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly AssignmentField<DateTimeOffset> Finish = new AssignmentField<DateTimeOffset>("Finish", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly AssignmentField<DateTimeOffset> EarlyStart = new AssignmentField<DateTimeOffset>("EarlyStart", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly AssignmentField<DateTimeOffset> EarlyFinish = new AssignmentField<DateTimeOffset>("EarlyFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly AssignmentField<DateTimeOffset> LateStart = new AssignmentField<DateTimeOffset>("LateStart", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly AssignmentField<DateTimeOffset> LateFinish = new AssignmentField<DateTimeOffset>("LateFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
 
         public static readonly ImmutableArray<AssignmentField> All = typeof(AssignmentFields).GetFields(BindingFlags.Static | BindingFlags.Public)
                                                                                              .Select(f => f.GetValue(null))

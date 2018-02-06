@@ -48,23 +48,19 @@ namespace Immutable.ProjectModel
                     }
                     else
                     {
-                        var taskEarlyFinish = DateTimeOffset.MinValue;
+                        var earlyFinish = DateTimeOffset.MinValue;
 
                         foreach (var assignment in assignments)
                         {
                             var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
-                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, time);
+                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var assignmentFinish, time);
 
-                            var newAssignment = assignment.SetValue(AssignmentFields.EarlyStart, earlyStart)
-                                                          .SetValue(AssignmentFields.EarlyFinish, earlyFinish);
-                            project = project.UpdateAssignment(newAssignment);
-
-                            if (earlyFinish > taskEarlyFinish)
-                                taskEarlyFinish = earlyFinish;
+                            if (assignmentFinish > earlyFinish)
+                                earlyFinish = assignmentFinish;
                         }
 
                         task = task.SetValue(TaskFields.EarlyStart, earlyStart)
-                                   .SetValue(TaskFields.EarlyFinish, taskEarlyFinish);
+                                   .SetValue(TaskFields.EarlyFinish, earlyFinish);
                         project = project.UpdateTask(task);
                     }
 
@@ -117,22 +113,18 @@ namespace Immutable.ProjectModel
                     }
                     else
                     {
-                        var taskLateStart = DateTimeOffset.MaxValue;
+                        var lateStart = DateTimeOffset.MaxValue;
 
                         foreach (var assignment in assignments)
                         {
                             var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
-                            ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, time);
+                            ComputeStart(project.Information.Calendar, out var assignmentStart, ref lateFinish, time);
 
-                            var newAssignment = assignment.SetValue(AssignmentFields.LateStart, lateStart)
-                                                          .SetValue(AssignmentFields.LateFinish, lateFinish);
-                            project = project.UpdateAssignment(newAssignment);
-
-                            if (lateStart < taskLateStart)
-                                taskLateStart = lateStart;
+                            if (assignmentStart < lateStart)
+                                lateStart = assignmentStart;
                         }
 
-                        task = task.SetValue(TaskFields.LateStart, taskLateStart)
+                        task = task.SetValue(TaskFields.LateStart, lateStart)
                                    .SetValue(TaskFields.LateFinish, lateFinish);
                         project = project.UpdateTask(task);
                     }
@@ -171,8 +163,15 @@ namespace Immutable.ProjectModel
 
             foreach (var assignment in assignments)
             {
-                var newAssignment = assignment.SetValue(AssignmentFields.Start, assignment.EarlyStart)
-                                              .SetValue(AssignmentFields.Finish, assignment.EarlyFinish);
+                var task = project.Tasks[assignment.TaskId];
+                var assignmentStart = task.Start;
+
+                var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
+                ComputeFinish(project.Information.Calendar, ref assignmentStart, out var assignmentFinish, time);
+
+                var newAssignment = assignment.SetValue(AssignmentFields.Start, assignmentStart)
+                                              .SetValue(AssignmentFields.Finish, assignmentFinish);
+
                 project = project.UpdateAssignment(newAssignment);
             }
 
