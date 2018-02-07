@@ -142,6 +142,58 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Assignment_TaskName_ResourceName_AreInitialized()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .AddTask(taskId)
+                                    .WithName("Some Task")
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Some Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForAssignment(taskId, resourceId)
+                              .AssertTaskName("Some Task")
+                              .AssertResourceName("Some Resource");
+        }
+
+        [Fact]
+        public void Assignment_TaskName_ResourceName_AreUpdated()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .AddTask(taskId)
+                                    .WithName("Some Task")
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Some Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .GetTask(taskId)
+                                    .WithName("Some New Task")
+                                    .Project
+                                 .GetResource(resourceId)
+                                    .WithName("Some New Resource")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForAssignment(taskId, resourceId)
+                              .AssertTaskName("Some New Task")
+                              .AssertResourceName("Some New Resource");
+        }
+
+        [Fact]
         public void Assignment_Addition_Increases_Task_Work()
         {
             var taskId = TaskId.Create();

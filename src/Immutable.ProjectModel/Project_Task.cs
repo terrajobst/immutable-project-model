@@ -63,6 +63,10 @@ namespace Immutable.ProjectModel
             {
                 project = SetTaskOrdinal(Data, task.Id, (int)value);
             }
+            else if (field == TaskFields.Name)
+            {
+                project = SetTaskName(Data, task.Id, (string)value);
+            }
             else if (field == TaskFields.Duration)
             {
                 project = SetTaskDuration(Data, task.Id, (TimeSpan)value);
@@ -102,6 +106,18 @@ namespace Immutable.ProjectModel
             }
 
             return project.WithTasks(tasks);
+        }
+
+        private ProjectData SetTaskName(ProjectData project, TaskId id, string value)
+        {
+            project = project.UpdateTask(project.Tasks[id].SetValue(TaskFields.Name, value));
+
+            var newAssignments = project.Assignments;
+
+            foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == id))
+                newAssignments = newAssignments.SetItem(assignment.Id, assignment.SetValue(AssignmentFields.TaskName, value));
+
+            return project.WithAssignments(newAssignments);
         }
 
         private ProjectData SetTaskDuration(ProjectData project, TaskId id, TimeSpan value)

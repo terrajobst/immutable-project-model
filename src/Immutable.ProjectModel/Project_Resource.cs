@@ -31,10 +31,29 @@ namespace Immutable.ProjectModel
         {
             ProjectData project;
 
-            var resourceData = resource.Data.SetValue(field, value);
-            project = Data.UpdateResource(resourceData);
+            if (field == ResourceFields.Name)
+            {
+                project = SetResourceName(Data, resource.Id, (string)value);
+            }
+            else
+            {
+                var resourceData = resource.Data.SetValue(field, value);
+                project = Data.UpdateResource(resourceData);
+            }
 
             return UpdateProject(project).GetResource(resource.Id);
+        }
+
+        private ProjectData SetResourceName(ProjectData project, ResourceId id, string value)
+        {
+            project = project.UpdateResource(project.Resources[id].SetValue(ResourceFields.Name, value));
+
+            var newAssignments = project.Assignments;
+
+            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == id))
+                newAssignments = newAssignments.SetItem(assignment.Id, assignment.SetValue(AssignmentFields.ResourceName, value));
+
+            return project.WithAssignments(newAssignments);
         }
     }
 }

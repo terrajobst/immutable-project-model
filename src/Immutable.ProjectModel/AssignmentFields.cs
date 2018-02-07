@@ -15,6 +15,9 @@ namespace Immutable.ProjectModel
         public static readonly AssignmentField<DateTimeOffset> Start = new AssignmentField<DateTimeOffset>("Start", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly AssignmentField<DateTimeOffset> Finish = new AssignmentField<DateTimeOffset>("Finish", FieldKinds.DateTime, FieldFlags.ReadOnly);
 
+        public static readonly AssignmentField<string> TaskName = new AssignmentField<string>("TaskName", FieldKinds.Text, FieldFlags.ReadOnly);
+        public static readonly AssignmentField<string> ResourceName = new AssignmentField<string>("ResourceName", FieldKinds.Text, FieldFlags.ReadOnly);
+
         public static readonly ImmutableArray<AssignmentField> All = typeof(AssignmentFields).GetFields(BindingFlags.Static | BindingFlags.Public)
                                                                                              .Select(f => f.GetValue(null))
                                                                                              .OfType<AssignmentField>()

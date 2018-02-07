@@ -43,5 +43,15 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             return AssertField(AssignmentFields.Finish, value);
         }
+
+        public AssignmentAssert AssertTaskName(string value)
+        {
+            return AssertField(AssignmentFields.TaskName, value);
+        }
+
+        public AssignmentAssert AssertResourceName(string value)
+        {
+            return AssertField(AssignmentFields.ResourceName, value);
+        }
     }
 }

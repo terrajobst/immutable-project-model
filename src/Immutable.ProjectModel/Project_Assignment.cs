@@ -14,13 +14,23 @@ namespace Immutable.ProjectModel
             if (GetAssignment(taskId, resourceId) != null)
                 throw new ArgumentException($"An assignment for task ID {taskId} and resource ID {resourceId} already exists.");
 
-            if (GetTask(taskId) == null)
+            var task = GetTask(taskId);
+            if (task == null)
                 throw new ArgumentException($"The project doesn't contain a task with ID {taskId}.", nameof(taskId));
 
-            if (GetResource(resourceId) == null)
+            var resource = GetResource(resourceId);
+            if (resource == null)
                 throw new ArgumentException($"The project doesn't contain a resource with ID {resourceId}.", nameof(resourceId));
 
             var projectData = Scheduler.AddAssignment(Data, assignmentId, taskId, resourceId);
+
+            var assignmentData = projectData.Assignments[assignmentId];
+
+            assignmentData = assignmentData.SetValue(AssignmentFields.TaskName, task.Name)
+                                           .SetValue(AssignmentFields.ResourceName, resource.Name);
+
+            projectData = projectData.UpdateAssignment(assignmentData);
+
             return UpdateProject(projectData).GetAssignment(assignmentId);
         }
 
