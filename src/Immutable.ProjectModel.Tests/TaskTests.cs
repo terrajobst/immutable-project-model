@@ -697,6 +697,98 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Predecessors_IsOrderedByOrdinal()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+            var taskId4 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .Project
+                                 .AddTask(taskId4)
+                                    .AddPredecessorId(taskId2)
+                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorId(taskId3)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId4)
+                              .AssertPredecessors("0,1,2");
+        }
+
+        [Fact]
+        public void Task_Predecessors_Set()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+            var taskId4 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .Project
+                                 .AddTask(taskId4)
+                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorId(taskId2)
+                                    .Project
+                                 .GetTask(taskId3)
+                                    .WithPredecessors("0,1")
+                                    .Project
+                                 .GetTask(taskId4)
+                                    .WithPredecessors("1,2")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId3)
+                              .AssertPredecessors("0,1")
+                              .Project
+                         .ForTask(taskId4)
+                              .AssertPredecessors("1,2");
+        }
+
+        [Fact]
+        public void Task_Predecessors_IsUpdated_WhenPrecessorIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .AddPredecessorId(taskId1)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorId(taskId2)
+                                    .Project
+                                 .GetTask(taskId2)
+                                    .RemovePredecessorId(taskId1)
+                                    .Project
+                                 .GetTask(taskId3)
+                                    .RemovePredecessorId(taskId2)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId2)
+                              .AssertPredecessors(string.Empty)
+                              .Project
+                         .ForTask(taskId3)
+                              .AssertPredecessors("0");
+        }
+
+        [Fact]
         public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromNonZero_ToZero()
         {
             var taskId1 = TaskId.Create();

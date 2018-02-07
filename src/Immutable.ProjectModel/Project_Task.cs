@@ -86,6 +86,10 @@ namespace Immutable.ProjectModel
             {
                 project = SetTaskResourceNames(Data, task.Id, (string)value);
             }
+            else if (field == TaskFields.Predecessors)
+            {
+                project = SetTaskPredecessors(Data, task.Id, (string)value);
+            }
             else
             {
                 var taskData = task.Data.SetValue(field, value);
@@ -167,6 +171,7 @@ namespace Immutable.ProjectModel
             }
 
             project = project.UpdateTask(project.Tasks[id].SetValue(TaskFields.PredecessorIds, value));
+            project = InitializeTaskPredecessors(project, id);
             return project;
         }
 
@@ -255,6 +260,57 @@ namespace Immutable.ProjectModel
                 result = result.RemoveAssignment(assignmentId);
 
             return result.Data;
+        }
+
+        private ProjectData InitializeTaskPredecessors(ProjectData project, TaskId id)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var t in project.Tasks[id].PredecessorIds.Select(pid => project.Tasks[pid]).OrderBy(t => t.Ordinal))
+            {
+                if (sb.Length > 0)
+                    sb.Append(",");
+
+                sb.Append(t.Ordinal);
+            }
+
+            var precedessors = sb.ToString();
+            return project.UpdateTask(project.Tasks[id].SetValue(TaskFields.Predecessors, precedessors));
+        }
+
+        private ProjectData SetTaskPredecessors(ProjectData project, TaskId id, string value)
+        {
+            var task = GetTask(id);
+
+            value = value.Trim();
+
+            var remainingPredecessorIds = task.Project.GetTask(id).PredecessorIds.ToList();
+
+            if (value.Length > 0)
+            {
+                var predecessorIdParts = value.Split(',');
+
+                foreach (var predecessorIdPart in predecessorIdParts)
+                {
+                    var predecessorIdText = predecessorIdPart.Trim();
+
+                    if (!int.TryParse(predecessorIdText, out var predecessorId))
+                        throw new FormatException($"'{predecessorIdText}' isn't a valid int");
+
+                    var predecessor = task.Project.Tasks.SingleOrDefault(t => t.Ordinal == predecessorId);
+                    if (predecessor == null)
+                        throw new FormatException($"'{predecessorId}' isn't a valid predecessor");
+
+                    task = task.AddPredecessorId(predecessor.Id);
+
+                    remainingPredecessorIds.Remove(predecessor.Id);
+                }
+            }
+
+            foreach (var predecessorIds in remainingPredecessorIds)
+                task = task.RemovePredecessorId(predecessorIds);
+
+            return task.Project.Data;
         }
     }
 }

@@ -3,7 +3,6 @@
 ## Fields
 
 * IsCritical := Total Slack <= Project.ShowCriticalSlack
-* Task.Predecessors
 * Task.Successors
 
 I'm still not happy with the way the interactions work:
