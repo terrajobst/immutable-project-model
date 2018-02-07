@@ -6,15 +6,18 @@ namespace Immutable.ProjectModel
 {
     public sealed class Resource
     {
-        internal Resource(ResourceData data, Project project)
+        private readonly Project _project;
+        private readonly ResourceData _data;
+
+        internal Resource(Project project, ResourceData data)
         {
-            Data = data;
-            Project = project;
+            _project = project;
+            _data = data;
         }
 
-        internal ResourceData Data { get; }
+        public Project Project => _project;
 
-        public Project Project { get; }
+        internal ResourceData Data => _data;
 
         public ResourceId Id => GetValue(ResourceFields.Id);
 
@@ -56,8 +59,7 @@ namespace Immutable.ProjectModel
                 value != null && !field.Type.IsAssignableFrom(value.GetType()))
                 throw new ArgumentException(nameof(value));
 
-            var data = Data.SetValue(field, value);
-            return Project.UpdateResource(data);
+            return Project.SetResourceField(this, field, value);
         }
 
         public Resource WithName(string name)

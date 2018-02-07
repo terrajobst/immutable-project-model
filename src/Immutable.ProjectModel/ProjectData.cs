@@ -53,7 +53,7 @@ namespace Immutable.ProjectModel
             return With(information, Tasks, Resources, Assignments);
         }
 
-        private ProjectData WithTasks(ImmutableDictionary<TaskId, TaskData> tasks)
+        public ProjectData WithTasks(ImmutableDictionary<TaskId, TaskData> tasks)
         {
             return With(Information, tasks, Resources, Assignments);
         }

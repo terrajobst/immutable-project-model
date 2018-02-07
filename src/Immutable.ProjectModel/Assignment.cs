@@ -5,15 +5,18 @@ namespace Immutable.ProjectModel
 {
     public sealed class Assignment
     {
-        internal Assignment(AssignmentData data, Project project)
+        private readonly Project _project;
+        private readonly AssignmentData _data;
+
+        internal Assignment(Project project, AssignmentData data)
         {
-            Project = project;
-            Data = data;
+            _project = project;
+            _data = data;
         }
 
-        internal AssignmentData Data { get; }
+        public Project Project => _project;
 
-        public Project Project { get; }
+        internal AssignmentData Data => _data;
 
         public AssignmentId Id => Data.Id;
 
@@ -61,8 +64,7 @@ namespace Immutable.ProjectModel
                 value != null && !field.Type.IsAssignableFrom(value.GetType()))
                 throw new ArgumentException(nameof(value));
 
-            var data = field.Setter(Project.Data, Data, value);
-            return Project.UpdateProject(data).GetAssignment(Id);
+            return Project.SetAssignmentField(this, field, value);
         }
 
         public Assignment WithWork(TimeSpan work)

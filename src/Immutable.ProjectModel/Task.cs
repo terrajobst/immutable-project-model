@@ -7,15 +7,18 @@ namespace Immutable.ProjectModel
 {
     public sealed class Task
     {
-        internal Task(TaskData data, Project project)
+        private readonly Project _project;
+        private readonly TaskData _data;
+
+        internal Task(Project project, TaskData data)
         {
-            Project = project;
-            Data = data;
+            _project = project;
+            _data = data;
         }
 
-        internal TaskData Data { get; }
+        public Project Project => _project;
 
-        public Project Project { get; }
+        internal TaskData Data => _data;
 
         public TaskId Id => GetValue(TaskFields.Id);
 
@@ -85,8 +88,7 @@ namespace Immutable.ProjectModel
                 value != null && !field.Type.IsAssignableFrom(value.GetType()))
                 throw new ArgumentException(nameof(value));
 
-            var data = field.Setter(Project.Data, Data, value);
-            return Project.UpdateProject(data).GetTask(Id);
+            return Project.SetTaskField(this, field, value);
         }
 
         public Task WithName(string name)

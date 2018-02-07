@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Immutable.ProjectModel
 {
-    public sealed class Project
+    public sealed partial class Project
     {
         private ImmutableDictionary<TaskData, Task> _tasks = ImmutableDictionary<TaskData, Task>.Empty;
         private ImmutableDictionary<ResourceData, Resource> _resources = ImmutableDictionary<ResourceData, Resource>.Empty;
@@ -45,7 +45,7 @@ namespace Immutable.ProjectModel
             if (!Data.Tasks.TryGetValue(id, out var data))
                 return null;
 
-            return ImmutableInterlocked.GetOrAdd(ref _tasks, data, k => new Task(k, this));
+            return ImmutableInterlocked.GetOrAdd(ref _tasks, data, k => new Task(this, k));
         }
 
         public Resource GetResource(ResourceId id)
@@ -53,7 +53,7 @@ namespace Immutable.ProjectModel
             if (!Data.Resources.TryGetValue(id, out var data))
                 return null;
 
-            return ImmutableInterlocked.GetOrAdd(ref _resources, data, k => new Resource(k, this));
+            return ImmutableInterlocked.GetOrAdd(ref _resources, data, k => new Resource(this, k));
         }
 
         public Assignment GetAssignment(AssignmentId id)
@@ -61,7 +61,7 @@ namespace Immutable.ProjectModel
             if (!Data.Assignments.TryGetValue(id, out var data))
                 return null;
 
-            return ImmutableInterlocked.GetOrAdd(ref _assignments, data, k => new Assignment(k, this));
+            return ImmutableInterlocked.GetOrAdd(ref _assignments, data, k => new Assignment(this, k));
         }
 
         public Assignment GetAssignment(TaskId taskId, ResourceId resourceId)

@@ -8,10 +8,10 @@ namespace Immutable.ProjectModel
     public static class TaskFields
     {
         public static readonly TaskField<TaskId> Id = new TaskField<TaskId>("Id", FieldKinds.TaskId, FieldFlags.ReadOnly | FieldFlags.Virtual);
-        public static readonly TaskField<int> Ordinal = new TaskField<int>("Ordinal", FieldKinds.Int32, FieldFlags.ReadOnly);
+        public static readonly TaskField<int> Ordinal = new TaskField<int>("Ordinal", FieldKinds.Int32);
         public static readonly TaskField<string> Name = new TaskField<string>("Name", FieldKinds.Text);
-        public static readonly TaskField<TimeSpan> Duration = new TaskField<TimeSpan>("Duration", FieldKinds.Duration, setter: Scheduler.SetTaskDuration);
-        public static readonly TaskField<TimeSpan> Work = new TaskField<TimeSpan>("Work", FieldKinds.Work, setter: Scheduler.SetTaskWork);
+        public static readonly TaskField<TimeSpan> Duration = new TaskField<TimeSpan>("Duration", FieldKinds.Duration);
+        public static readonly TaskField<TimeSpan> Work = new TaskField<TimeSpan>("Work", FieldKinds.Work);
         public static readonly TaskField<DateTimeOffset> Start = new TaskField<DateTimeOffset>("Start", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> Finish = new TaskField<DateTimeOffset>("Finish", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> EarlyStart = new TaskField<DateTimeOffset>("EarlyStart", FieldKinds.DateTime, FieldFlags.ReadOnly);

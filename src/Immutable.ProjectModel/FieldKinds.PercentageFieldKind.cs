@@ -34,6 +34,5 @@ namespace Immutable.ProjectModel
                 return false;
             }
         }
-
     }
 }

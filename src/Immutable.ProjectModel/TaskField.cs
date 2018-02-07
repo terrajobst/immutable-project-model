@@ -8,10 +8,5 @@ namespace Immutable.ProjectModel
             : base(name, fieldType, flags | FieldFlags.Task, defaultValue)
         {
         }
-
-        internal virtual Func<ProjectData, TaskData, object, ProjectData> GetSetter()
-            => (p, t, v) => p.UpdateTask(t.SetValue(this, v));
-
-        internal Func<ProjectData, TaskData, object, ProjectData> Setter => GetSetter();
     }
 }
