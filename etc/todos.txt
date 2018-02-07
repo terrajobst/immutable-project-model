@@ -1,9 +1,6 @@
 # To-Do List
 
-## Fields
-
-* IsCritical := Total Slack <= Project.ShowCriticalSlack
-* Task.Successors
+## Scheduling
 
 I'm still not happy with the way the interactions work:
 
@@ -52,10 +49,7 @@ I'm still not happy with the way the interactions work:
 * Add scheduling from the back
 * Add actual work
 * Add percent complete
-
-## UI
-
-* Handle errors
+* Add successors
 
 ## Settings
 
