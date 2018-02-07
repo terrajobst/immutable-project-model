@@ -546,6 +546,126 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromNonZero_ToZero()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .WithDuration(TimeSpan.FromDays(1))
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .WithDuration(TimeSpan.FromDays(2))
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .Project
+                                 .AddAssignment(taskId2, resourceId)
+                                    .Project
+                                 .GetTask(taskId1)
+                                    .WithDuration(TimeSpan.Zero)
+                                    .Project
+                                 .GetAssignment(taskId2, resourceId)
+                                    .WithWork(TimeSpan.Zero)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                              .AssertIsMilesone(true)
+                              .Project
+                         .ForTask(taskId2)
+                              .AssertIsMilesone(true);
+        }
+
+        [Fact]
+        public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromZero_ToNonZero()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .Project
+                                 .AddAssignment(taskId2, resourceId)
+                                    .Project
+                                 .GetTask(taskId1)
+                                    .WithDuration(TimeSpan.FromDays(1))
+                                    .Project
+                                 .GetAssignment(taskId2, resourceId)
+                                    .WithWork(TimeSpan.FromHours(8))
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                              .AssertIsMilesone(false)
+                              .Project
+                         .ForTask(taskId2)
+                              .AssertIsMilesone(false);
+        }
+
+        [Fact]
+        public void Task_IsMilestone_IsNotUpdated_WhenDurationChanges_FromNonZero_ToNonZero()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .WithDuration(TimeSpan.FromDays(2))
+                                    .WithIsMilestone(true)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .WithDuration(TimeSpan.FromDays(2))
+                                    .WithIsMilestone(true)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .Project
+                                 .AddAssignment(taskId2, resourceId)
+                                    .Project
+                                 .GetTask(taskId1)
+                                    .WithDuration(TimeSpan.FromDays(1))
+                                    .Project
+                                 .GetAssignment(taskId2, resourceId)
+                                    .WithWork(TimeSpan.FromHours(8))
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                              .AssertIsMilesone(true)
+                              .Project
+                         .ForTask(taskId2)
+                              .AssertIsMilesone(true);
+        }
+
+        [Fact]
+        public void Task_IsMilestone_IsNotUpdated_WhenDurationChanges_FromZero_ToZero()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .WithWork(TimeSpan.FromHours(0))
+                                    .WithIsMilestone(false)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertIsMilesone(false);
+        }
+
+        [Fact]
         public void Task_Removal_UpdatesOrdinal()
         {
             var taskId1 = TaskId.Create();

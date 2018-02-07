@@ -111,6 +111,18 @@ namespace Immutable.ProjectModel
                 return this;
 
             var fields = Fields.SetItem(field, value);
+
+            if (field == TaskFields.Duration)
+            {
+                var oldValue = (TimeSpan)existingValue;
+                var newValue = (TimeSpan)value;
+
+                if (oldValue == TimeSpan.Zero && newValue != TimeSpan.Zero)
+                    fields = fields.SetItem(TaskFields.IsMilestone, false);
+                else if (oldValue != TimeSpan.Zero && newValue == TimeSpan.Zero)
+                    fields = fields.SetItem(TaskFields.IsMilestone, true);
+            }
+
             return WithFields(fields);
         }
     }

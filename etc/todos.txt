@@ -3,12 +3,6 @@
 ## Fields
 
 * IsCritical := Total Slack <= Project.ShowCriticalSlack
-* IsMilestone
-    - If a task is set to zero duration, IsMilestone will be set to true.
-    - If a task with zero duration is set to a non-zero duration, IsMilestone
-      will be set to false.
-    - If a task with non-zero duration is set to another non-zero duration,
-      IsMilestone isn't modified.
 * Task.Predecessors
 * Task.Sucessors
 

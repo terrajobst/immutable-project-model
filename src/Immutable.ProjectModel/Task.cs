@@ -109,6 +109,11 @@ namespace Immutable.ProjectModel
             return SetValue(TaskFields.Work, work);
         }
 
+        public Task WithIsMilestone(bool isMilestone)
+        {
+            return SetValue(TaskFields.IsMilestone, isMilestone);
+        }
+
         public Task WithPredecessorIds(ImmutableArray<TaskId> predecessorIds)
         {
             if (predecessorIds == PredecessorIds)

@@ -103,6 +103,11 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.IsCritical, value);
         }
 
+        public TaskAssert AssertIsMilesone(bool value)
+        {
+            return AssertField(TaskFields.IsMilestone, value);
+        }
+
         public TaskAssert AssertPredecessorIds(ImmutableArray<TaskId> value)
         {
             return AssertField(TaskFields.PredecessorIds, value, (v, av) => v.SequenceEqual(av));

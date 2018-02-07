@@ -17,7 +17,7 @@ namespace Immutable.ProjectModel
             public override bool TryParse(string text, out object value)
             {
                 var isYes = string.Equals(text, "Yes", StringComparison.OrdinalIgnoreCase);
-                var isNo = string.Equals(text, "Yes", StringComparison.OrdinalIgnoreCase);
+                var isNo = string.Equals(text, "No", StringComparison.OrdinalIgnoreCase);
 
                 value = isYes ? true : isNo ? (object) false : null;
                 return isYes || isNo;
