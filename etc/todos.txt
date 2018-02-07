@@ -47,7 +47,6 @@ I'm still not happy with the way the interactions work:
 ## Tests
 
 * Rename tests to make them field first, as opposed to operation first
-* Add test that ensures we expose all fields on Task, Resource, and Assignment
 
 ## Basics
 

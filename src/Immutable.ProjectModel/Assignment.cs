@@ -20,7 +20,15 @@ namespace Immutable.ProjectModel
 
         public AssignmentId Id => Data.Id;
 
+        public TaskId TaskId => Data.TaskId;
+
+        public string TaskName => GetValue(AssignmentFields.TaskName);
+
         public Task Task => Project.GetTask(Data.TaskId);
+
+        public ResourceId ResourceId => Data.ResourceId;
+
+        public string ResourceName => GetValue(AssignmentFields.ResourceName);
 
         public Resource Resource => Project.GetResource(Data.ResourceId);
 

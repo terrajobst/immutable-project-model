@@ -30,6 +30,10 @@ namespace Immutable.ProjectModel
 
         public TimeSpan Work => GetValue(TaskFields.Work);
 
+        public DateTimeOffset Start => GetValue(TaskFields.Start);
+
+        public DateTimeOffset Finish => GetValue(TaskFields.Finish);
+
         public DateTimeOffset EarlyStart => GetValue(TaskFields.EarlyStart);
 
         public DateTimeOffset EarlyFinish => GetValue(TaskFields.EarlyFinish);
@@ -47,6 +51,10 @@ namespace Immutable.ProjectModel
         public TimeSpan FreeSlack => GetValue(TaskFields.FreeSlack);
 
         public bool IsCritical => GetValue(TaskFields.IsCritical);
+
+        public bool IsMilestone => GetValue(TaskFields.IsMilestone);
+
+        public string ResourceNames => GetValue(TaskFields.ResourceNames);
 
         public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
 
@@ -89,6 +97,11 @@ namespace Immutable.ProjectModel
                 throw new ArgumentException(nameof(value));
 
             return Project.SetTaskField(this, field, value);
+        }
+
+        public Task WithOrdinal(int ordinal)
+        {
+            return SetValue(TaskFields.Ordinal, ordinal);
         }
 
         public Task WithName(string name)
