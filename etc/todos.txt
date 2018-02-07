@@ -1,5 +1,60 @@
 # To-Do List
 
+## Fields
+
+* IsCritical := Total Slack <= Project.ShowCriticalSlack
+* IsMilestone
+    - If a task is set to zero duration, IsMilestone will be set to true.
+    - If a task with zero duration is set to a non-zero duration, IsMilestone
+      will be set to false.
+    - If a task with non-zero duration is set to another non-zero duration,
+      IsMilestone isn't modified.
+* Task.Predecessors
+* Task.Sucessors
+
+I'm still not happy with the way the interactions work:
+
+* Right now, our policy layer lives at the object model layer but all the field
+  setting is expressed as modifications over `ProjectData`. However, the policy
+  for structure changes (adding and removing tasks for instance), isn't. This
+  results in weird cases where some field setters end up using `Project`
+  instances to create instances of `ProjectData` but with applied policy.
+  Clearly, that's not right.
+
+* We can either move all policy back to `ProjectData`, with the understanding
+  that (virtually) everything in the system has to go through
+  `ProjectData.SetValue(Id, Field, Value)` (as opposed to being able to set
+  fields on `TaskData` directly).
+
+* Alternatively, we can say that all policy is done at the object model. The
+  downside is that we need to find another way to do scheduling. Right now, we
+  schedule every time a `Project` is created. Long term, we probably don't want
+  this anyway, so maybe it's time to bit the bullet and introduce an internal
+  `Schedule` method?
+
+* However, my gut feel is that the object model layer is the wrong way to do it
+  though, as it probably creates more objects than necessary and prevents policy
+  operations from performing any optimizations. But it's probably also true that
+  optimizations are a bad idea as it implies that the changes aren't routed
+  through a centralized policy system. Still, I'm leaning moving the
+  functionality down, but this time to `ProjectData` which ensures the policy
+  can access (and modify) the entire project state, if necessary.
+
+## Naming & Exceptions
+
+* We should rename the parameters of all single-argument `WithXxx` methods to
+  just `value`.
+
+* Exceptions that are a result of validating field values should at most be
+  thrown one level down in the `ProjectData` component. Ideally, we should align
+  parameter names so that we can just throw `ArgumentExceptions` and not feel
+  too bad about it.
+
+## Tests
+
+* Rename tests to make them field first, as opposed to operation first
+* Add test that ensures we expose all fields on Task, Resource, and Assignment
+
 ## Basics
 
 * Disallow cycles in predecessors
@@ -19,8 +74,11 @@
 
 * Creating custom types for duration and work so we can store the unit (minutes,
   hours, days, week, months) and whether it was estimated
-* We should add all the project settings, such as hours per day, hours per week,
-  days per month.
+* We should add all the project settings, such as
+  - hours per day
+  - hours per week
+  - days per month
+  - Tasks are critical if slack is less than or equal to
   - Note: Project has a default start time and default finish times for tasks.
     However, those don't seem to be used unless the task is manually scheduled;
     task dates snap to the calendar being used.
