@@ -30,13 +30,21 @@ namespace Immutable.ProjectModel
                                            .SetValue(AssignmentFields.ResourceName, resource.Name);
 
             projectData = projectData.UpdateAssignment(assignmentData);
+            projectData = InitializeTaskResourceNames(projectData, taskId);
 
             return UpdateProject(projectData).GetAssignment(assignmentId);
         }
 
         public Project RemoveAssignment(AssignmentId assignmentId)
         {
+            var assignment = GetAssignment(assignmentId);
+            if (assignment == null)
+                return this;
+
+            var taskId = assignment.Task.Id;
             var projectData = Scheduler.RemoveAssignment(Data, assignmentId);
+            projectData = InitializeTaskResourceNames(projectData, taskId);
+
             return UpdateProject(projectData);
         }
 
@@ -57,6 +65,10 @@ namespace Immutable.ProjectModel
             {
                 project = SetAssignmentWork(Data, assignment.Id, (TimeSpan)value);
             }
+            else if (field == AssignmentFields.Units)
+            {
+                project = SetAssignmentUnits(Data, assignment.Id, (double)value);
+            }
             else
             {
                 var assignmentData = assignment.Data.SetValue(field, value);
@@ -69,6 +81,13 @@ namespace Immutable.ProjectModel
         private ProjectData SetAssignmentWork(ProjectData project, AssignmentId id, TimeSpan value)
         {
             return Scheduler.SetAssignmentWork(project, project.Assignments[id], value);
+        }
+
+        private ProjectData SetAssignmentUnits(ProjectData project, AssignmentId id, double value)
+        {
+            project = project.UpdateAssignment(project.Assignments[id].SetValue(AssignmentFields.Units, value));
+            project = InitializeTaskResourceNames(project, project.Assignments[id].TaskId);
+            return project;
         }
     }
 }

@@ -39,6 +39,10 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
 
+        public string TaskName => GetValue(AssignmentFields.TaskName);
+
+        public string ResourceName => GetValue(AssignmentFields.ResourceName);
+
         private ImmutableDictionary<AssignmentField, object> Fields { get; }
 
         private AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)

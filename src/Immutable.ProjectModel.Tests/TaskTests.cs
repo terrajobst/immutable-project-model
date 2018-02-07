@@ -396,6 +396,156 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_ResourceNames_IsOrderedByName()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId1)
+                                    .WithName("ZZZ")
+                                    .Project
+                                 .AddResource(resourceId2)
+                                    .WithName("AAA")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId1)
+                                    .Project
+                                 .AddAssignment(taskId, resourceId2)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames("AAA, ZZZ");
+        }
+
+        [Fact]
+        public void Task_ResourceNames_IsUpdated_WhenResourceIsRenamed()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .GetResource(resourceId)
+                                    .WithName("New Name")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames("New Name");
+        }
+
+        [Fact]
+        public void Task_ResourceNames_IsUpdated_WhenResourceIsRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .RemoveResource(resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames(string.Empty);
+        }
+
+        [Fact]
+        public void Task_ResourceNames_IsUpdated_WhenAssignmentUnitsChange()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .GetAssignment(taskId, resourceId)
+                                    .WithUnits(.5)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames("Resource [50%]");
+        }
+
+        [Fact]
+        public void Task_ResourceNames_IsUpdated_WhenAssignmentIsRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .RemoveAssignment(taskId, resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames(string.Empty);
+        }
+
+        [Fact]
+        public void Task_ResourceNames_Setting()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId1)
+                                    .WithName("Res1")
+                                    .Project
+                                 .AddResource(resourceId2)
+                                    .WithName("Res2")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId1)
+                                    .Project
+                                 .GetTask(taskId)
+                                    .WithResourceNames("Res1 [10%], Res2, Res3")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceNames("Res1 [10%], Res2, Res3")
+                              .Project
+                         .HasResource(r => r.Name == "Res1")
+                         .HasResource(r => r.Name == "Res2")
+                         .HasResource(r => r.Name == "Res3")
+                         .ForAssignment(taskId, resourceId1)
+                              .AssertUnits(.10)
+                              .Project
+                         .HasAssignment(taskId, resourceId1)
+                         .HasAssignment(taskId, resourceId2);
+        }
+
+        [Fact]
         public void Task_Removal_UpdatesOrdinal()
         {
             var taskId1 = TaskId.Create();

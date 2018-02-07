@@ -129,5 +129,10 @@ namespace Immutable.ProjectModel
         {
             return WithPredecessorIds(PredecessorIds.Remove(taskId));
         }
+
+        public Task WithResourceNames(string value)
+        {
+            return SetValue(TaskFields.ResourceNames, value);
+        }
     }
 }

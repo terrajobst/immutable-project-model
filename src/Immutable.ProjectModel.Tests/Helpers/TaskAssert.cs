@@ -107,5 +107,10 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             return AssertField(TaskFields.PredecessorIds, value, (v, av) => v.SequenceEqual(av));
         }
+
+        public TaskAssert AssertResourceNames(string value)
+        {
+            return AssertField(TaskFields.ResourceNames, value);
+        }
     }
 }

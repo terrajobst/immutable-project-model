@@ -22,7 +22,10 @@ namespace Immutable.ProjectModel
             var project = Data.RemoveResource(resourceId);
 
             foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == resourceId))
+            {
                 project = Scheduler.RemoveAssignment(project, assignment.Id);
+                project = InitializeTaskResourceNames(project, assignment.TaskId);
+            }
 
             return UpdateProject(project);
         }
@@ -48,12 +51,21 @@ namespace Immutable.ProjectModel
         {
             project = project.UpdateResource(project.Resources[id].SetValue(ResourceFields.Name, value));
 
+            // Update Assignment.ResourceName
+
             var newAssignments = project.Assignments;
 
             foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == id))
                 newAssignments = newAssignments.SetItem(assignment.Id, assignment.SetValue(AssignmentFields.ResourceName, value));
 
-            return project.WithAssignments(newAssignments);
+            project = project.WithAssignments(newAssignments);
+
+            // Update Task.ResourceNames
+
+            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == id))
+                project = InitializeTaskResourceNames(project, assignment.TaskId);
+
+            return project;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Xunit;
 
@@ -53,6 +54,12 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             var resource = _project.GetResource(id);
             Assert.True(resource == null, $"The project {_project.Name} contains a resource {id} but shouldn't.");
+            return this;
+        }
+
+        public ProjectAssert HasResource(Predicate<Resource> matcher)
+        {
+            Assert.Single(_project.Resources, matcher);
             return this;
         }
 

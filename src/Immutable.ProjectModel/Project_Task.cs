@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 
 namespace Immutable.ProjectModel
 {
@@ -75,6 +76,10 @@ namespace Immutable.ProjectModel
             {
                 project = SetTaskWork(Data, task.Id, (TimeSpan)value);
             }
+            else if (field == TaskFields.ResourceNames)
+            {
+                project = SetTaskResourceNames(Data, task.Id, (string)value);
+            }
             else
             {
                 var taskData = task.Data.SetValue(field, value);
@@ -128,6 +133,93 @@ namespace Immutable.ProjectModel
         private ProjectData SetTaskWork(ProjectData project, TaskId id, TimeSpan value)
         {
             return Scheduler.SetTaskWork(project, project.Tasks[id], value);
+        }
+
+        private ProjectData InitializeTaskResourceNames(ProjectData project, TaskId id)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var a in project.Assignments.Values.Where(a => a.TaskId == id)
+                                                        .OrderBy(a => a.ResourceName))
+            {
+                if (sb.Length > 0)
+                    sb.Append(", ");
+
+                sb.Append(a.ResourceName);
+
+                if (a.Units != 1.0)
+                {
+                    sb.Append(" [");
+                    sb.Append(Math.Round(a.Units * 100, 2, MidpointRounding.AwayFromZero));
+                    sb.Append("%]");
+                }
+            }
+
+            var resourceNames = sb.ToString();
+            return project.UpdateTask(project.Tasks[id].SetValue(TaskFields.ResourceNames, resourceNames));
+        }
+
+        private ProjectData SetTaskResourceNames(ProjectData project, TaskId id, string value)
+        {
+            var result = this;
+
+            value = value.Trim();
+
+            var remainingAssignmentIds = result.Assignments.Where(a => a.Task.Id == id)
+                                                           .Select(a => a.Id)
+                                                           .ToList();
+
+            if (value.Length > 0)
+            {
+                var resourceParts = value.Split(',');
+
+                foreach (var resourcePart in resourceParts)
+                {
+                    var name = resourcePart.Trim();
+                    var units = 1.0;
+                    var openBracket = name.IndexOf("[");
+                    if (openBracket >= 0)
+                    {
+                        var closeBracket = name.IndexOf("]");
+
+                        if (closeBracket < openBracket)
+                            throw new FormatException("Missing ']' in resource name");
+
+                        var percentageText = name.Substring(openBracket + 1, closeBracket - openBracket - 1).Trim();
+
+                        if (percentageText.EndsWith("%"))
+                            percentageText = percentageText.Substring(0, percentageText.Length - 1).Trim();
+
+                        if (!double.TryParse(percentageText, out var percentage))
+                            throw new FormatException($"'{percentageText}' isn't a valid percentage");
+
+                        name = name.Substring(0, openBracket).Trim();
+                        units = percentage / 100.0;
+                    }
+
+                    var resource = result.Resources.FirstOrDefault(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
+                    if (resource == null)
+                    {
+                        resource = result.AddResource().WithName(name);
+                        result = resource.Project;
+                    }
+
+                    var assignment = result.Assignments.FirstOrDefault(a => a.Task.Id == id && a.Resource.Id == resource.Id);
+                    if (assignment == null)
+                    {
+                        assignment = result.AddAssignment(id, resource.Id);
+                        result = assignment.Project;
+                    }
+
+                    result = assignment.WithUnits(units).Project;
+                    remainingAssignmentIds.Remove(assignment.Id);
+                }
+            }
+
+            foreach (var assignmentId in remainingAssignmentIds)
+                result = result.RemoveAssignment(assignmentId);
+
+            return result.Data;
         }
     }
 }

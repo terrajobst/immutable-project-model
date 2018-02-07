@@ -23,6 +23,8 @@ namespace Immutable.ProjectModel
 
         public ResourceId Id { get; }
 
+        public string Name => GetValue(ResourceFields.Name);
+
         public IEnumerable<ResourceField> SetFields => ResourceFields.All.Where(HasValue);
 
         private ImmutableDictionary<ResourceField, object> Fields { get; }
