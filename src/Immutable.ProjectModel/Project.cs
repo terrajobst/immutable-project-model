@@ -138,12 +138,6 @@ namespace Immutable.ProjectModel
             return UpdateProject(projectData);
         }
 
-        internal Task UpdateTask(TaskData taskData)
-        {
-            var data = Data.UpdateTask(taskData);
-            return UpdateProject(data).GetTask(taskData.Id);
-        }
-
         public Resource AddNewResource(ResourceId resourceId = default)
         {
             resourceId = resourceId.CreateIfDefault();
@@ -160,12 +154,6 @@ namespace Immutable.ProjectModel
         {
             var projectData = Data.RemoveResource(resourceId);
             return UpdateProject(projectData);
-        }
-
-        internal Resource UpdateResource(ResourceData resourceData)
-        {
-            var data = Data.UpdateResource(resourceData);
-            return UpdateProject(data).GetResource(resourceData.Id);
         }
 
         public Assignment AddNewAssignment(TaskId taskId, ResourceId resourceId, AssignmentId assignmentId = default)
@@ -201,12 +189,6 @@ namespace Immutable.ProjectModel
                 return this;
 
             return RemoveAssignment(assignment.Id);
-        }
-
-        internal Assignment UpdateAssignment(AssignmentData assignmentData)
-        {
-            var data = Data.UpdateAssignment(assignmentData);
-            return UpdateProject(data).GetAssignment(assignmentData.Id);
         }
     }
 }
