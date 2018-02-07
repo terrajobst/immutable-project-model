@@ -510,7 +510,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Task_ResourceNames_Setting()
+        public void Task_ResourceNames_Set()
         {
             var taskId = TaskId.Create();
             var resourceId1 = ResourceId.Create();
