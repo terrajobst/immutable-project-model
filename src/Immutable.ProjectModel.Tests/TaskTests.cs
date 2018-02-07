@@ -256,6 +256,111 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Work_Increased_WhenAssignmentsAreAdded()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .AddTask(taskId)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddResource(resourceId1).Project
+                                 .AddResource(resourceId2).Project
+                                 .AddAssignment(taskId, resourceId1).Project
+                                 .AddAssignment(taskId, resourceId2).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(TimeSpan.FromDays(5))
+                              .AssertWork(TimeSpan.FromHours(80))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0)).Project
+                         .ForAssignment(taskId, resourceId1)
+                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0)).Project
+                         .ForAssignment(taskId, resourceId2)
+                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
+        }
+
+        [Fact]
+        public void Task_Work_Decreased_WhenAssignmentsAreRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .AddTask(taskId)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddResource(resourceId1).Project
+                                 .AddResource(resourceId2).Project
+                                 .AddAssignment(taskId, resourceId1).Project
+                                 .AddAssignment(taskId, resourceId2).Project
+                                 .RemoveAssignment(taskId, resourceId2);
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(TimeSpan.FromDays(5))
+                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0)).Project
+                         .ForAssignment(taskId, resourceId1)
+                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
+        }
+
+        [Fact]
+        public void Task_Work_Cleared_WhenAllAssignmentsAreRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .AddTask(taskId)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddResource(resourceId).Project
+                                 .AddAssignment(taskId, resourceId).Project
+                                 .RemoveAssignment(taskId, resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(TimeSpan.FromDays(5))
+                              .AssertWork(TimeSpan.Zero)
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
+        }
+
+        [Fact]
+        public void Task_Work_Decreased_WhenResourcesAreRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .AddTask(taskId)
+                                    .WithDuration(TimeSpan.FromDays(5)).Project
+                                 .AddResource(resourceId).Project
+                                 .AddAssignment(taskId, resourceId).Project
+                                 .RemoveResource(resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(TimeSpan.FromDays(5))
+                              .AssertWork(TimeSpan.Zero)
+                              .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
+        }
+
+        [Fact]
         public void Task_EarylyStart_EarylyFinish_LateStart_LateFinish()
         {
             var taskId3 = TaskId.Create();
@@ -666,7 +771,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Task_Removal_UpdatesOrdinal()
+        public void Task_Ordinal_IsUpated_WhenTaskIsRemoved()
         {
             var taskId1 = TaskId.Create();
             var taskId2 = TaskId.Create();
@@ -690,7 +795,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Task_Removal_UpdatesPredecessors()
+        public void Task_Predecessors_IsUpdated_WhenTasksIsRemoved()
         {
             var taskId1 = TaskId.Create();
             var taskId2 = TaskId.Create();
@@ -706,35 +811,6 @@ namespace Immutable.ProjectModel.Tests
             ProjectAssert.For(project)
                          .ForTask(0)
                               .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
-        }
-
-        [Fact]
-        public void Task_Removal_RemovesAssignments()
-        {
-            var taskId1 = TaskId.Create();
-            var taskId2 = TaskId.Create();
-            var resourceId = ResourceId.Create();
-
-            var project = Project.Create()
-                                 .AddTask(taskId1)
-                                    .Project
-                                 .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
-                                    .Project
-                                 .AddResource(resourceId)
-                                    .Project
-                                 .AddAssignment(taskId1, resourceId)
-                                    .Project
-                                 .AddAssignment(taskId2, resourceId)
-                                    .Project
-                                 .RemoveTask(taskId1);
-
-            ProjectAssert.For(project)
-                         .HasNoTask(taskId1)
-                         .HasTask(taskId2)
-                         .HasResource(resourceId)
-                         .HasNoAssignment(taskId1, resourceId)
-                         .HasAssignment(taskId2, resourceId);
         }
     }
 }

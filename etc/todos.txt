@@ -44,10 +44,6 @@ I'm still not happy with the way the interactions work:
   parameter names so that we can just throw `ArgumentExceptions` and not feel
   too bad about it.
 
-## Tests
-
-* Rename tests to make them field first, as opposed to operation first
-
 ## Basics
 
 * Disallow cycles in predecessors
