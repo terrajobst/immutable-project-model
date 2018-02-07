@@ -33,5 +33,16 @@ namespace Immutable.ProjectModel
                                                                                  .Select(f => f.GetValue(null))
                                                                                  .OfType<TaskField>()
                                                                                  .ToImmutableArray();
+
+        public static readonly ImmutableArray<TaskField> Default = ImmutableArray.Create<TaskField>(
+            Ordinal,
+            Name,
+            Duration,
+            Work,
+            Start,
+            Finish,
+            Predecessors,
+            ResourceNames
+        );
     }
 }

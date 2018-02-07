@@ -13,5 +13,9 @@ namespace Immutable.ProjectModel
                                                                                          .Select(f => f.GetValue(null))
                                                                                          .OfType<ResourceField>()
                                                                                          .ToImmutableArray();
+
+        public static readonly ImmutableArray<ResourceField> Default = ImmutableArray.Create<ResourceField>(
+            Name
+        );
     }
 }

@@ -18,9 +18,9 @@ namespace Demo
     public partial class MainWindow : Window
     {
         private ProjectWorkspace _workspace;
-        private List<TaskField> _taskFields = new List<TaskField>();
-        private List<ResourceField> _resourceFields = new List<ResourceField>();
-        private List<AssignmentField> _assignmentFields = new List<AssignmentField>();
+        private List<TaskField> _taskFields = new List<TaskField>(TaskFields.Default);
+        private List<ResourceField> _resourceFields = new List<ResourceField>(ResourceFields.Default);
+        private List<AssignmentField> _assignmentFields = new List<AssignmentField>(AssignmentFields.Default);
 
         public MainWindow()
         {
@@ -241,16 +241,12 @@ namespace Demo
 
             GanttControl.DataContext = new GanttViewModel(_workspace);
 
-            _taskFields.AddRange(TaskFields.All);
-            _taskFields.Remove(TaskFields.PredecessorIds);
             UpdateTaskGridColumns();
             TaskDataGrid.DataContext = new TaskGridViewModel(_workspace);
 
-            _resourceFields.AddRange(ResourceFields.All);
             UpdateResourceGridColumns();
             ResourceDataGrid.DataContext = new ResourceGridViewModel(_workspace);
 
-            _assignmentFields.AddRange(AssignmentFields.All);
             UpdateAssignmentGridColumns();
             AssignmentDataGrid.DataContext = new AssignmentGridViewModel(_workspace);
 

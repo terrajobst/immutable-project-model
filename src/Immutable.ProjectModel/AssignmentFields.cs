@@ -22,5 +22,14 @@ namespace Immutable.ProjectModel
                                                                                              .Select(f => f.GetValue(null))
                                                                                              .OfType<AssignmentField>()
                                                                                              .ToImmutableArray();
+
+        public static readonly ImmutableArray<AssignmentField> Default = ImmutableArray.Create<AssignmentField>(
+            TaskName,
+            ResourceName,
+            Work,
+            Units,
+            Start,
+            Finish
+        );
     }
 }
