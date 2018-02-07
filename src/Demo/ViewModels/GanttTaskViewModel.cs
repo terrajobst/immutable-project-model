@@ -97,7 +97,7 @@ namespace Demo.ViewModels
 
             Predecessors.Clear();
 
-            foreach (var task in Current.Predecessors)
+            foreach (var task in Current.PredecessorTasks)
             {
                 var item = new Predecessor()
                 {

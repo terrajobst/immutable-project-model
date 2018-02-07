@@ -58,7 +58,7 @@ namespace Immutable.ProjectModel
 
         public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
 
-        public IEnumerable<Task> Predecessors => PredecessorIds.Select(id => Project.GetTask(id));
+        public IEnumerable<Task> PredecessorTasks => PredecessorIds.Select(id => Project.GetTask(id));
 
         public IEnumerable<Assignment> Assignments => Project.Data.Assignments.Values
                                                                               .Where(a => a.TaskId == Id)
