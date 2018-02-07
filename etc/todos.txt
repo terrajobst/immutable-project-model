@@ -4,7 +4,7 @@
 
 * IsCritical := Total Slack <= Project.ShowCriticalSlack
 * Task.Predecessors
-* Task.Sucessors
+* Task.Successors
 
 I'm still not happy with the way the interactions work:
 
