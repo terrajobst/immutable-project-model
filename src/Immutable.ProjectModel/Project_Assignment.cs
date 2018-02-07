@@ -4,7 +4,7 @@ namespace Immutable.ProjectModel
 {
     public sealed partial class Project
     {
-        public Assignment AddNewAssignment(TaskId taskId, ResourceId resourceId, AssignmentId assignmentId = default)
+        public Assignment AddAssignment(TaskId taskId, ResourceId resourceId, AssignmentId assignmentId = default)
         {
             assignmentId = assignmentId.CreateIfDefault();
 

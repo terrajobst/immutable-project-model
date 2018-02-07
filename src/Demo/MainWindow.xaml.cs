@@ -39,28 +39,28 @@ namespace Demo
             return Project.Create()
                           .WithName("Some Software Project")
                           .WithStartDate(new DateTimeOffset(2018, 1, 29, 0, 0, 0, DateTimeOffset.Now.Offset))
-                          .AddNewTask(designTaskId)
+                          .AddTask(designTaskId)
                               .WithName("Design")
                               .WithDuration(TimeSpan.FromDays(5)).Project
-                          .AddNewTask(implementationTaskId)
+                          .AddTask(implementationTaskId)
                               .WithName("Implementation")
                               .WithDuration(TimeSpan.FromDays(10))
                               .AddPredecessorId(designTaskId).Project
-                          .AddNewTask(migrationTaskId)
+                          .AddTask(migrationTaskId)
                               .WithName("Migration")
                               .WithDuration(TimeSpan.FromDays(8)).Project
-                          .AddNewTask(finishTaskId)
+                          .AddTask(finishTaskId)
                               .WithName("Finish")
                               .AddPredecessorId(implementationTaskId)
                               .AddPredecessorId(migrationTaskId).Project
-                          .AddNewResource(immoResourceId)
+                          .AddResource(immoResourceId)
                               .WithName("Immo").Project
-                          .AddNewResource(thomasResourceId)
+                          .AddResource(thomasResourceId)
                               .WithName("Thomas").Project
-                          .AddNewAssignment(designTaskId, immoResourceId).Project
-                          .AddNewAssignment(implementationTaskId, immoResourceId).Project
-                          .AddNewAssignment(implementationTaskId, thomasResourceId).Project
-                          .AddNewAssignment(migrationTaskId, thomasResourceId).Project;
+                          .AddAssignment(designTaskId, immoResourceId).Project
+                          .AddAssignment(implementationTaskId, immoResourceId).Project
+                          .AddAssignment(implementationTaskId, thomasResourceId).Project
+                          .AddAssignment(migrationTaskId, thomasResourceId).Project;
         }
 
         private static DataGridColumn CreateColumn(string name, string header, FieldDefinition field)
@@ -268,7 +268,7 @@ namespace Demo
 
         private void TaskGridAddButton_Click(object sender, RoutedEventArgs e)
         {
-            var project = _workspace.Current.AddNewTask().Project;
+            var project = _workspace.Current.AddTask().Project;
             _workspace.ApplyChanges(project);
         }
 
@@ -299,7 +299,7 @@ namespace Demo
 
         private void ResourceGridAddButton_Click(object sender, RoutedEventArgs e)
         {
-            var project = _workspace.Current.AddNewResource().Project;
+            var project = _workspace.Current.AddResource().Project;
             _workspace.ApplyChanges(project);
         }
 
@@ -340,7 +340,7 @@ namespace Demo
                 foreach (var resource in selectedResources)
                 {
                     if (project.GetAssignment(task.TaskId, resource.ResourceId) == null)
-                        project = project.AddNewAssignment(task.TaskId, resource.ResourceId).Project;
+                        project = project.AddAssignment(task.TaskId, resource.ResourceId).Project;
                 }
             }
 

@@ -16,10 +16,10 @@ namespace Immutable.ProjectModel.Tests
 
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 1, 29))
-                                 .AddNewTask(taskId)
+                                 .AddTask(taskId)
                                     .WithDuration(TimeSpan.FromDays(5)).Project
-                                 .AddNewResource(resourceId).Project
-                                 .AddNewAssignment(taskId, resourceId).Project
+                                 .AddResource(resourceId).Project
+                                 .AddAssignment(taskId, resourceId).Project
                                  .RemoveResource(resourceId);
 
             ProjectAssert.For(project)
@@ -39,18 +39,18 @@ namespace Immutable.ProjectModel.Tests
             var resourceId2 = ResourceId.Create();
 
             var project = Project.Create()
-                                 .AddNewTask(taskId1)
+                                 .AddTask(taskId1)
                                     .Project
-                                 .AddNewTask(taskId2)
+                                 .AddTask(taskId2)
                                     .AddPredecessorId(taskId1)
                                     .Project
-                                 .AddNewResource(resourceId1)
+                                 .AddResource(resourceId1)
                                     .Project
-                                 .AddNewResource(resourceId2)
+                                 .AddResource(resourceId2)
                                     .Project
-                                 .AddNewAssignment(taskId1, resourceId1)
+                                 .AddAssignment(taskId1, resourceId1)
                                     .Project
-                                 .AddNewAssignment(taskId2, resourceId2)
+                                 .AddAssignment(taskId2, resourceId2)
                                     .Project
                                  .RemoveResource(resourceId1);
 

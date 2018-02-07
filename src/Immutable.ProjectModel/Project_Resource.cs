@@ -4,7 +4,7 @@ namespace Immutable.ProjectModel
 {
     public sealed partial class Project
     {
-        public Resource AddNewResource(ResourceId resourceId = default)
+        public Resource AddResource(ResourceId resourceId = default)
         {
             resourceId = resourceId.CreateIfDefault();
 

@@ -5,7 +5,7 @@ namespace Immutable.ProjectModel
 {
     public sealed partial class Project
     {
-        public Task AddNewTask(TaskId taskId = default)
+        public Task AddTask(TaskId taskId = default)
         {
             taskId = taskId.CreateIfDefault();
 

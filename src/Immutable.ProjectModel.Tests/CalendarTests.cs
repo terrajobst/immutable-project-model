@@ -16,9 +16,9 @@ namespace Immutable.ProjectModel.Tests
 
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 1, 29))
-                                 .AddNewTask(taskId1)
+                                 .AddTask(taskId1)
                                     .WithDuration(TimeSpan.FromDays(10)).Project
-                                 .AddNewTask(taskId2)
+                                 .AddTask(taskId2)
                                     .WithDuration(TimeSpan.FromDays(5))
                                     .AddPredecessorId(taskId1).Project;
 
@@ -48,9 +48,9 @@ namespace Immutable.ProjectModel.Tests
             var project = Project.Create()                                 
                                  .WithStartDate(new DateTime(2018, 1, 29))
                                  .WithCalendar(calendar)
-                                 .AddNewTask(taskId1)
+                                 .AddTask(taskId1)
                                     .WithDuration(TimeSpan.FromDays(10)).Project
-                                 .AddNewTask(taskId2)
+                                 .AddTask(taskId2)
                                     .WithDuration(TimeSpan.FromDays(5))
                                     .AddPredecessorId(taskId1).Project;
 
@@ -76,9 +76,9 @@ namespace Immutable.ProjectModel.Tests
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 2, 1))
                                  .WithCalendar(Calendar.TwentyFourSeven)
-                                 .AddNewTask(taskId1)
+                                 .AddTask(taskId1)
                                     .WithDuration(TimeSpan.FromDays(10)).Project
-                                 .AddNewTask(taskId2)
+                                 .AddTask(taskId2)
                                     .WithDuration(TimeSpan.FromDays(5))
                                     .AddPredecessorId(taskId1).Project;
 
