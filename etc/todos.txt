@@ -46,7 +46,6 @@ I'm still not happy with the way the interactions work:
 
 ## Basics
 
-* Disallow cycles in predecessors
 * Add hierarchical tasks
 * Add effort driven
 * Add task type

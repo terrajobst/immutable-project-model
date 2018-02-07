@@ -651,6 +651,52 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_PredecessorIds_DetectsCycle_WhenDirect()
+        {
+            var taskId = TaskId.Create();
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                Project.Create()
+                        .AddTask(taskId)
+                            .AddPredecessorId(taskId)
+            );
+
+            Assert.Equal("Adding 0 as a predecessor would cause a cycle", exception.Message);
+        }
+
+        [Fact]
+        public void Task_PredecessorIds_DetectsCycle_WhenIndirect()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+            var taskId4 = TaskId.Create();
+            var taskId5 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                     .Project
+                                 .AddTask(taskId2)
+                                     .AddPredecessorId(taskId1)
+                                     .Project
+                                 .AddTask(taskId3)
+                                     .AddPredecessorId(taskId2)
+                                     .Project
+                                 .AddTask(taskId4)
+                                     .AddPredecessorId(taskId3)
+                                     .Project
+                                 .AddTask(taskId5)
+                                     .AddPredecessorId(taskId4)
+                                     .Project;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                project.GetTask(taskId1).AddPredecessorId(taskId5)   
+            );
+
+            Assert.Equal("Adding 4 as a predecessor would cause a cycle", exception.Message);
+        }
+
+        [Fact]
         public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromNonZero_ToZero()
         {
             var taskId1 = TaskId.Create();

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -76,6 +78,10 @@ namespace Immutable.ProjectModel
             {
                 project = SetTaskWork(Data, task.Id, (TimeSpan)value);
             }
+            else if (field == TaskFields.PredecessorIds)
+            {
+                project = SetTaskPredecessorIds(Data, task.Id, (ImmutableArray<TaskId>)value);
+            }
             else if (field == TaskFields.ResourceNames)
             {
                 project = SetTaskResourceNames(Data, task.Id, (string)value);
@@ -133,6 +139,35 @@ namespace Immutable.ProjectModel
         private ProjectData SetTaskWork(ProjectData project, TaskId id, TimeSpan value)
         {
             return Scheduler.SetTaskWork(project, project.Tasks[id], value);
+        }
+
+        private ProjectData SetTaskPredecessorIds(ProjectData project, TaskId id, ImmutableArray<TaskId> value)
+        {
+            // Check for cycles
+
+            var queue = new Queue<TaskId>();
+
+            foreach (var predecessorId in value)
+            {
+                queue.Enqueue(predecessorId);
+
+                while (queue.Count > 0)
+                {
+                    var taskId = queue.Dequeue();
+                    if (taskId == id)
+                    {
+                        var predecessorOrdinal = project.Tasks[predecessorId].Ordinal;
+                        throw new InvalidOperationException($"Adding {predecessorOrdinal} as a predecessor would cause a cycle");
+                    }
+
+                    var task = project.Tasks[taskId];
+                    foreach (var pid in task.PredecessorIds)
+                        queue.Enqueue(pid);
+                }
+            }
+
+            project = project.UpdateTask(project.Tasks[id].SetValue(TaskFields.PredecessorIds, value));
+            return project;
         }
 
         private ProjectData InitializeTaskResourceNames(ProjectData project, TaskId id)
