@@ -1,4 +1,7 @@
 ﻿
+﻿using System;
+using System.Windows;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
@@ -27,7 +30,17 @@ namespace Demo.ViewModels
             set
             {
                 var field = ResourceFields.All[index];
-                Workspace.ApplyChanges(Current.SetValue(field, value).Project);
+                try
+                {
+                    var project = Current.SetValue(field, value).Project;
+                    Workspace.ApplyChanges(project);
+                }
+                catch (Exception ex)
+                {
+                    var caption = "Updating Resource";
+                    var message = $"Error setting {field.Name} to '{value}': {ex.Message}";
+                    MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

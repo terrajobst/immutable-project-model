@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 using Immutable.ProjectModel;
@@ -22,7 +23,7 @@ namespace Demo
                 if (targetType == typeof(string))
                     return _fieldKind.Format(value);
 
-                return null;
+                return DependencyProperty.UnsetValue;
             }
 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -30,7 +31,7 @@ namespace Demo
                 if (value is string text && _fieldKind.TryParse(text, out var result))
                     return result;
 
-                return null;
+                return DependencyProperty.UnsetValue;
             }
         }
     }
