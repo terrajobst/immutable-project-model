@@ -5,6 +5,24 @@ namespace Immutable.ProjectModel
 {
     public sealed partial class Project
     {
+        public Task AddNewTask(TaskId taskId = default)
+        {
+            taskId = taskId.CreateIfDefault();
+
+            if (GetTask(taskId) != null)
+                throw new ArgumentException($"Project already contains a task with ID {taskId}.");
+
+            var taskData = TaskData.Create(taskId).SetValue(TaskFields.Ordinal, Data.Tasks.Count);
+            var projectData = Data.AddTask(taskData);
+            return UpdateProject(projectData).GetTask(taskData.Id);
+        }
+
+        public Project RemoveTask(TaskId taskId)
+        {
+            var projectData = Data.RemoveTask(taskId);
+            return UpdateProject(projectData);
+        }
+
         internal Task SetTaskField(Task task, TaskField field, object value)
         {
             ProjectData project;
