@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 
 namespace Immutable.ProjectModel
 {
@@ -65,34 +64,7 @@ namespace Immutable.ProjectModel
 
         public ProjectData RemoveTask(TaskId taskId)
         {
-            var newTasks = Tasks.Remove(taskId);
-
-            var ordinal = 0;
-
-            foreach (var task in Tasks.Values.OrderBy(t => t.Ordinal))
-            {
-                if (task.Id == taskId)
-                    continue;
-
-                var newTask = task;
-
-                // Update Ordinal
-                newTask = newTask.SetValue(TaskFields.Ordinal, ordinal);
-                ordinal++;
-
-                // Update PredecessorIds
-                var predecessors = newTask.PredecessorIds.Remove(taskId);
-                newTask = newTask.SetValue(TaskFields.PredecessorIds, predecessors);
-
-                newTasks = newTasks.SetItem(newTask.Id, newTask);
-            }
-
-            var newAssignments = Assignments;
-
-            foreach (var assignment in Assignments.Values.Where(a => a.TaskId == taskId))
-                newAssignments = newAssignments.Remove(assignment.Id);
-
-            return With(Information, newTasks, Resources, newAssignments);
+            return WithTasks(Tasks.Remove(taskId));
         }
 
         public ProjectData UpdateTask(TaskData task)
@@ -100,7 +72,7 @@ namespace Immutable.ProjectModel
             return WithTasks(Tasks.SetItem(task.Id, task));
         }
 
-        private ProjectData WithResources(ImmutableDictionary<ResourceId, ResourceData> resources)
+        public ProjectData WithResources(ImmutableDictionary<ResourceId, ResourceData> resources)
         {
             return With(Information, Tasks, resources, Assignments);
         }
@@ -112,13 +84,7 @@ namespace Immutable.ProjectModel
 
         public ProjectData RemoveResource(ResourceId resourceId)
         {
-            var newResources = Resources.Remove(resourceId);
-            var result = WithResources(newResources);
-
-            foreach (var assignment in Assignments.Values.Where(a => a.ResourceId == resourceId))
-                result = Scheduler.RemoveAssignment(result, assignment.Id);
-
-            return result;
+            return WithResources(Resources.Remove(resourceId));
         }
 
         public ProjectData UpdateResource(ResourceData resource)
@@ -126,7 +92,7 @@ namespace Immutable.ProjectModel
             return WithResources(Resources.SetItem(resource.Id, resource));
         }
 
-        private ProjectData WithAssignments(ImmutableDictionary<AssignmentId, AssignmentData> assignments)
+        public ProjectData WithAssignments(ImmutableDictionary<AssignmentId, AssignmentData> assignments)
         {
             return With(Information, Tasks, Resources, assignments);
         }

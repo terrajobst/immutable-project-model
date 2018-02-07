@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Immutable.ProjectModel
 {
@@ -18,8 +19,12 @@ namespace Immutable.ProjectModel
 
         public Project RemoveResource(ResourceId resourceId)
         {
-            var projectData = Data.RemoveResource(resourceId);
-            return UpdateProject(projectData);
+            var project = Data.RemoveResource(resourceId);
+
+            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == resourceId))
+                project = Scheduler.RemoveAssignment(project, assignment.Id);
+
+            return UpdateProject(project);
         }
 
         internal Resource SetResourceField(Resource resource, ResourceField field, object value)

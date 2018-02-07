@@ -19,8 +19,40 @@ namespace Immutable.ProjectModel
 
         public Project RemoveTask(TaskId taskId)
         {
-            var projectData = Data.RemoveTask(taskId);
-            return UpdateProject(projectData);
+            var project = Data.RemoveTask(taskId);
+
+            // Update tasks
+
+            var newTasks = project.Tasks;
+
+            var ordinal = 0;
+
+            foreach (var task in project.Tasks.Values.OrderBy(t => t.Ordinal))
+            {
+                var newTask = task;
+
+                // Update Ordinal
+                newTask = newTask.SetValue(TaskFields.Ordinal, ordinal);
+                ordinal++;
+
+                // Update PredecessorIds
+                var predecessors = newTask.PredecessorIds.Remove(taskId);
+                newTask = newTask.SetValue(TaskFields.PredecessorIds, predecessors);
+
+                newTasks = newTasks.SetItem(newTask.Id, newTask);
+            }
+
+            project = project.WithTasks(newTasks);
+
+            // Update assignments
+
+            var taskAssignments = project.Assignments.Values.Where(a => a.TaskId == taskId)
+                                                            .Select(a => a.Id);
+            var newAssignments = project.Assignments.RemoveRange(taskAssignments);
+
+            project = project.WithAssignments(newAssignments);
+
+            return UpdateProject(project);
         }
 
         internal Task SetTaskField(Task task, TaskField field, object value)
