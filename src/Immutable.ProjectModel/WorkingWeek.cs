@@ -24,6 +24,16 @@ namespace Immutable.ProjectModel
             WorkingDay.CreateTwentyFour(DayOfWeek.Sunday)
         );
 
+        public static WorkingWeek NonWorking = new WorkingWeek(
+            WorkingDay.CreateNonWorking(DayOfWeek.Monday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Tuesday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Wednesday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Thursday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Friday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Saturday),
+            WorkingDay.CreateNonWorking(DayOfWeek.Sunday)
+        );
+
         public static WorkingWeek Create(WorkingDay monday,
                                          WorkingDay tuesday,
                                          WorkingDay wednesday,

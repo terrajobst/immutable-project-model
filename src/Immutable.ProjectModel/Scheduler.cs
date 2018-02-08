@@ -156,7 +156,7 @@ namespace Immutable.ProjectModel
                                   .SetValue(TaskFields.Finish, task.EarlyFinish);
 
                 // Set duration
-                var work = GetWork(calendar, newTask.Start, newTask.Finish);
+                var work = calendar.GetWork(newTask.Start, newTask.Finish);
                 newTask = newTask.SetValue(TaskFields.Duration, work);
 
                 project = project.UpdateTask(newTask);
@@ -167,8 +167,8 @@ namespace Immutable.ProjectModel
                 var newTask = task;
 
                 // Set start slack, finish slack, and start slack
-                var startSlack = GetWork(calendar, task.EarlyStart, task.LateStart);
-                var finishSlack = GetWork(calendar, task.EarlyFinish, task.LateFinish);
+                var startSlack = calendar.GetWork(task.EarlyStart, task.LateStart);
+                var finishSlack = calendar.GetWork(task.EarlyFinish, task.LateFinish);
                 var totalSlack = startSlack <= finishSlack ? startSlack : finishSlack;
                 newTask = newTask.SetValue(TaskFields.StartSlack, startSlack)
                                  .SetValue(TaskFields.FinishSlack, finishSlack)
@@ -179,7 +179,7 @@ namespace Immutable.ProjectModel
                 var minumumEarlyStartOfSuccessors = successors.Select(t => t.EarlyStart)
                                                               .DefaultIfEmpty(projectEnd)
                                                               .Min();
-                var freeSlack = GetWork(project.Information.Calendar, newTask.EarlyStart, minumumEarlyStartOfSuccessors) - newTask.Duration;
+                var freeSlack = calendar.GetWork(newTask.EarlyStart, minumumEarlyStartOfSuccessors) - newTask.Duration;
                 newTask = newTask.SetValue(TaskFields.FreeSlack, freeSlack);
 
                 // Set criticality
@@ -225,8 +225,8 @@ namespace Immutable.ProjectModel
                 return;
             }
 
-            start = AddWork(calendar, start, TimeSpan.Zero);
-            end = AddWork(calendar, start, work);
+            start = calendar.FindWorkStart(start);
+            end = calendar.AddWork(start, work);
         }
 
         private static void ComputeStart(Calendar calendar, out DateTimeOffset start, ref DateTimeOffset end, TimeSpan work)
@@ -237,115 +237,8 @@ namespace Immutable.ProjectModel
                 return;
             }
 
-            end = SubtractWork(calendar, end, TimeSpan.Zero);
-            start = SubtractWork(calendar, end, work);
-        }
-
-        private static DateTimeOffset AddWork(Calendar calendar, DateTimeOffset date, TimeSpan work)
-        {
-            var result = date;
-
-            do
-            {
-                var workingTime = GetNextWorkingTime(calendar, ref result);
-                if (workingTime > work)
-                    workingTime = work;
-
-                result += workingTime;
-                work -= workingTime;
-            }
-            while (work > TimeSpan.Zero);
-
-            return result;
-        }
-
-        private static DateTimeOffset SubtractWork(Calendar calendar, DateTimeOffset date, TimeSpan work)
-        {
-            var result = date;
-
-            do
-            {
-                var workingTime = GetPreviousWorkingTime(calendar, ref result);
-                if (workingTime > work)
-                    workingTime = work;
-
-                result -= workingTime;
-                work -= workingTime;
-            }
-            while (work > TimeSpan.Zero);
-
-            return result;
-        }
-
-        private static TimeSpan GetNextWorkingTime(Calendar calendar, ref DateTimeOffset date)
-        {
-            while (true)
-            {
-                var day = calendar.WorkingWeek[date.DayOfWeek];
-
-                foreach (var time in day.WorkingTimes)
-                {
-                    var from = date.Date.Add(time.From);
-                    var to = date.Date.Add(time.To);
-                    if (date < to)
-                    {
-                        date = date < from ? from : date;
-                        return to - date;
-                    }
-                }
-
-                date = date.Date.AddDays(1);
-            }
-        }
-
-        private static TimeSpan GetPreviousWorkingTime(Calendar calendar, ref DateTimeOffset date)
-        {
-            var input = date;
-            var atEndOfDay = false;
-
-            while (true)
-            {
-                var day = calendar.WorkingWeek[date.DayOfWeek];
-
-                foreach (var time in day.WorkingTimes.Reverse())
-                {
-                    var from = date.Date.Add(time.From);
-                    var to = date.Date.Add(time.To);
-
-                    if (atEndOfDay)
-                        date = to;
-
-                    if (date > from)
-                    {
-                        date = date > to ? to : date;
-                        return date - from;
-                    }
-                }
-
-                date = date.Date.AddDays(-1);
-                atEndOfDay = true;
-            }
-        }
-
-        private static TimeSpan GetWork(Calendar calendar, DateTimeOffset start, DateTimeOffset end)
-        {
-            Debug.Assert(start <= end);
-
-            var result = TimeSpan.Zero;
-            var date = start;
-
-            while (date < end)
-            {
-                var workingTime = GetNextWorkingTime(calendar, ref date);
-                date += workingTime;
-
-                if (date > end)
-                    workingTime -= date - end;
-
-                result += workingTime;
-            }
-
-            return result;
+            end = calendar.FindWorkEnd(end);
+            start = calendar.AddWork(end, -work);
         }
 
         public static ProjectData SetTaskWork(ProjectData project, TaskData task, TimeSpan work)
