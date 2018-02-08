@@ -157,8 +157,7 @@ namespace Immutable.ProjectModel
 
                 // Set duration
                 var work = GetWork(calendar, newTask.Start, newTask.Finish);
-                var duration = GetDuration(project, work);
-                newTask = newTask.SetValue(TaskFields.Duration, duration);
+                newTask = newTask.SetValue(TaskFields.Duration, work);
 
                 project = project.UpdateTask(newTask);
             }
@@ -168,8 +167,8 @@ namespace Immutable.ProjectModel
                 var newTask = task;
 
                 // Set start slack, finish slack, and start slack
-                var startSlack = GetDuration(project, GetWork(calendar, task.EarlyStart, task.LateStart));
-                var finishSlack = GetDuration(project, GetWork(calendar, task.EarlyFinish, task.LateFinish));
+                var startSlack = GetWork(calendar, task.EarlyStart, task.LateStart);
+                var finishSlack = GetWork(calendar, task.EarlyFinish, task.LateFinish);
                 var totalSlack = startSlack <= finishSlack ? startSlack : finishSlack;
                 newTask = newTask.SetValue(TaskFields.StartSlack, startSlack)
                                  .SetValue(TaskFields.FinishSlack, finishSlack)
@@ -180,7 +179,7 @@ namespace Immutable.ProjectModel
                 var minumumEarlyStartOfSuccessors = successors.Select(t => t.EarlyStart)
                                                               .DefaultIfEmpty(projectEnd)
                                                               .Min();
-                var freeSlack = GetDuration(project, GetWork(project.Information.Calendar, newTask.EarlyStart, minumumEarlyStartOfSuccessors)) - newTask.Duration;
+                var freeSlack = GetWork(project.Information.Calendar, newTask.EarlyStart, minumumEarlyStartOfSuccessors) - newTask.Duration;
                 newTask = newTask.SetValue(TaskFields.FreeSlack, freeSlack);
 
                 // Set criticality
@@ -213,7 +212,7 @@ namespace Immutable.ProjectModel
         {
             var hasAssignments = project.Assignments.Values.Any(a => a.TaskId == task.Id);
             if (!hasAssignments)
-                return GetWork(project, task.Duration);
+                return task.Duration;
 
             return task.Work;
         }
@@ -349,16 +348,6 @@ namespace Immutable.ProjectModel
             return result;
         }
 
-        private static TimeSpan GetWork(ProjectData project, TimeSpan duration)
-        {
-            return TimeSpan.FromHours(duration.TotalDays * 8.0);
-        }
-
-        private static TimeSpan GetDuration(ProjectData project, TimeSpan work)
-        {
-            return TimeSpan.FromDays(work.TotalHours / 8.0);
-        }
-
         public static ProjectData SetTaskWork(ProjectData project, TaskData task, TimeSpan work)
         {
             task = task.SetValue(TaskFields.Work, work);
@@ -404,7 +393,6 @@ namespace Immutable.ProjectModel
 
         public static ProjectData SetTaskDuration(ProjectData project, TaskData task, TimeSpan duration)
         {
-            var oldDuration = task.Duration;
             task = task.SetValue(TaskFields.Duration, duration);
             project = project.UpdateTask(task);
 
@@ -412,14 +400,11 @@ namespace Immutable.ProjectModel
             if (!hasAssignments)
                 return project;
 
-            var oldWork = GetWork(project, oldDuration);
-            var work = GetWork(project, duration);
-
             foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == task.Id))
             {
                 if (assignment.Finish == task.Finish)
                 {
-                    var assignmentWork = TimeSpan.FromHours(work.TotalHours * assignment.Units);
+                    var assignmentWork = TimeSpan.FromHours(duration.TotalHours * assignment.Units);
                     project = SetAssignmentWork(project, assignment, assignmentWork);
                 }
             }

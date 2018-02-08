@@ -29,6 +29,7 @@ namespace Demo
 
         private static Project CreateProject()
         {
+            var time = TimeConversion.Default;
             var designTaskId = TaskId.Create();
             var implementationTaskId = TaskId.Create();
             var migrationTaskId = TaskId.Create();
@@ -41,14 +42,14 @@ namespace Demo
                           .WithStartDate(new DateTimeOffset(2018, 1, 29, 0, 0, 0, DateTimeOffset.Now.Offset))
                           .AddTask(designTaskId)
                               .WithName("Design")
-                              .WithDuration(TimeSpan.FromDays(5)).Project
+                              .WithDuration(time.FromDays(5)).Project
                           .AddTask(implementationTaskId)
                               .WithName("Implementation")
-                              .WithDuration(TimeSpan.FromDays(10))
+                              .WithDuration(time.FromDays(10))
                               .AddPredecessorId(designTaskId).Project
                           .AddTask(migrationTaskId)
                               .WithName("Migration")
-                              .WithDuration(TimeSpan.FromDays(8)).Project
+                              .WithDuration(time.FromDays(8)).Project
                           .AddTask(finishTaskId)
                               .WithName("Finish")
                               .AddPredecessorId(implementationTaskId)
@@ -63,7 +64,7 @@ namespace Demo
                           .AddAssignment(migrationTaskId, thomasResourceId).Project;
         }
 
-        private static DataGridColumn CreateColumn(string name, string header, FieldDefinition field)
+        private DataGridColumn CreateColumn(string name, string header, FieldDefinition field)
         {
             var mode = field.IsReadOnly ? BindingMode.OneTime : BindingMode.TwoWay;
 
@@ -71,7 +72,7 @@ namespace Demo
             {
                 Binding = new Binding(name)
                 {
-                    Converter = new FieldKindValueConverter(field.Kind)
+                    Converter = new FieldKindValueConverter(_workspace, field.Kind)
                 },
                 Header = header,
                 IsReadOnly = field.IsReadOnly

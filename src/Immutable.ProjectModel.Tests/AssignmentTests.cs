@@ -17,18 +17,18 @@ namespace Immutable.ProjectModel.Tests
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 1, 29))
                                  .AddTask(taskId)
-                                    .WithDuration(TimeSpan.FromDays(10)).Project
+                                    .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddResource(resourceId).Project
                                  .AddAssignment(taskId, resourceId).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertWork(TimeSpan.FromHours(80))
+                              .AssertDuration(ProjectTime.FromDays(10))
+                              .AssertWork(ProjectTime.FromHours(80))
                               .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0)).Project
                          .ForAssignment(taskId, resourceId)
-                              .AssertWork(TimeSpan.FromHours(80))
+                              .AssertWork(ProjectTime.FromHours(80))
                               .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0));
         }
@@ -42,19 +42,19 @@ namespace Immutable.ProjectModel.Tests
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 1, 29))
                                  .AddTask(taskId)
-                                    .WithDuration(TimeSpan.FromDays(10))
-                                    .WithWork(TimeSpan.FromHours(40)).Project
+                                    .WithDuration(ProjectTime.FromDays(10))
+                                    .WithWork(ProjectTime.FromHours(40)).Project
                                  .AddResource(resourceId).Project
                                  .AddAssignment(taskId, resourceId).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(5))
-                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertDuration(ProjectTime.FromDays(5))
+                              .AssertWork(ProjectTime.FromHours(40))
                               .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0)).Project
                          .ForAssignment(taskId, resourceId)
-                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertWork(ProjectTime.FromHours(40))
                               .AssertStart(new DateTime(2018, 1, 29, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 2, 17, 0, 0));
         }
@@ -72,25 +72,25 @@ namespace Immutable.ProjectModel.Tests
                                  .AddResource(resourceId1).Project
                                  .AddResource(resourceId2).Project
                                  .AddAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(40))
+                                    .WithWork(ProjectTime.FromHours(40))
                                     .WithUnits(.5).Project
                                  .AddAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(20)).Project;
+                                    .WithWork(ProjectTime.FromHours(20)).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertWork(TimeSpan.FromHours(60))
+                              .AssertDuration(ProjectTime.FromDays(10))
+                              .AssertWork(ProjectTime.FromHours(60))
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
                               .Project
                          .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertWork(ProjectTime.FromHours(40))
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0))
                               .Project
                          .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(20))
+                              .AssertWork(ProjectTime.FromHours(20))
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 7, 12, 0, 0));
         }
@@ -106,36 +106,36 @@ namespace Immutable.ProjectModel.Tests
             var project = Project.Create()
                                  .WithStartDate(new DateTime(2018, 2, 5))
                                  .AddTask(taskId)
-                                    .WithDuration(TimeSpan.FromDays(10)).Project
+                                    .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddResource(resourceId1).Project
                                  .AddResource(resourceId2).Project
                                  .AddResource(resourceId3).Project
                                  .AddAssignment(taskId, resourceId1)
-                                    .WithWork(TimeSpan.FromHours(80)).Project
+                                    .WithWork(ProjectTime.FromHours(80)).Project
                                  .AddAssignment(taskId, resourceId2)
-                                    .WithWork(TimeSpan.FromHours(40)).Project
+                                    .WithWork(ProjectTime.FromHours(40)).Project
                                  .AddAssignment(taskId, resourceId3)
-                                    .WithWork(TimeSpan.FromHours(10))
+                                    .WithWork(ProjectTime.FromHours(10))
                                     .WithUnits(.25).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
-                              .AssertDuration(TimeSpan.FromDays(10))
-                              .AssertWork(TimeSpan.FromHours(130))
+                              .AssertDuration(ProjectTime.FromDays(10))
+                              .AssertWork(ProjectTime.FromHours(130))
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0)).Project
                          .ForAssignment(taskId, resourceId1)
-                              .AssertWork(TimeSpan.FromHours(80))
+                              .AssertWork(ProjectTime.FromHours(80))
                               .AssertUnits(1.0)
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 16, 17, 0, 0)).Project
                          .ForAssignment(taskId, resourceId2)
-                              .AssertWork(TimeSpan.FromHours(40))
+                              .AssertWork(ProjectTime.FromHours(40))
                               .AssertUnits(1.0)
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0)).Project
                          .ForAssignment(taskId, resourceId3)
-                              .AssertWork(TimeSpan.FromHours(10))
+                              .AssertWork(ProjectTime.FromHours(10))
                               .AssertUnits(.25)
                               .AssertStart(new DateTime(2018, 2, 5, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 9, 17, 0, 0));

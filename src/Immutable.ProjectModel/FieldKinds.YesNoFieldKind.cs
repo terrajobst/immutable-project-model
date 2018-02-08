@@ -8,13 +8,13 @@ namespace Immutable.ProjectModel
         {
             public override Type Type => typeof(bool);
 
-            public override string Format(object value)
+            public override string Format(Project project, object value)
             {
                 var actualValue = (bool)value;
                 return actualValue ? "Yes" : "No";
             }
 
-            public override bool TryParse(string text, out object value)
+            public override bool TryParse(Project project, string text, out object value)
             {
                 var isYes = string.Equals(text, "Yes", StringComparison.OrdinalIgnoreCase);
                 var isNo = string.Equals(text, "No", StringComparison.OrdinalIgnoreCase);

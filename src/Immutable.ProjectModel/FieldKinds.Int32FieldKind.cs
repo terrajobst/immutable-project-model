@@ -8,13 +8,13 @@ namespace Immutable.ProjectModel
         {
             public override Type Type => typeof(int);
 
-            public override string Format(object value)
+            public override string Format(Project project, object value)
             {
                 var actualValue = (int)value;
                 return actualValue.ToString();
             }
 
-            public override bool TryParse(string text, out object value)
+            public override bool TryParse(Project project, string text, out object value)
             {
                 if (text != null)
                 {

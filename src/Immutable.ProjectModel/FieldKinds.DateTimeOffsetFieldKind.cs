@@ -8,13 +8,13 @@ namespace Immutable.ProjectModel
         {
             public override Type Type => typeof(DateTimeOffset);
 
-            public override string Format(object value)
+            public override string Format(Project project, object value)
             {
                 var actualValue = (DateTimeOffset)value;
                 return actualValue.ToString("MM/dd/yyyy hh:mm tt");
             }
 
-            public override bool TryParse(string text, out object value)
+            public override bool TryParse(Project project, string text, out object value)
             {
                 var result = DateTimeOffset.TryParse(text, out var actualValue);
                 value = actualValue;

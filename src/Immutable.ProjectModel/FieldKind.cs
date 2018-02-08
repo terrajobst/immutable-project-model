@@ -9,7 +9,7 @@ namespace Immutable.ProjectModel
         }
 
         public abstract Type Type { get; }
-        public abstract string Format(object value);
-        public abstract bool TryParse(string text, out object value);
+        public abstract string Format(Project project, object value);
+        public abstract bool TryParse(Project project, string text, out object value);
     }
 }

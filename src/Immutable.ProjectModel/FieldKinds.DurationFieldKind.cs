@@ -8,25 +8,19 @@ namespace Immutable.ProjectModel
         {
             public override Type Type => typeof(TimeSpan);
 
-            public override string Format(object value)
+            public override string Format(Project project, object value)
             {
                 var actualValue = (TimeSpan)value;
-                var days = Math.Round(actualValue.TotalDays, 2, MidpointRounding.AwayFromZero);
-                return $"{days} days";
+                return project.TimeConversion.FormatDuration(actualValue);
             }
 
-            public override bool TryParse(string text, out object value)
+            public override bool TryParse(Project project, string text, out object value)
             {
                 if (text != null)
                 {
-                    if (text.EndsWith("days"))
-                        text = text.Substring(0, text.Length - 3);
-
-                    text = text.Trim();
-
-                    if (double.TryParse(text, out var actualValue))
+                    if (project.TimeConversion.TryParseDuration(text, out var actualValue))
                     {
-                        value = TimeSpan.FromDays(actualValue);
+                        value = actualValue;
                         return true;
                     }
                 }

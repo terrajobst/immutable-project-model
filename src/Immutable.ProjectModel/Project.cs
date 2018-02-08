@@ -34,6 +34,8 @@ namespace Immutable.ProjectModel
 
         public Calendar Calendar => Data.Information.Calendar;
 
+        public TimeConversion TimeConversion => Data.Information.TimeConversion;
+
         public IEnumerable<Task> Tasks => Data.Tasks.Keys.Select(GetTask).OrderBy(t => t.Ordinal);
 
         public IEnumerable<Resource> Resources => Data.Resources.Keys.Select(GetResource);
@@ -116,6 +118,16 @@ namespace Immutable.ProjectModel
                 throw new ArgumentNullException(nameof(calendar));
 
             var information = Data.Information.WithCalendar(calendar);
+            var data = Data.WithInformation(information);
+            return UpdateProject(data);
+        }
+
+        public Project WithTimeConversion(TimeConversion timeConversion)
+        {
+            if (timeConversion == null)
+                throw new ArgumentNullException(nameof(timeConversion));
+
+            var information = Data.Information.WithTimeConversion(timeConversion);
             var data = Data.WithInformation(information);
             return UpdateProject(data);
         }
