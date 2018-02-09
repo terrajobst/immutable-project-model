@@ -60,8 +60,12 @@ namespace Demo.ViewModels
 
         public TimeSpan Duration
         {
-            get => Current.GetValue(TaskFields.Duration);
-            set => SetField(TaskFields.Duration, value);
+            get => Current.GetValue(TaskFields.Duration).Span;
+            set
+            {
+                var v = Current.GetValue(TaskFields.Duration).WithSpan(value);
+                SetField(TaskFields.Duration, v);
+            }
         }
 
         public ObservableCollection<Predecessor> Predecessors { get; }

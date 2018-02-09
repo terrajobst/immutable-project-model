@@ -15,6 +15,7 @@ namespace Immutable.ProjectModel
         public static readonly FieldKind DateTime = new DateTimeOffsetFieldKind();
         public static readonly FieldKind Work = new WorkFieldKind();
         public static readonly FieldKind Duration = new DurationFieldKind();
+        internal static readonly FieldKind FakeDuration = new FakeDurationFieldKind();
         public static readonly FieldKind Percentage = new PercentageFieldKind();
     }
 }

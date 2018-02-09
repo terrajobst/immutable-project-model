@@ -24,7 +24,7 @@ namespace Immutable.ProjectModel
 
         public string Name => GetValue(TaskFields.Name);
 
-        public TimeSpan Duration => GetValue(TaskFields.Duration);
+        public Duration Duration => GetValue(TaskFields.Duration);
 
         public TimeSpan Work => GetValue(TaskFields.Work);
 
@@ -120,6 +120,11 @@ namespace Immutable.ProjectModel
         }
 
         public Task WithDuration(TimeSpan duration)
+        {
+            return WithDuration(Duration.WithSpan(duration));
+        }
+
+        public Task WithDuration(Duration duration)
         {
             return SetValue(TaskFields.Duration, duration);
         }

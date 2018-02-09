@@ -82,12 +82,13 @@ namespace Immutable.ProjectModel
                 var earlyFinish = project.Get(TaskFields.EarlyFinish, taskId);
                 var lateStart = project.Get(TaskFields.LateStart, taskId);
                 var lateFinish = project.Get(TaskFields.LateFinish, taskId);
+                var duration = project.Get(TaskFields.Duration, taskId);
 
                 // Set start, finish, and duration
 
                 var start = earlyStart;
                 var finish = earlyFinish;
-                var duration = calendar.GetWork(start, finish);
+                duration = duration.WithSpan(calendar.GetWork(start, finish));
 
                 project = project.SetRaw(TaskFields.Start, taskId, start)
                                  .SetRaw(TaskFields.Finish, taskId, finish)
@@ -191,7 +192,7 @@ namespace Immutable.ProjectModel
         {
             var hasAssignments = project.GetAssignments(taskId).Any();
             if (!hasAssignments)
-                return project.Get(TaskFields.Duration, taskId);
+                return project.Get(TaskFields.Duration, taskId).Span;
 
             return project.Get(TaskFields.Work, taskId);
         }

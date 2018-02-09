@@ -192,7 +192,7 @@ namespace Immutable.ProjectModel
 
         public bool TryParseWork(string text, out TimeSpan result)
         {
-            return TryParse(text, WorkUnit, out result);
+            return TryParse(text, WorkUnit, out result, out var units);
         }
 
         public TimeSpan ParseWork(string text)
@@ -210,7 +210,26 @@ namespace Immutable.ProjectModel
 
         public bool TryParseDuration(string text, out TimeSpan result)
         {
-            return TryParse(text, DurationUnit, out result);
+            return TryParse(text, DurationUnit, out result, out var unit);
+        }
+
+        public bool TryParseDuration(string text, out TimeSpan span, out TimeUnit unit, out bool isEstimated)
+        {
+            if (text != null)
+            {
+                text = text.Trim();
+
+                isEstimated = text.EndsWith("?");
+                if (isEstimated)
+                    text = text.Substring(0, text.Length - 1).Trim();
+
+                return TryParse(text, DurationUnit, out span, out unit);
+            }
+
+            span = default;
+            unit = default;
+            isEstimated = default;
+            return false;
         }
 
         public TimeSpan ParseDuration(string text)
@@ -226,20 +245,30 @@ namespace Immutable.ProjectModel
             return Format(work, DurationUnit);
         }
 
-        private bool TryParse(string text, TimeUnit defaultUnit, out TimeSpan result)
+        public string FormatDuration(TimeSpan work, TimeUnit unit, bool isEstimated)
+        {
+            var result = Format(work, unit);
+            if (isEstimated)
+                result += "?";
+
+            return result;
+        }
+
+        private bool TryParse(string text, TimeUnit defaultUnit, out TimeSpan span, out TimeUnit unit)
         {
             if (text != null)
             {
-                var unit = ParseUnit(ref text, defaultUnit);
+                unit = ParseUnit(ref text, defaultUnit);
 
                 if (double.TryParse(text, out var value))
                 {
-                    result = FromUnit(value, unit);
+                    span = FromUnit(value, unit);
                     return true;
                 }
             }
 
-            result = default;
+            span = default;
+            unit = default;
             return false;
         }
 

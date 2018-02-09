@@ -117,7 +117,7 @@ namespace Immutable.ProjectModel
             }
             else if (field == TaskFields.Duration)
             {
-                return SetTaskDuration(this, id, (TimeSpan)value);
+                return SetTaskDuration(this, id, (Duration)value);
             }
             else if (field == TaskFields.Work)
             {
@@ -209,7 +209,7 @@ namespace Immutable.ProjectModel
             return project;
         }
 
-        private static ProjectData SetTaskDuration(ProjectData project, TaskId id, TimeSpan value)
+        private static ProjectData SetTaskDuration(ProjectData project, TaskId id, Duration value)
         {
             project = project.SetRaw(TaskFields.Duration, id, value);
 
@@ -222,7 +222,7 @@ namespace Immutable.ProjectModel
 
                 if (assignmentFinish == taskFinish)
                 {
-                    var assignmentWork = TimeSpan.FromHours(value.TotalHours * assignmentUnits);
+                    var assignmentWork = TimeSpan.FromHours(value.Span.TotalHours * assignmentUnits);
                     project = project.Set(AssignmentFields.Work, assignmentId, assignmentWork);
                 }
             }

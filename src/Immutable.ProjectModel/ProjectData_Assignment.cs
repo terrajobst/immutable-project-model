@@ -63,7 +63,7 @@ namespace Immutable.ProjectModel
             {
                 var work = project.Get(TaskFields.Work, taskId);
                 if (work == TimeSpan.Zero)
-                    work = project.Get(TaskFields.Duration, taskId);
+                    work = project.Get(TaskFields.Duration, taskId).Span;
 
                 project = project.SetRaw(TaskFields.Work, taskId, work)
                                  .SetRaw(AssignmentFields.Work, assignmentId, work);

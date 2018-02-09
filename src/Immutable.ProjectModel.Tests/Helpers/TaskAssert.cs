@@ -54,7 +54,8 @@ namespace Immutable.ProjectModel.Tests.Helpers
 
         public TaskAssert AssertDuration(TimeSpan value)
         {
-            return AssertField(TaskFields.Duration, value);
+            var duration = new Duration(value, TimeUnit.Days, false);
+            return AssertField(TaskFields.Duration, duration);
         }
 
         public TaskAssert AssertStart(DateTimeOffset value)

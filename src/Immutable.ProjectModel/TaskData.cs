@@ -74,12 +74,12 @@ namespace Immutable.ProjectModel
 
             if (field == TaskFields.Duration)
             {
-                var oldValue = (TimeSpan)existingValue;
-                var newValue = (TimeSpan)value;
+                var oldValue = (Duration)existingValue;
+                var newValue = (Duration)value;
 
-                if (oldValue == TimeSpan.Zero && newValue != TimeSpan.Zero)
+                if (oldValue.Span == TimeSpan.Zero && newValue.Span != TimeSpan.Zero)
                     fields = fields.SetItem(TaskFields.IsMilestone, false);
-                else if (oldValue != TimeSpan.Zero && newValue == TimeSpan.Zero)
+                else if (oldValue.Span != TimeSpan.Zero && newValue.Span == TimeSpan.Zero)
                     fields = fields.SetItem(TaskFields.IsMilestone, true);
             }
 
