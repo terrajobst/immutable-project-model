@@ -120,7 +120,12 @@ namespace Immutable.ProjectModel
                 tasks = tasks.SetItem(t.Id, t);
             }
 
-            return project.WithTasks(tasks);
+            project = project.WithTasks(tasks);
+
+            for (var i = 0; i < orderedTasks.Count; i++)
+                project = InitializeTaskPredecessors(project, orderedTasks[i].Id);
+
+            return project;
         }
 
         private ProjectData SetTaskName(ProjectData project, TaskId id, string value)

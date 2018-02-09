@@ -781,6 +781,31 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Predecessors_IsUpdated_WhenOrdinalIsUpdated()
+        {
+            var taskId0 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId0)
+                                    .Project
+                                 .AddTask()
+                                    .Project
+                                 .AddTask()
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .WithPredecessors("0,1")
+                                    .Project
+                                 .GetTask(taskId0)
+                                    .WithOrdinal(3)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId3)
+                              .AssertPredecessors("0,3");
+        }
+
+        [Fact]
         public void Task_Predecessors_IsUpdated_WhenPrecessorIsRemoved()
         {
             var taskId1 = TaskId.Create();
