@@ -283,8 +283,10 @@ namespace Demo
 
         private void TaskGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(TaskFields.All, _taskFields);
-            dialog.Owner = this;
+            var dialog = new ColumnChooserDialog(TaskFields.All, _taskFields)
+            {
+                Owner = this
+            };
             if (dialog.ShowDialog() == true)
             {
                 _taskFields.Clear();
@@ -314,8 +316,10 @@ namespace Demo
 
         private void ResourceGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(ResourceFields.All, _resourceFields);
-            dialog.Owner = this;
+            var dialog = new ColumnChooserDialog(ResourceFields.All, _resourceFields)
+            {
+                Owner = this
+            };
             if (dialog.ShowDialog() == true)
             {
                 _resourceFields.Clear();
@@ -358,8 +362,10 @@ namespace Demo
 
         private void AssignmentGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(AssignmentFields.All, _assignmentFields);
-            dialog.Owner = this;
+            var dialog = new ColumnChooserDialog(AssignmentFields.All, _assignmentFields)
+            {
+                Owner = this
+            };
             if (dialog.ShowDialog() == true)
             {
                 _assignmentFields.Clear();
