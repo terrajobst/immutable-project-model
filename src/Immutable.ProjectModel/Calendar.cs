@@ -1,9 +1,20 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Immutable.ProjectModel
 {
+    // NOTE: We're extremely naive int the way we compute the times:
+    //
+    //       In both, AddWork() and GetWork(), we should have an optimized path
+    //       that avoids walking times of individual days if the the span is
+    //       larger than a single week. We should break it apart like this:
+    //
+    //          HandleStart() + (NumberOfWeeks * HoursInAWeek) + HandleEnd()
+    //
+    // Needless to say this will get more complicated when we add exceptions
+    // and configurable work weeks, but logically that optimization can be
+    // still applied. In the end, I expect exceptions to just cause us to break
+    // the range apart (start..exception1, exception1..exception2, and so on).
     public sealed class Calendar
     {
         public static Calendar Default = new Calendar(WorkingWeek.Default);
