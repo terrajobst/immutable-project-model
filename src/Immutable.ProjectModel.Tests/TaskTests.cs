@@ -36,6 +36,30 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Ordinal_IsUpated_WhenTaskIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .Project
+                                 .RemoveTask(taskId2);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                              .AssertOrdinal(0)
+                              .Project
+                         .ForTask(taskId3)
+                              .AssertOrdinal(1);
+        }
+
+        [Fact]
         public void Task_Duration_Set()
         {
             var taskId1 = TaskId.Create();
@@ -789,6 +813,25 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Predecessors_IsUpdated_WhenTasksIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .AddPredecessorId(taskId1)
+                                    .Project
+                                 .RemoveTask(taskId1);
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
+        }
+
+        [Fact]
         public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromNonZero_ToZero()
         {
             var taskId1 = TaskId.Create();
@@ -906,49 +949,6 @@ namespace Immutable.ProjectModel.Tests
             ProjectAssert.For(project)
                          .ForTask(taskId)
                               .AssertIsMilesone(false);
-        }
-
-        [Fact]
-        public void Task_Ordinal_IsUpated_WhenTaskIsRemoved()
-        {
-            var taskId1 = TaskId.Create();
-            var taskId2 = TaskId.Create();
-            var taskId3 = TaskId.Create();
-
-            var project = Project.Create()
-                                 .AddTask(taskId1)
-                                    .Project
-                                 .AddTask(taskId2)
-                                    .Project
-                                 .AddTask(taskId3)
-                                    .Project
-                                 .RemoveTask(taskId2);
-
-            ProjectAssert.For(project)
-                         .ForTask(taskId1)
-                              .AssertOrdinal(0)
-                              .Project
-                         .ForTask(taskId3)
-                              .AssertOrdinal(1);
-        }
-
-        [Fact]
-        public void Task_Predecessors_IsUpdated_WhenTasksIsRemoved()
-        {
-            var taskId1 = TaskId.Create();
-            var taskId2 = TaskId.Create();
-
-            var project = Project.Create()
-                                 .AddTask(taskId1)
-                                    .Project
-                                 .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
-                                    .Project
-                                 .RemoveTask(taskId1);
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
         }
     }
 }
