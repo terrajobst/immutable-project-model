@@ -277,7 +277,7 @@ namespace Immutable.ProjectModel
                 }
             }
 
-            var value = ToUnit(span, unit);
+            var value = Math.Round(ToUnit(span, unit), 2, MidpointRounding.AwayFromZero);
             var unitText = GetUnitText(unit, value == 1.0);
             return $"{value} {unitText}";
         }
