@@ -185,14 +185,6 @@ namespace Immutable.ProjectModel.Tests
             Assert.Equal(expectedDate, Calendar.Default.FindWorkEnd(date));
         }
 
-        [Fact]
-        public void Calendar_GetWork_Throws_ForInvalidEnd()
-        {
-            var startDate = new DateTime(2018, 2, 5);
-            var endDate = new DateTime(2018, 2, 4);
-            Assert.Throws<ArgumentOutOfRangeException>(() => Calendar.Default.GetWork(startDate, endDate));
-        }
-
         [Theory]
         [InlineData("2/5/2018 12:00", "2/5/2018 13:00", 0.0)]
         [InlineData("2/5/2018 12:15", "2/5/2018 12:45", 0.0)]
@@ -203,12 +195,15 @@ namespace Immutable.ProjectModel.Tests
         [InlineData("2/5/2018 11:00", "2/5/2018 14:00", 2.0)]
         [InlineData("2/5/2018 08:00", "2/5/2018 17:00", 8.0)]
         [InlineData("2/5/2018 00:00", "2/5/2018 23:59", 8.0)]
+        [InlineData("2/5/2018 17:00", "2/4/2018 08:00", -8.0)]
         public void Calendar_GetWork(string startDateText, string endDateText, double expectedHours)
         {
             var startDate = DateTime.Parse(startDateText, CultureInfo.InvariantCulture);
             var endDate = DateTime.Parse(endDateText, CultureInfo.InvariantCulture);
             var expected = TimeSpan.FromHours(expectedHours);
+
             Assert.Equal(expected, Calendar.Default.GetWork(startDate, endDate));
+            Assert.Equal(-expected, Calendar.Default.GetWork(endDate, startDate));
         }
     }
 }

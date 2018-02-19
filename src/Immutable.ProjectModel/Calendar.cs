@@ -143,7 +143,7 @@ namespace Immutable.ProjectModel
         public TimeSpan GetWork(DateTimeOffset start, DateTimeOffset end)
         {
             if (end < start)
-                throw new ArgumentOutOfRangeException(nameof(end));
+                return -GetWork(end, start);
 
             start = FindWorkStart(start);
             end = FindWorkEnd(end);
