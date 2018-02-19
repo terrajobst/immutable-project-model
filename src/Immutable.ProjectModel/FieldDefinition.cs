@@ -40,8 +40,6 @@ namespace Immutable.ProjectModel
 
         public bool IsAssignment => (Flags & FieldFlags.Assignment) == FieldFlags.Assignment;
 
-        internal bool IsVirtual => (Flags & FieldFlags.Virtual) == FieldFlags.Virtual;
-
         public bool IsReadOnly => (Flags & FieldFlags.ReadOnly) == FieldFlags.ReadOnly;
 
         public override string ToString() => Name;

@@ -7,7 +7,7 @@ namespace Immutable.ProjectModel
 {
     public static class TaskFields
     {
-        public static readonly TaskField<TaskId> Id = new TaskField<TaskId>("Id", FieldKinds.TaskId, FieldFlags.ReadOnly | FieldFlags.Virtual);
+        public static readonly TaskField<TaskId> Id = new TaskField<TaskId>("Id", FieldKinds.TaskId, FieldFlags.ReadOnly);
         public static readonly TaskField<int> Ordinal = new TaskField<int>("Ordinal", FieldKinds.Int32);
         public static readonly TaskField<string> Name = new TaskField<string>("Name", FieldKinds.Text);
         public static readonly TaskField<TimeSpan> Duration = new TaskField<TimeSpan>("Duration", FieldKinds.Duration);

@@ -12,16 +12,18 @@ namespace Immutable.ProjectModel
         {
             Debug.Assert(!id.IsDefault);
 
-            return new TaskData(id, ImmutableDictionary<TaskField, object>.Empty);
+            var fields = ImmutableDictionary.Create<TaskField, object>()
+                                            .Add(TaskFields.Id, id);
+
+            return new TaskData(fields);
         }
 
-        private TaskData(TaskId id, ImmutableDictionary<TaskField, object> fields)
+        private TaskData(ImmutableDictionary<TaskField, object> fields)
         {
-            Id = id;
             Fields = fields;
         }
 
-        public TaskId Id { get; }
+        public TaskId Id => GetValue(TaskFields.Id);
 
         public int Ordinal => GetValue(TaskFields.Ordinal);
 
@@ -62,12 +64,12 @@ namespace Immutable.ProjectModel
             if (fields == Fields)
                 return this;
 
-            return new TaskData(Id, fields);
+            return new TaskData(fields);
         }
 
         public bool HasValue(TaskField field)
         {
-            return field.IsVirtual || Fields.ContainsKey(field);
+            return Fields.ContainsKey(field);
         }
 
         public T GetValue<T>(TaskField<T> field)
@@ -84,12 +86,6 @@ namespace Immutable.ProjectModel
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
-
-            if (field.IsVirtual)
-            {
-                if (field == TaskFields.Id)
-                    return Id;
-            }
 
             if (!Fields.TryGetValue(field, out var result))
                 return field.DefaultValue;

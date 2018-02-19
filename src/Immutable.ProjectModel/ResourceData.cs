@@ -12,16 +12,18 @@ namespace Immutable.ProjectModel
         {
             Debug.Assert(!id.IsDefault);
 
-            return new ResourceData(id, ImmutableDictionary<ResourceField, object>.Empty);
+            var fields = ImmutableDictionary.Create<ResourceField, object>()
+                                            .Add(ResourceFields.Id, id);
+
+            return new ResourceData(fields);
         }
 
-        private ResourceData(ResourceId id, ImmutableDictionary<ResourceField, object> fields)
+        private ResourceData(ImmutableDictionary<ResourceField, object> fields)
         {
-            Id = id;
             Fields = fields;
         }
 
-        public ResourceId Id { get; }
+        public ResourceId Id => GetValue(ResourceFields.Id);
 
         public string Name => GetValue(ResourceFields.Name);
 
@@ -34,12 +36,12 @@ namespace Immutable.ProjectModel
             if (fields == Fields)
                 return this;
 
-            return new ResourceData(Id, fields);
+            return new ResourceData(fields);
         }
 
         public bool HasValue(ResourceField field)
         {
-            return field.IsVirtual || Fields.ContainsKey(field);
+            return Fields.ContainsKey(field);
         }
 
         public T GetValue<T>(ResourceField<T> field)
@@ -56,12 +58,6 @@ namespace Immutable.ProjectModel
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
-
-            if (field.IsVirtual)
-            {
-                if (field == ResourceFields.Id)
-                    return Id;
-            }
 
             if (!Fields.TryGetValue(field, out var result))
                 return field.DefaultValue;

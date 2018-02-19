@@ -14,22 +14,24 @@ namespace Immutable.ProjectModel
             Debug.Assert(!taskId.IsDefault);
             Debug.Assert(!resourceId.IsDefault);
 
-            return new AssignmentData(id, taskId, resourceId, ImmutableDictionary<AssignmentField, object>.Empty);
+            var fields = ImmutableDictionary.Create<AssignmentField, object>()
+                                            .Add(AssignmentFields.Id, id)
+                                            .Add(AssignmentFields.TaskId, taskId)
+                                            .Add(AssignmentFields.ResourceId, resourceId);
+
+            return new AssignmentData(fields);
         }
 
-        private AssignmentData(AssignmentId id, TaskId taskId, ResourceId resourceId, ImmutableDictionary<AssignmentField, object> fields)
+        private AssignmentData(ImmutableDictionary<AssignmentField, object> fields)
         {
-            Id = id;
-            TaskId = taskId;
-            ResourceId = resourceId;
             Fields = fields;
         }
 
-        public AssignmentId Id { get; }
+        public AssignmentId Id => GetValue(AssignmentFields.Id);
 
-        public TaskId TaskId { get; }
+        public TaskId TaskId => GetValue(AssignmentFields.TaskId);
 
-        public ResourceId ResourceId { get; }
+        public ResourceId ResourceId => GetValue(AssignmentFields.ResourceId);
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
@@ -50,14 +52,14 @@ namespace Immutable.ProjectModel
             if (fields == Fields)
                 return this;
 
-            return new AssignmentData(Id, TaskId, ResourceId, fields);
+            return new AssignmentData(fields);
         }
 
         public IEnumerable<AssignmentField> SetFields => AssignmentFields.All.Where(HasValue);
 
         public bool HasValue(AssignmentField field)
         {
-            return field.IsVirtual || Fields.ContainsKey(field);
+            return Fields.ContainsKey(field);
         }
 
         public T GetValue<T>(AssignmentField<T> field)
@@ -74,18 +76,6 @@ namespace Immutable.ProjectModel
         {
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
-
-            if (field.IsVirtual)
-            {
-                if (field == AssignmentFields.Id)
-                    return Id;
-
-                if (field == AssignmentFields.TaskId)
-                    return TaskId;
-
-                if (field == AssignmentFields.ResourceId)
-                    return ResourceId;
-            }
 
             if (!Fields.TryGetValue(field, out var result))
                 return field.DefaultValue;
