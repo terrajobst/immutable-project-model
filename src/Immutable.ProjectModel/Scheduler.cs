@@ -29,21 +29,32 @@ namespace Immutable.ProjectModel
                 }
                 else
                 {
-                    var earlyStart = predecessorIds.Select(p => project.Get(TaskFields.EarlyFinish, p))
-                                                   .DefaultIfEmpty(project.Information.Start)
-                                                   .Max();
+                    var constraintType = project.Get(TaskFields.ConstraintType, taskId);
+                    var constraintDate = project.Get(TaskFields.ConstraintDate, taskId);
+
+                    var predecessorFinish = predecessorIds.Select(p => (DateTimeOffset?)project.Get(TaskFields.EarlyFinish, p))
+                                                          .DefaultIfEmpty()
+                                                          .Max();
 
                     var assignmentIds = project.GetAssignments(taskId);
                     if (!assignmentIds.Any())
                     {
                         var work = GetWork(project, taskId);
-                        ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, work);
+                        ComputeFinish(project.Information.Calendar,
+                                      project.Information.Start,
+                                      predecessorFinish,
+                                      constraintType,
+                                      constraintDate,
+                                      out var earlyStart,
+                                      out var earlyFinish,
+                                      work);
 
                         project = project.SetRaw(TaskFields.EarlyStart, taskId, earlyStart)
                                          .SetRaw(TaskFields.EarlyFinish, taskId, earlyFinish);
                     }
                     else
                     {
+                        var earlyStart = DateTimeOffset.MaxValue;
                         var earlyFinish = DateTimeOffset.MinValue;
 
                         foreach (var assignmentId in assignmentIds)
@@ -52,7 +63,17 @@ namespace Immutable.ProjectModel
                             var assignmentUnits = project.Get(AssignmentFields.Units, assignmentId);
 
                             var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
-                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var assignmentFinish, duration);
+                            ComputeFinish(project.Information.Calendar,
+                                          project.Information.Start,
+                                          predecessorFinish,
+                                          constraintType,
+                                          constraintDate,
+                                          out var assignmentStart,
+                                          out var assignmentFinish,
+                                          duration);
+
+                            if (assignmentStart < earlyStart)
+                                earlyStart = assignmentStart;
 
                             if (assignmentFinish > earlyFinish)
                                 earlyFinish = assignmentFinish;
@@ -91,15 +112,25 @@ namespace Immutable.ProjectModel
                 }
                 else
                 {
-                    var lateFinish = successors.Select(id => project.Get(TaskFields.LateStart, id))
-                                               .DefaultIfEmpty(project.Information.Finish)
-                                               .Min();
+                    var constraintType = project.Get(TaskFields.ConstraintType, taskId);
+                    var constraintDate = project.Get(TaskFields.ConstraintDate, taskId);
+
+                    var successorStart = successors.Select(id => (DateTimeOffset?)project.Get(TaskFields.LateStart, id))
+                                                   .DefaultIfEmpty()
+                                                   .Min();
 
                     var assignmentIds = project.GetAssignments(taskId);
                     if (!assignmentIds.Any())
                     {
                         var work = GetWork(project, taskId);
-                        ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, work);
+                        ComputeStart(project.Information.Calendar,
+                                     project.Information.Finish,
+                                     successorStart,
+                                     constraintType,
+                                     constraintDate,
+                                     out var lateStart,
+                                     out var lateFinish,
+                                     work);
 
                         project = project.SetRaw(TaskFields.LateStart, taskId, lateStart)
                                          .SetRaw(TaskFields.LateFinish, taskId, lateFinish);
@@ -107,6 +138,7 @@ namespace Immutable.ProjectModel
                     else
                     {
                         var lateStart = DateTimeOffset.MaxValue;
+                        var lateFinish = DateTimeOffset.MinValue;
 
                         foreach (var assignmentId in assignmentIds)
                         {
@@ -114,10 +146,20 @@ namespace Immutable.ProjectModel
                             var assignmentUnits = project.Get(AssignmentFields.Units, assignmentId);
 
                             var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
-                            ComputeStart(project.Information.Calendar, out var assignmentStart, ref lateFinish, duration);
+                            ComputeStart(project.Information.Calendar,
+                                         project.Information.Finish,
+                                         successorStart,
+                                         constraintType,
+                                         constraintDate,
+                                         out var assignmentStart,
+                                         out var assignmentFinish,
+                                         duration);
 
                             if (assignmentStart < lateStart)
                                 lateStart = assignmentStart;
+
+                            if (assignmentFinish > lateFinish)
+                                lateFinish = assignmentFinish;
                         }
 
                         project = project.SetRaw(TaskFields.LateStart, taskId, lateStart)
@@ -141,11 +183,13 @@ namespace Immutable.ProjectModel
                 var earlyFinish = project.Get(TaskFields.EarlyFinish, taskId);
                 var lateStart = project.Get(TaskFields.LateStart, taskId);
                 var lateFinish = project.Get(TaskFields.LateFinish, taskId);
+                var constraintType = project.Get(TaskFields.ConstraintType, taskId);
 
                 // Set start, finish, and duration
 
-                var start = earlyStart;
-                var finish = earlyFinish;
+                var isAsap = constraintType != ConstraintType.AsLateAsPossible;
+                var start = isAsap ? earlyStart : lateStart;
+                var finish = isAsap ? earlyFinish : lateFinish;
                 var duration = calendar.GetWork(start, finish);
 
                 project = project.SetRaw(TaskFields.Start, taskId, start)
@@ -171,6 +215,10 @@ namespace Immutable.ProjectModel
                                                            .DefaultIfEmpty(project.Information.Finish)
                                                            .Min();
                 var freeSlack = calendar.GetWork(earlyStart, minumumEarlyStartOfSuccessors) - duration;
+                if (freeSlack < TimeSpan.Zero ||
+                    constraintType == ConstraintType.MustFinishOn ||
+                    constraintType == ConstraintType.FinishNoLaterThan)
+                    freeSlack = TimeSpan.Zero;
                 project = project.SetRaw(TaskFields.FreeSlack, taskId, freeSlack);
             }
 
@@ -186,7 +234,7 @@ namespace Immutable.ProjectModel
                 var assignmentStart = taskStart;
 
                 var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
-                ComputeFinish(project.Information.Calendar, ref assignmentStart, out var assignmentFinish, duration);
+                var assignmentFinish = calendar.AddWork(assignmentStart, duration);
 
                 project = project.SetRaw(AssignmentFields.Start, assignmentId, assignmentStart)
                                  .SetRaw(AssignmentFields.Finish, assignmentId, assignmentFinish);
@@ -204,28 +252,80 @@ namespace Immutable.ProjectModel
             return project.Get(TaskFields.Work, taskId);
         }
 
-        private static void ComputeFinish(Calendar calendar, ref DateTimeOffset start, out DateTimeOffset end, TimeSpan work)
+        private static void ComputeFinish(Calendar calendar,
+                                          DateTimeOffset projectStart,
+                                          DateTimeOffset? predecessorEnd,
+                                          ConstraintType constraintType,
+                                          DateTimeOffset? constraintDate,
+                                          out DateTimeOffset start,
+                                          out DateTimeOffset end,
+                                          TimeSpan work)
         {
-            if (work == TimeSpan.Zero)
+            start = predecessorEnd ?? projectStart;
+
+            if (work != TimeSpan.Zero)
+                start = calendar.FindWorkStart(start);
+
+            if (constraintType == ConstraintType.StartNoEarlierThan && (predecessorEnd == null || start < constraintDate) ||
+                constraintType == ConstraintType.StartNoLaterThan && start > constraintDate ||
+                constraintType == ConstraintType.MustStartOn)
             {
-                end = start;
-                return;
+                start = constraintDate.Value;
+
+                if (constraintType == ConstraintType.StartNoEarlierThan)
+                   start = calendar.FindWorkStart(start);
             }
 
-            start = calendar.FindWorkStart(start);
-            end = calendar.AddWork(start, work);
+            if (work == TimeSpan.Zero)
+                end = start;
+            else
+                end = calendar.AddWork(start, work);
+
+            if (constraintType == ConstraintType.FinishNoEarlierThan && (predecessorEnd == null || end < constraintDate) ||
+                constraintType == ConstraintType.FinishNoLaterThan && end > constraintDate ||
+                constraintType == ConstraintType.MustFinishOn)
+            {
+                end = constraintDate.Value;
+                start = calendar.AddWork(end, -work);
+            }
         }
 
-        private static void ComputeStart(Calendar calendar, out DateTimeOffset start, ref DateTimeOffset end, TimeSpan work)
+        private static void ComputeStart(Calendar calendar,
+                                         DateTimeOffset projectEnd,
+                                         DateTimeOffset? successorStart,
+                                         ConstraintType constraintType,
+                                         DateTimeOffset? constraintDate,
+                                         out DateTimeOffset start,
+                                         out DateTimeOffset end,
+                                         TimeSpan work)
         {
-            if (work == TimeSpan.Zero)
+            end = successorStart ?? projectEnd;
+
+            if (work != TimeSpan.Zero)
+                end = calendar.FindWorkEnd(end);
+
+            if (constraintType == ConstraintType.FinishNoEarlierThan && (/*successorStart == null ||*/ end < constraintDate) ||
+                constraintType == ConstraintType.FinishNoLaterThan && (/*successorStart == null ||*/ end > constraintDate) ||
+                constraintType == ConstraintType.MustFinishOn)
             {
-                start = end;
-                return;
+                end = constraintDate.Value;
+
+                if (constraintType == ConstraintType.FinishNoEarlierThan)
+                    end = calendar.FindWorkEnd(end);
             }
 
-            end = calendar.FindWorkEnd(end);
-            start = calendar.AddWork(end, -work);
+            if (work == TimeSpan.Zero)
+                start = end;
+            else
+                start = calendar.AddWork(end, -work);
+
+            if (constraintType == ConstraintType.StartNoEarlierThan && (/*successorStart == null ||*/ start < constraintDate) ||
+                constraintType == ConstraintType.StartNoLaterThan && (/*successorStart == null ||*/ start > constraintDate) ||
+                constraintType == ConstraintType.MustStartOn)
+            {
+                start = constraintDate.Value;
+                end = calendar.AddWork(start, work);
+            }
         }
     }
 }

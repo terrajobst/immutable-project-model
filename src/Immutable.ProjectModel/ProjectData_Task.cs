@@ -123,6 +123,14 @@ namespace Immutable.ProjectModel
             {
                 return SetTaskWork(this, id, (TimeSpan)value);
             }
+            else if (field == TaskFields.ConstraintType)
+            {
+                return SetTaskConstraintType(this, id, (ConstraintType)value);
+            }
+            else if (field == TaskFields.ConstraintDate)
+            {
+                return SetTaskConstraintDate(this, id, (DateTimeOffset?)value);
+            }
             else if (field == TaskFields.Predecessors)
             {
                 return SetTaskPredecessors(this, id, (string)value);
@@ -270,6 +278,50 @@ namespace Immutable.ProjectModel
             }
 
             return project;
+        }
+
+        private static ProjectData SetTaskConstraintType(ProjectData project, TaskId id, ConstraintType value)
+        {
+            project = project.SetRaw(TaskFields.ConstraintType, id, value);
+
+            var hasNoDate = value == ConstraintType.AsSoonAsPossible ||
+                            value == ConstraintType.AsLateAsPossible;
+
+            if (hasNoDate)
+            {
+                project = project.SetRaw(TaskFields.ConstraintDate, id, null);
+            }
+            else
+            {
+                var hasDate = project.Get(TaskFields.ConstraintDate, id) != null;
+                if (!hasDate)
+                {
+                    var isStart = value == ConstraintType.MustStartOn ||
+                                  value == ConstraintType.StartNoEarlierThan ||
+                                  value == ConstraintType.StartNoLaterThan;
+                    var date = isStart
+                                ? project.Get(TaskFields.Start, id)
+                                : project.Get(TaskFields.Finish, id);
+                    project = project.SetRaw(TaskFields.ConstraintDate, id, date);
+                }
+            }
+
+            return project;
+        }
+
+        private static ProjectData SetTaskConstraintDate(ProjectData project, TaskId id, DateTimeOffset? value)
+        {
+            var constraintType = project.Get(TaskFields.ConstraintType, id);
+            var hasNoDate = constraintType == ConstraintType.AsSoonAsPossible ||
+                            constraintType == ConstraintType.AsLateAsPossible;
+            var requiresDate = !hasNoDate;
+
+            if (hasNoDate && value != null)
+                throw new InvalidOperationException($"Cannot set constraint date for a constraint of {constraintType}");
+            else if (requiresDate && value == null)
+                throw new InvalidOperationException($"Cannot clear constraint date for a constraint of {constraintType}");
+
+            return project.SetRaw(TaskFields.ConstraintDate, id, value);
         }
 
         private static ProjectData ResetTaskPredecessors(ProjectData project, TaskId id)

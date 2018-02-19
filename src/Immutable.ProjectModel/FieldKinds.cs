@@ -13,8 +13,10 @@ namespace Immutable.ProjectModel
         public static readonly FieldKind YesNo = new YesNoFieldKind();
         public static readonly FieldKind Text = new TextFieldKind();
         public static readonly FieldKind DateTime = new DateTimeOffsetFieldKind();
+        public static readonly FieldKind NullableDateTime = new NullableDateTimeOffsetFieldKind();
         public static readonly FieldKind Work = new WorkFieldKind();
         public static readonly FieldKind Duration = new DurationFieldKind();
         public static readonly FieldKind Percentage = new PercentageFieldKind();
+        public static readonly FieldKind ConstraintType = new EnumFieldKind(typeof(ConstraintType));
     }
 }

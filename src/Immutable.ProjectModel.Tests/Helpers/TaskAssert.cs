@@ -107,6 +107,16 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.FreeSlack, value);
         }
 
+        public TaskAssert AssertConstraintType(ConstraintType value)
+        {
+            return AssertField(TaskFields.ConstraintType, value);
+        }
+
+        public TaskAssert AssertConstraintDate(DateTimeOffset? value)
+        {
+            return AssertField(TaskFields.ConstraintDate, value);
+        }
+
         public TaskAssert AssertIsCritical(bool value)
         {
             return AssertField(TaskFields.IsCritical, value);

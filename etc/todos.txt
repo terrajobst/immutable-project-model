@@ -13,7 +13,6 @@
 ## Basics
 
 * Add hierarchical tasks
-* Add constraints
 * Add effort driven
 * Add task type
 * Add other predecessor types

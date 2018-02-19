@@ -32,6 +32,10 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset Finish => GetValue(TaskFields.Finish);
 
+        public ConstraintType ConstraintType => GetValue(TaskFields.ConstraintType);
+
+        public DateTimeOffset? ConstraintDate => GetValue(TaskFields.ConstraintDate);
+
         public DateTimeOffset EarlyStart => GetValue(TaskFields.EarlyStart);
 
         public DateTimeOffset EarlyFinish => GetValue(TaskFields.EarlyFinish);
@@ -127,6 +131,16 @@ namespace Immutable.ProjectModel
         public Task WithWork(TimeSpan work)
         {
             return SetValue(TaskFields.Work, work);
+        }
+
+        public Task WithConstraintType(ConstraintType constraintType)
+        {
+            return SetValue(TaskFields.ConstraintType, constraintType);
+        }
+
+        public Task WithConstraintDate(DateTimeOffset? constraintDate)
+        {
+            return SetValue(TaskFields.ConstraintDate, constraintDate);
         }
 
         public Task WithIsMilestone(bool isMilestone)

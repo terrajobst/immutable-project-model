@@ -22,6 +22,8 @@ namespace Immutable.ProjectModel
         public static readonly TaskField<TimeSpan> FinishSlack = new TaskField<TimeSpan>("FinishSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
         public static readonly TaskField<TimeSpan> TotalSlack = new TaskField<TimeSpan>("TotalSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
         public static readonly TaskField<TimeSpan> FreeSlack = new TaskField<TimeSpan>("FreeSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
+        public static readonly TaskField<ConstraintType> ConstraintType = new TaskField<ConstraintType>("ConstraintType", FieldKinds.ConstraintType);
+        public static readonly TaskField<DateTimeOffset?> ConstraintDate = new TaskField<DateTimeOffset?>("ConstraintDate", FieldKinds.NullableDateTime);
         public static readonly TaskField<bool> IsCritical = new TaskField<bool>("IsCritical", FieldKinds.YesNo, FieldFlags.ReadOnly);
         public static readonly TaskField<bool> IsMilestone = new TaskField<bool>("IsMilestone", FieldKinds.YesNo, defaultValue: true);
         public static readonly TaskField<string> ResourceNames = new TaskField<string>("ResourceNames", FieldKinds.Text);
