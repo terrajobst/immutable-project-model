@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace Immutable.ProjectModel
 {
@@ -7,6 +8,8 @@ namespace Immutable.ProjectModel
         private sealed class YesNoFieldKind : FieldKind
         {
             public override Type Type => typeof(bool);
+
+            public override bool HasSuggestions => true;
 
             public override string Format(Project project, object value)
             {
@@ -21,6 +24,11 @@ namespace Immutable.ProjectModel
 
                 value = isYes ? true : isNo ? (object) false : null;
                 return isYes || isNo;
+            }
+
+            public override IEnumerable GetSuggestions()
+            {
+                return new[] { true, false };
             }
         }
     }

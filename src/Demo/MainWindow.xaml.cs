@@ -68,17 +68,34 @@ namespace Demo
         {
             var mode = field.IsReadOnly ? BindingMode.OneTime : BindingMode.TwoWay;
 
-            var column = new DataGridTextColumn
+            if (field.Kind.HasSuggestions)
             {
-                Binding = new Binding(name)
-                {
-                    Converter = new FieldKindValueConverter(_workspace, field.Kind)
-                },
-                Header = header,
-                IsReadOnly = field.IsReadOnly
-            };
+                var formattedItems = field.Kind.GetSuggestions()
+                                               .OfType<object>()
+                                               .Select(o => new { Value = o, Text = field.Kind.Format(_workspace.Current, o) });
 
-            return column;
+                return new DataGridComboBoxColumn
+                {
+                    SelectedValueBinding = new Binding(name),
+                    SelectedValuePath = "Value",
+                    DisplayMemberPath = "Text",
+                    ItemsSource = formattedItems,
+                    Header = header,
+                    IsReadOnly = field.IsReadOnly
+                };
+            }
+            else
+            {
+                return new DataGridTextColumn
+                {
+                    Binding = new Binding(name)
+                    {
+                        Converter = new FieldKindValueConverter(_workspace, field.Kind)
+                    },
+                    Header = header,
+                    IsReadOnly = field.IsReadOnly
+                };
+            }
         }
 
         private void UpdateTaskGridColumns()
