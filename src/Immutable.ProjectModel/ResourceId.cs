@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Immutable.ProjectModel
 {
-    public struct ResourceId : IEquatable<ResourceId>
+    public readonly struct ResourceId : IEquatable<ResourceId>
     {
         private readonly Guid _guid;
 
