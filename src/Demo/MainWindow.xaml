@@ -6,8 +6,9 @@
         xmlns:gantt="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="350"
-        Width="525"
+        Width="800"
+        Height="600"
+        WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
     <DockPanel>
         <StackPanel x:Name="UndoRedoPanel"
