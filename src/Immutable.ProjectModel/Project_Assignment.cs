@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Immutable.ProjectModel
 {
@@ -22,29 +23,13 @@ namespace Immutable.ProjectModel
             if (resource == null)
                 throw new ArgumentException($"The project doesn't contain a resource with ID {resourceId}.", nameof(resourceId));
 
-            var projectData = Scheduler.AddAssignment(Data, assignmentId, taskId, resourceId);
-
-            var assignmentData = projectData.Assignments[assignmentId];
-
-            assignmentData = assignmentData.SetValue(AssignmentFields.TaskName, task.Name)
-                                           .SetValue(AssignmentFields.ResourceName, resource.Name);
-
-            projectData = projectData.UpdateAssignment(assignmentData);
-            projectData = InitializeTaskResourceNames(projectData, taskId);
-
+            var projectData = Data.AddAssignment(assignmentId, taskId, resourceId);
             return UpdateProject(projectData).GetAssignment(assignmentId);
         }
 
         public Project RemoveAssignment(AssignmentId assignmentId)
         {
-            var assignment = GetAssignment(assignmentId);
-            if (assignment == null)
-                return this;
-
-            var taskId = assignment.Task.Id;
-            var projectData = Scheduler.RemoveAssignment(Data, assignmentId);
-            projectData = InitializeTaskResourceNames(projectData, taskId);
-
+            var projectData = Data.RemoveAssignment(assignmentId);
             return UpdateProject(projectData);
         }
 
@@ -59,35 +44,11 @@ namespace Immutable.ProjectModel
 
         internal Assignment SetAssignmentField(Assignment assignment, AssignmentField field, object value)
         {
-            ProjectData project;
+            Debug.Assert(assignment != null);
+            Debug.Assert(field != null);
 
-            if (field == AssignmentFields.Work)
-            {
-                project = SetAssignmentWork(Data, assignment.Id, (TimeSpan)value);
-            }
-            else if (field == AssignmentFields.Units)
-            {
-                project = SetAssignmentUnits(Data, assignment.Id, (double)value);
-            }
-            else
-            {
-                var assignmentData = assignment.Data.SetValue(field, value);
-                project = Data.UpdateAssignment(assignmentData);
-            }
-
+            var project = Data.Set(field, assignment.Id, value);
             return UpdateProject(project).GetAssignment(assignment.Id);
-        }
-
-        private ProjectData SetAssignmentWork(ProjectData project, AssignmentId id, TimeSpan value)
-        {
-            return Scheduler.SetAssignmentWork(project, project.Assignments[id], value);
-        }
-
-        private ProjectData SetAssignmentUnits(ProjectData project, AssignmentId id, double value)
-        {
-            project = project.UpdateAssignment(project.Assignments[id].SetValue(AssignmentFields.Units, value));
-            project = InitializeTaskResourceNames(project, project.Assignments[id].TaskId);
-            return project;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace Immutable.ProjectModel
+﻿namespace Immutable.ProjectModel
 {
     internal sealed partial class ProjectData
     {
@@ -8,7 +6,7 @@ namespace Immutable.ProjectModel
 
         public ProjectData WithInformation(ProjectInformationData information)
         {
-            return With(information, Tasks, Resources, Assignments);
+            return With(information, _taskMap, _resourceMap, _assignmentMap);
         }
     }
 }

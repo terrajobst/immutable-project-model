@@ -29,8 +29,6 @@ namespace Immutable.ProjectModel
 
         public ResourceId Id => GetValue(ResourceFields.Id);
 
-        public string Name => GetValue(ResourceFields.Name);
-
         public IEnumerable<ResourceField> SetFields => ResourceFields.All.Where(HasValue);
 
         public bool HasValue(ResourceField field)

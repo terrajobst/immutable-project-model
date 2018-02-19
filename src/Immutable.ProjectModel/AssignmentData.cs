@@ -33,30 +33,6 @@ namespace Immutable.ProjectModel
 
         public AssignmentId Id => GetValue(AssignmentFields.Id);
 
-        public TaskId TaskId => GetValue(AssignmentFields.TaskId);
-
-        public ResourceId ResourceId => GetValue(AssignmentFields.ResourceId);
-
-        public TimeSpan Work => GetValue(AssignmentFields.Work);
-
-        public double Units => GetValue(AssignmentFields.Units);
-
-        public DateTimeOffset Start => GetValue(AssignmentFields.Start);
-
-        public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
-
-        public string TaskName => GetValue(AssignmentFields.TaskName);
-
-        public string ResourceName => GetValue(AssignmentFields.ResourceName);
-
-        private AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)
-        {
-            if (fields == _fields)
-                return this;
-
-            return new AssignmentData(fields);
-        }
-
         public IEnumerable<AssignmentField> SetFields => AssignmentFields.All.Where(HasValue);
 
         public bool HasValue(AssignmentField field)
@@ -99,7 +75,7 @@ namespace Immutable.ProjectModel
                 return this;
 
             var fields = _fields.SetItem(field, value);
-            return WithFields(fields);
+            return new AssignmentData(fields);
         }
 
         public override bool Equals(object obj)

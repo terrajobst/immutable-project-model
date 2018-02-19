@@ -16,21 +16,19 @@ namespace Immutable.ProjectModel
 
         public Project Project => _project;
 
-        internal AssignmentData Data => _data;
+        public AssignmentId Id => GetValue(AssignmentFields.Id);
 
-        public AssignmentId Id => Data.Id;
-
-        public TaskId TaskId => Data.TaskId;
+        public TaskId TaskId => GetValue(AssignmentFields.TaskId);
 
         public string TaskName => GetValue(AssignmentFields.TaskName);
 
-        public Task Task => Project.GetTask(Data.TaskId);
+        public Task Task => Project.GetTask(TaskId);
 
-        public ResourceId ResourceId => Data.ResourceId;
+        public ResourceId ResourceId => GetValue(AssignmentFields.ResourceId);
 
         public string ResourceName => GetValue(AssignmentFields.ResourceName);
 
-        public Resource Resource => Project.GetResource(Data.ResourceId);
+        public Resource Resource => Project.GetResource(ResourceId);
 
         public TimeSpan Work => GetValue(AssignmentFields.Work);
 
@@ -40,11 +38,11 @@ namespace Immutable.ProjectModel
 
         public DateTimeOffset Finish => GetValue(AssignmentFields.Finish);
 
-        public IEnumerable<AssignmentField> SetFields => Data.SetFields;
+        public IEnumerable<AssignmentField> SetFields => _data.SetFields;
 
         public bool HasValue(AssignmentField field)
         {
-            return Data.HasValue(field);
+            return _data.HasValue(field);
         }
 
         public T GetValue<T>(AssignmentField<T> field)
@@ -59,7 +57,7 @@ namespace Immutable.ProjectModel
 
         public object GetValue(AssignmentField field)
         {
-            return Data.GetValue(field);
+            return _data.GetValue(field);
         }
 
         public Assignment SetValue(AssignmentField field, object value)

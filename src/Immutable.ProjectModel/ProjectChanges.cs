@@ -9,8 +9,8 @@ namespace Immutable.ProjectModel
         {
             // Tasks
 
-            var oldTasks = oldProject.Tasks;
-            var newTasks = newProject.Tasks;
+            var oldTasks = oldProject.TaskMap;
+            var newTasks = newProject.TaskMap;
 
             var addedTasks = newTasks.Keys
                                      .Where(id => !oldTasks.ContainsKey(id))
@@ -29,8 +29,8 @@ namespace Immutable.ProjectModel
 
             // Resources
 
-            var oldResources = oldProject.Resources;
-            var newResources = newProject.Resources;
+            var oldResources = oldProject.ResourceMap;
+            var newResources = newProject.ResourceMap;
 
             var addedResources = newResources.Keys
                                              .Where(id => !oldResources.ContainsKey(id))
@@ -49,8 +49,8 @@ namespace Immutable.ProjectModel
 
             // Assignments
 
-            var oldAssignments = oldProject.Assignments;
-            var newAssignments = newProject.Assignments;
+            var oldAssignments = oldProject.AssignmentMapping;
+            var newAssignments = newProject.AssignmentMapping;
 
             var addedAssignments = newAssignments.Keys
                                                  .Where(id => !oldAssignments.ContainsKey(id))

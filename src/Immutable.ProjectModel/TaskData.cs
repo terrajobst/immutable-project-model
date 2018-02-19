@@ -29,36 +29,6 @@ namespace Immutable.ProjectModel
 
         public TaskId Id => GetValue(TaskFields.Id);
 
-        public int Ordinal => GetValue(TaskFields.Ordinal);
-
-        public string Name => GetValue(TaskFields.Name);
-
-        public TimeSpan Duration => GetValue(TaskFields.Duration);
-
-        public TimeSpan Work => GetValue(TaskFields.Work);
-
-        public DateTimeOffset Start => GetValue(TaskFields.Start);
-
-        public DateTimeOffset Finish => GetValue(TaskFields.Finish);
-
-        public DateTimeOffset EarlyStart => GetValue(TaskFields.EarlyStart);
-
-        public DateTimeOffset EarlyFinish => GetValue(TaskFields.EarlyFinish);
-
-        public DateTimeOffset LateStart => GetValue(TaskFields.LateStart);
-
-        public DateTimeOffset LateFinish => GetValue(TaskFields.LateFinish);
-
-        public TimeSpan StartSlack => GetValue(TaskFields.StartSlack);
-
-        public TimeSpan FinishSlack => GetValue(TaskFields.FinishSlack);
-
-        public TimeSpan TotalSlack => GetValue(TaskFields.TotalSlack);
-
-        public TimeSpan FreeSlack => GetValue(TaskFields.FreeSlack);
-
-        public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
-
         public IEnumerable<TaskField> SetFields => TaskFields.All.Where(HasValue);
 
         public bool HasValue(TaskField field)

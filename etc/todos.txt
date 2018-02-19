@@ -1,35 +1,5 @@
 # To-Do List
 
-## Scheduling
-
-I'm still not happy with the way the interactions work:
-
-* Right now, our policy layer lives at the object model layer but all the field
-  setting is expressed as modifications over `ProjectData`. However, the policy
-  for structure changes (adding and removing tasks for instance), isn't. This
-  results in weird cases where some field setters end up using `Project`
-  instances to create instances of `ProjectData` but with applied policy.
-  Clearly, that's not right.
-
-* We can either move all policy back to `ProjectData`, with the understanding
-  that (virtually) everything in the system has to go through
-  `ProjectData.SetValue(Id, Field, Value)` (as opposed to being able to set
-  fields on `TaskData` directly).
-
-* Alternatively, we can say that all policy is done at the object model. The
-  downside is that we need to find another way to do scheduling. Right now, we
-  schedule every time a `Project` is created. Long term, we probably don't want
-  this anyway, so maybe it's time to bit the bullet and introduce an internal
-  `Schedule` method?
-
-* However, my gut feel is that the object model layer is the wrong way to do it
-  though, as it probably creates more objects than necessary and prevents policy
-  operations from performing any optimizations. But it's probably also true that
-  optimizations are a bad idea as it implies that the changes aren't routed
-  through a centralized policy system. Still, I'm leaning moving the
-  functionality down, but this time to `ProjectData` which ensures the policy
-  can access (and modify) the entire project state, if necessary.
-
 ## Naming & Exceptions
 
 * We should rename the parameters of all single-argument `WithXxx` methods to

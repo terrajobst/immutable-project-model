@@ -17,21 +17,18 @@ namespace Immutable.ProjectModel
 
         public Project Project => _project;
 
-        internal ResourceData Data => _data;
-
         public ResourceId Id => GetValue(ResourceFields.Id);
 
         public string Name => GetValue(ResourceFields.Name);
 
-        public IEnumerable<Assignment> Assignments => Project.Data.Assignments.Values
-                                                                              .Where(a => a.ResourceId == Id)
-                                                                              .Select(a => Project.GetAssignment(a.Id));
+        public IEnumerable<Assignment> Assignments => Project.Data.GetAssignments(Id)
+                                                                  .Select(a => Project.GetAssignment(a));
 
-        public IEnumerable<ResourceField> SetFields => Data.SetFields;
+        public IEnumerable<ResourceField> SetFields => _data.SetFields;
 
         public bool HasValue(ResourceField field)
         {
-            return Data.HasValue(field);
+            return _data.HasValue(field);
         }
 
         public T GetValue<T>(ResourceField<T> field)
@@ -46,7 +43,7 @@ namespace Immutable.ProjectModel
 
         public object GetValue(ResourceField field)
         {
-            return Data.GetValue(field);
+            return _data.GetValue(field);
         }
 
         public Resource SetValue(ResourceField field, object value)

@@ -36,15 +36,15 @@ namespace Immutable.ProjectModel
 
         public TimeConversion TimeConversion => Data.Information.TimeConversion;
 
-        public IEnumerable<Task> Tasks => Data.Tasks.Keys.Select(GetTask).OrderBy(t => t.Ordinal);
+        public IEnumerable<Task> Tasks => Data.Tasks.Select(GetTask).OrderBy(t => t.Ordinal);
 
-        public IEnumerable<Resource> Resources => Data.Resources.Keys.Select(GetResource);
+        public IEnumerable<Resource> Resources => Data.Resources.Select(GetResource);
 
-        public IEnumerable<Assignment> Assignments => Data.Assignments.Keys.Select(GetAssignment);
+        public IEnumerable<Assignment> Assignments => Data.Assignments.Select(GetAssignment);
 
         public Task GetTask(TaskId id)
         {
-            if (!Data.Tasks.TryGetValue(id, out var data))
+            if (!Data.TaskMap.TryGetValue(id, out var data))
                 return null;
 
             return ImmutableInterlocked.GetOrAdd(ref _tasks, data, k => new Task(this, k));
@@ -52,7 +52,7 @@ namespace Immutable.ProjectModel
 
         public Resource GetResource(ResourceId id)
         {
-            if (!Data.Resources.TryGetValue(id, out var data))
+            if (!Data.ResourceMap.TryGetValue(id, out var data))
                 return null;
 
             return ImmutableInterlocked.GetOrAdd(ref _resources, data, k => new Resource(this, k));
@@ -60,7 +60,7 @@ namespace Immutable.ProjectModel
 
         public Assignment GetAssignment(AssignmentId id)
         {
-            if (!Data.Assignments.TryGetValue(id, out var data))
+            if (!Data.AssignmentMapping.TryGetValue(id, out var data))
                 return null;
 
             return ImmutableInterlocked.GetOrAdd(ref _assignments, data, k => new Assignment(this, k));
@@ -68,12 +68,11 @@ namespace Immutable.ProjectModel
 
         public Assignment GetAssignment(TaskId taskId, ResourceId resourceId)
         {
-            var assignmentData = Data.Assignments.Values.SingleOrDefault(a => a.TaskId == taskId &&
-                                                                              a.ResourceId == resourceId);
-            if (assignmentData.IsDefault)
+            var assignmentId = Data.GetAssignment(taskId, resourceId);
+            if (assignmentId.IsDefault)
                 return null;
 
-            return GetAssignment(assignmentData.Id);
+            return GetAssignment(assignmentId);
         }
 
         public ProjectChanges GetChanges(Project baseline)

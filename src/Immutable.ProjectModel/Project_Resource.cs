@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Diagnostics;
 
 namespace Immutable.ProjectModel
 {
@@ -12,60 +12,23 @@ namespace Immutable.ProjectModel
             if (GetResource(resourceId) != null)
                 throw new ArgumentException($"Project already contains a resource with ID {resourceId}.");
 
-            var resourceData = ResourceData.Create(resourceId);
-            var projectData = Data.AddResource(resourceData);
-            return UpdateProject(projectData).GetResource(resourceData.Id);
+            var projectData = Data.AddResource(resourceId);
+            return UpdateProject(projectData).GetResource(resourceId);
         }
 
         public Project RemoveResource(ResourceId resourceId)
         {
             var project = Data.RemoveResource(resourceId);
-
-            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == resourceId))
-            {
-                project = Scheduler.RemoveAssignment(project, assignment.Id);
-                project = InitializeTaskResourceNames(project, assignment.TaskId);
-            }
-
             return UpdateProject(project);
         }
 
         internal Resource SetResourceField(Resource resource, ResourceField field, object value)
         {
-            ProjectData project;
+            Debug.Assert(resource != null);
+            Debug.Assert(field != null);
 
-            if (field == ResourceFields.Name)
-            {
-                project = SetResourceName(Data, resource.Id, (string)value);
-            }
-            else
-            {
-                var resourceData = resource.Data.SetValue(field, value);
-                project = Data.UpdateResource(resourceData);
-            }
-
+            var project = Data.Set(field, resource.Id, value);
             return UpdateProject(project).GetResource(resource.Id);
-        }
-
-        private ProjectData SetResourceName(ProjectData project, ResourceId id, string value)
-        {
-            project = project.UpdateResource(project.Resources[id].SetValue(ResourceFields.Name, value));
-
-            // Update Assignment.ResourceName
-
-            var newAssignments = project.Assignments;
-
-            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == id))
-                newAssignments = newAssignments.SetItem(assignment.Id, assignment.SetValue(AssignmentFields.ResourceName, value));
-
-            project = project.WithAssignments(newAssignments);
-
-            // Update Task.ResourceNames
-
-            foreach (var assignment in project.Assignments.Values.Where(a => a.ResourceId == id))
-                project = InitializeTaskResourceNames(project, assignment.TaskId);
-
-            return project;
         }
     }
 }

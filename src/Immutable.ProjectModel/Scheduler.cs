@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Immutable.ProjectModel
@@ -17,51 +16,50 @@ namespace Immutable.ProjectModel
         private static ProjectData ForwardPass(this ProjectData project)
         {
             var computedTasks = new HashSet<TaskId>();
-            var toBeScheduled = new Queue<TaskId>(project.Tasks.Keys);
+            var toBeScheduled = new Queue<TaskId>(project.Tasks);
 
             while (toBeScheduled.Count > 0)
             {
                 var taskId = toBeScheduled.Dequeue();
-                var task = project.Tasks[taskId];
-                var allPredecessorsComputed = task.PredecessorIds.All(id => computedTasks.Contains(id));
+                var predecessorIds = project.Get(TaskFields.PredecessorIds, taskId);
+                var allPredecessorsComputed = predecessorIds.All(id => computedTasks.Contains(id));
                 if (!allPredecessorsComputed)
                 {
-                    toBeScheduled.Enqueue(task.Id);
+                    toBeScheduled.Enqueue(taskId);
                 }
                 else
                 {
-                    var predecessors = task.PredecessorIds.Select(id => project.Tasks[id]);
+                    var earlyStart = predecessorIds.Select(p => project.Get(TaskFields.EarlyFinish, p))
+                                                   .DefaultIfEmpty(project.Information.StartDate)
+                                                   .Max();
 
-                    var earlyStart = predecessors.Select(p => p.EarlyFinish)
-                                                 .DefaultIfEmpty(project.Information.StartDate)
-                                                 .Max();
-
-                    var assignments = project.Assignments.Values.Where(a => a.TaskId == taskId);
-                    if (!assignments.Any())
+                    var assignmentIds = project.GetAssignments(taskId);
+                    if (!assignmentIds.Any())
                     {
-                        var work = GetWork(project, task);
+                        var work = GetWork(project, taskId);
                         ComputeFinish(project.Information.Calendar, ref earlyStart, out var earlyFinish, work);
 
-                        task = task.SetValue(TaskFields.EarlyStart, earlyStart)
-                                   .SetValue(TaskFields.EarlyFinish, earlyFinish);
-                        project = project.UpdateTask(task);
+                        project = project.SetRaw(TaskFields.EarlyStart, taskId, earlyStart)
+                                         .SetRaw(TaskFields.EarlyFinish, taskId, earlyFinish);
                     }
                     else
                     {
                         var earlyFinish = DateTimeOffset.MinValue;
 
-                        foreach (var assignment in assignments)
+                        foreach (var assignmentId in assignmentIds)
                         {
-                            var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
-                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var assignmentFinish, time);
+                            var assignmentWork = project.Get(AssignmentFields.Work, assignmentId);
+                            var assignmentUnits = project.Get(AssignmentFields.Units, assignmentId);
+
+                            var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
+                            ComputeFinish(project.Information.Calendar, ref earlyStart, out var assignmentFinish, duration);
 
                             if (assignmentFinish > earlyFinish)
                                 earlyFinish = assignmentFinish;
                         }
 
-                        task = task.SetValue(TaskFields.EarlyStart, earlyStart)
-                                   .SetValue(TaskFields.EarlyFinish, earlyFinish);
-                        project = project.UpdateTask(task);
+                        project = project.SetRaw(TaskFields.EarlyStart, taskId, earlyStart)
+                                         .SetRaw(TaskFields.EarlyFinish, taskId, earlyFinish);
                     }
 
                     computedTasks.Add(taskId);
@@ -73,23 +71,22 @@ namespace Immutable.ProjectModel
 
         private static ProjectData BackwardPass(this ProjectData project)
         {
-            var projectEnd = project.Tasks.Values.Select(t => t.EarlyFinish)
-                                                 .DefaultIfEmpty()
-                                                 .Max();
+            var projectEnd = project.Tasks
+                                    .Select(t => project.Get(TaskFields.EarlyFinish, t))
+                                    .DefaultIfEmpty()
+                                    .Max();
 
             var computedTasks = new HashSet<TaskId>();
             var successorsById = project.Tasks
-                                            .Values
-                                            .SelectMany(s => s.PredecessorIds, (s, pId) => (predecessor: pId, successor: s.Id))
-                                            .ToLookup(t => t.predecessor, t => t.successor);
+                                        .SelectMany(s => project.GetPredecessors(s), (s, p) => (predecessor: p, successor: s))
+                                        .ToLookup(t => t.predecessor, t => t.successor);
 
-            var toBeScheduled = new Queue<TaskId>(project.Tasks.Keys);
+            var toBeScheduled = new Queue<TaskId>(project.Tasks);
 
             while (toBeScheduled.Count > 0)
             {
                 var taskId = toBeScheduled.Dequeue();
-                var task = project.Tasks[taskId];
-                var successors = successorsById[task.Id];
+                var successors = successorsById[taskId];
                 var allSuccessorsComputed = successors.All(id => computedTasks.Contains(id));
                 if (!allSuccessorsComputed)
                 {
@@ -97,39 +94,40 @@ namespace Immutable.ProjectModel
                 }
                 else
                 {
-                    var lateFinish = successors.Select(id => project.Tasks[id].LateStart)
+                    var lateFinish = successors.Select(id => project.Get(TaskFields.LateStart, id))
                                                .DefaultIfEmpty(projectEnd)
                                                .Min();
 
-                    var assignments = project.Assignments.Values.Where(a => a.TaskId == taskId);
-                    if (!assignments.Any())
+                    var assignmentIds = project.GetAssignments(taskId);
+                    if (!assignmentIds.Any())
                     {
-                        var work = GetWork(project, task);
+                        var work = GetWork(project, taskId);
                         ComputeStart(project.Information.Calendar, out var lateStart, ref lateFinish, work);
 
-                        task = task.SetValue(TaskFields.LateStart, lateStart)
-                                   .SetValue(TaskFields.LateFinish, lateFinish);
-                        project = project.UpdateTask(task);
+                        project = project.SetRaw(TaskFields.LateStart, taskId, lateStart)
+                                         .SetRaw(TaskFields.LateFinish, taskId, lateFinish);
                     }
                     else
                     {
                         var lateStart = DateTimeOffset.MaxValue;
 
-                        foreach (var assignment in assignments)
+                        foreach (var assignmentId in assignmentIds)
                         {
-                            var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
-                            ComputeStart(project.Information.Calendar, out var assignmentStart, ref lateFinish, time);
+                            var assignmentWork = project.Get(AssignmentFields.Work, assignmentId);
+                            var assignmentUnits = project.Get(AssignmentFields.Units, assignmentId);
+
+                            var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
+                            ComputeStart(project.Information.Calendar, out var assignmentStart, ref lateFinish, duration);
 
                             if (assignmentStart < lateStart)
                                 lateStart = assignmentStart;
                         }
 
-                        task = task.SetValue(TaskFields.LateStart, lateStart)
-                                   .SetValue(TaskFields.LateFinish, lateFinish);
-                        project = project.UpdateTask(task);
+                        project = project.SetRaw(TaskFields.LateStart, taskId, lateStart)
+                                         .SetRaw(TaskFields.LateFinish, taskId, lateFinish);
                     }
 
-                    computedTasks.Add(task.Id);
+                    computedTasks.Add(taskId);
                 }
             }
 
@@ -140,81 +138,81 @@ namespace Immutable.ProjectModel
         {
             var calendar = project.Information.Calendar;
 
-            var projectEnd = project.Tasks.Values.Select(t => t.EarlyFinish)
+            var projectEnd = project.Tasks                                    
+                                    .Select(t => project.Get(TaskFields.EarlyFinish, t))
                                     .DefaultIfEmpty()
                                     .Max();
 
-            var successorsById = project.Tasks
-                                .Values
-                                .SelectMany(s => s.PredecessorIds, (s, pId) => (predecessor: pId, successor: s.Id))
-                                .ToLookup(t => t.predecessor, t => t.successor);
+            var successorsById = project.Tasks                                        
+                                        .SelectMany(s => project.GetPredecessors(s), (s, p) => (predecessor: p, successor: s))
+                                        .ToLookup(t => t.predecessor, t => t.successor);
 
-            foreach (var task in project.Tasks.Values)
+            foreach (var taskId in project.Tasks)
             {
-                // Set Start & finish
-                var newTask = task.SetValue(TaskFields.Start, task.EarlyStart)
-                                  .SetValue(TaskFields.Finish, task.EarlyFinish);
+                var earlyStart = project.Get(TaskFields.EarlyStart, taskId);
+                var earlyFinish = project.Get(TaskFields.EarlyFinish, taskId);
+                var lateStart = project.Get(TaskFields.LateStart, taskId);
+                var lateFinish = project.Get(TaskFields.LateFinish, taskId);
 
-                // Set duration
-                var work = calendar.GetWork(newTask.Start, newTask.Finish);
-                newTask = newTask.SetValue(TaskFields.Duration, work);
+                // Set start, finish, and duration
 
-                project = project.UpdateTask(newTask);
-            }
+                var start = earlyStart;
+                var finish = earlyFinish;
+                var duration = calendar.GetWork(start, finish);
 
-            foreach (var task in project.Tasks.Values)
-            {
-                var newTask = task;
+                project = project.SetRaw(TaskFields.Start, taskId, start)
+                                 .SetRaw(TaskFields.Finish, taskId, finish)
+                                 .SetRaw(TaskFields.Duration, taskId, duration);
 
-                // Set start slack, finish slack, and start slack
-                var startSlack = calendar.GetWork(task.EarlyStart, task.LateStart);
-                var finishSlack = calendar.GetWork(task.EarlyFinish, task.LateFinish);
+                // Set start slack, finish slack, total slack, and criticality
+
+                var startSlack = calendar.GetWork(earlyStart, lateStart);
+                var finishSlack = calendar.GetWork(earlyFinish, lateFinish);
                 var totalSlack = startSlack <= finishSlack ? startSlack : finishSlack;
-                newTask = newTask.SetValue(TaskFields.StartSlack, startSlack)
-                                 .SetValue(TaskFields.FinishSlack, finishSlack)
-                                 .SetValue(TaskFields.TotalSlack, totalSlack);
+                var isCritical = totalSlack == TimeSpan.Zero;
+
+                project = project.SetRaw(TaskFields.StartSlack, taskId, startSlack)
+                                 .SetRaw(TaskFields.FinishSlack, taskId, finishSlack)
+                                 .SetRaw(TaskFields.TotalSlack, taskId, totalSlack)
+                                 .SetRaw(TaskFields.IsCritical, taskId, isCritical);
 
                 // Set free slack
-                var successors = successorsById[newTask.Id].Select(id => project.Tasks[id]);
-                var minumumEarlyStartOfSuccessors = successors.Select(t => t.EarlyStart)
-                                                              .DefaultIfEmpty(projectEnd)
-                                                              .Min();
-                var freeSlack = calendar.GetWork(newTask.EarlyStart, minumumEarlyStartOfSuccessors) - newTask.Duration;
-                newTask = newTask.SetValue(TaskFields.FreeSlack, freeSlack);
 
-                // Set criticality
-                var isCritical = newTask.TotalSlack == TimeSpan.Zero;
-                newTask = newTask.SetValue(TaskFields.IsCritical, isCritical);
-
-                project = project.UpdateTask(newTask);
+                var minumumEarlyStartOfSuccessors = successorsById[taskId].Select(t => project.Get(TaskFields.EarlyStart, t))
+                                                                          .DefaultIfEmpty(projectEnd)
+                                                                          .Min();
+                var freeSlack = calendar.GetWork(earlyStart, minumumEarlyStartOfSuccessors) - duration;
+                project = project.SetRaw(TaskFields.FreeSlack, taskId, freeSlack);
             }
 
-            var assignments = project.Assignments.Values;
+            // Set assignment start and finish
 
-            foreach (var assignment in assignments)
+            foreach (var assignmentId in project.Assignments)
             {
-                var task = project.Tasks[assignment.TaskId];
-                var assignmentStart = task.Start;
+                var taskId = project.Get(AssignmentFields.TaskId, assignmentId);
+                var taskStart = project.Get(TaskFields.Start, taskId);
 
-                var time = TimeSpan.FromHours(assignment.Work.TotalHours * (1.0 / assignment.Units));
-                ComputeFinish(project.Information.Calendar, ref assignmentStart, out var assignmentFinish, time);
+                var assignmentWork = project.Get(AssignmentFields.Work, assignmentId);
+                var assignmentUnits = project.Get(AssignmentFields.Units, assignmentId);
+                var assignmentStart = taskStart;
 
-                var newAssignment = assignment.SetValue(AssignmentFields.Start, assignmentStart)
-                                              .SetValue(AssignmentFields.Finish, assignmentFinish);
+                var duration = TimeSpan.FromHours(assignmentWork.TotalHours / assignmentUnits);
+                ComputeFinish(project.Information.Calendar, ref assignmentStart, out var assignmentFinish, duration);
 
-                project = project.UpdateAssignment(newAssignment);
+                project = project.SetRaw(AssignmentFields.Start, assignmentId, assignmentStart)
+                                 .SetRaw(AssignmentFields.Finish, assignmentId, assignmentFinish);
             }
 
             return project;
         }
 
-        private static TimeSpan GetWork(ProjectData project, TaskData task)
+        private static TimeSpan GetWork(ProjectData project, TaskId taskId)
         {
-            var hasAssignments = project.Assignments.Values.Any(a => a.TaskId == task.Id);
+            var hasAssignments = project.GetAssignments(taskId).Any();
             if (!hasAssignments)
-                return task.Duration;
+                return project.Get(TaskFields.Duration, taskId);
 
-            return task.Work;
+            return project.Get(TaskFields.Work, taskId);
         }
 
         private static void ComputeFinish(Calendar calendar, ref DateTimeOffset start, out DateTimeOffset end, TimeSpan work)
@@ -239,133 +237,6 @@ namespace Immutable.ProjectModel
 
             end = calendar.FindWorkEnd(end);
             start = calendar.AddWork(end, -work);
-        }
-
-        public static ProjectData SetTaskWork(ProjectData project, TaskData task, TimeSpan work)
-        {
-            task = task.SetValue(TaskFields.Work, work);
-            project = project.UpdateTask(task);
-
-            var taskAssignments = project.Assignments.Values.Where(a => a.TaskId == task.Id).ToArray();
-
-            if (work == TimeSpan.Zero)
-            {
-                for (var i = 0; i < taskAssignments.Length; i++)
-                    taskAssignments[i] = taskAssignments[i].SetValue(AssignmentFields.Work, TimeSpan.Zero);
-            }
-            else
-            {
-                var totalExistingWork = TimeSpan.Zero;
-
-                foreach (var a in taskAssignments)
-                    totalExistingWork += a.Work;
-
-                for (var i = 0; i < taskAssignments.Length; i++)
-                {
-                    double newHours;
-
-                    if (totalExistingWork > TimeSpan.Zero)
-                    {
-                        newHours = taskAssignments[i].Work.TotalHours / totalExistingWork.TotalHours * work.TotalHours;
-                    }
-                    else
-                    {
-                        newHours = work.TotalHours / taskAssignments.Length;
-                    }
-
-                    var newWork = TimeSpan.FromHours(newHours);
-                    taskAssignments[i] = taskAssignments[i].SetValue(AssignmentFields.Work, newWork);
-                }
-            }
-
-            foreach (var assignment in taskAssignments)
-                project = project.UpdateAssignment(assignment);
-
-            return project;
-        }
-
-        public static ProjectData SetTaskDuration(ProjectData project, TaskData task, TimeSpan duration)
-        {
-            task = task.SetValue(TaskFields.Duration, duration);
-            project = project.UpdateTask(task);
-
-            var hasAssignments = project.Assignments.Values.Any(a => a.TaskId == task.Id);
-            if (!hasAssignments)
-                return project;
-
-            foreach (var assignment in project.Assignments.Values.Where(a => a.TaskId == task.Id))
-            {
-                if (assignment.Finish == task.Finish)
-                {
-                    var assignmentWork = TimeSpan.FromHours(duration.TotalHours * assignment.Units);
-                    project = SetAssignmentWork(project, assignment, assignmentWork);
-                }
-            }
-
-            return project;
-        }
-
-        public static ProjectData AddAssignment(ProjectData project, AssignmentId assignmentId, TaskId taskId, ResourceId resourceId)
-        {
-            var assignment = AssignmentData.Create(assignmentId, taskId, resourceId);
-
-            var task = project.Tasks[taskId];
-            var allAssignments = project.Assignments.Values.Where(a => a.TaskId == taskId).ToArray();
-
-            if (allAssignments.Length == 0)
-            {
-                var work = task.Work != TimeSpan.Zero
-                            ? task.Work
-                            : GetWork(project, task);
-
-                task = task.SetValue(TaskFields.Work, work);
-                project = project.UpdateTask(task);
-
-                assignment = assignment.SetValue(AssignmentFields.Work, work);
-                project = project.AddAssignment(assignment);
-            }
-            else
-            {
-                var newTaskWorkHours = task.Work.TotalHours / allAssignments.Length * (allAssignments.Length + 1);
-                var newAssignmentWorkHours = newTaskWorkHours - task.Work.TotalHours;
-
-                var newTaskWork = TimeSpan.FromHours(newTaskWorkHours);
-                var newAssignmentWork = TimeSpan.FromHours(newAssignmentWorkHours);
-
-                task = task.SetValue(TaskFields.Work, newTaskWork);
-                project = project.UpdateTask(task);
-
-                assignment = assignment.SetValue(AssignmentFields.Work, newAssignmentWork);
-                project = project.AddAssignment(assignment);
-            }
-
-            return project;
-        }
-
-        public static ProjectData RemoveAssignment(ProjectData project, AssignmentId assignmentId)
-        {
-            if (!project.Assignments.TryGetValue(assignmentId, out var assignment))
-                return project;
-
-            project = project.RemoveAssignment(assignmentId);
-
-            var task = project.Tasks[assignment.TaskId];
-            project = SetTaskWork(project, task, task.Work - assignment.Work);
-
-            return project;
-        }
-
-        public static ProjectData SetAssignmentWork(ProjectData project, AssignmentData assignment, TimeSpan work)
-        {
-            var task = project.Tasks[assignment.TaskId];
-            var assignmentWorkDelta = work - assignment.Work;
-
-            var taskWork = task.Work + assignmentWorkDelta;
-            var newTask = task.SetValue(TaskFields.Work, taskWork);
-            var newAssignment = assignment.SetValue(AssignmentFields.Work, work);
-
-            return project.UpdateTask(newTask)
-                          .UpdateAssignment(newAssignment);
         }
     }
 }

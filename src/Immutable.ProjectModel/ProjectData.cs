@@ -5,9 +5,9 @@ namespace Immutable.ProjectModel
     internal sealed partial class ProjectData
     {
         private readonly ProjectInformationData _information;
-        private readonly ImmutableDictionary<TaskId, TaskData> _tasks;
-        private readonly ImmutableDictionary<ResourceId, ResourceData> _resources;
-        private readonly ImmutableDictionary<AssignmentId, AssignmentData> _assignments;
+        private readonly ImmutableDictionary<TaskId, TaskData> _taskMap;
+        private readonly ImmutableDictionary<ResourceId, ResourceData> _resourceMap;
+        private readonly ImmutableDictionary<AssignmentId, AssignmentData> _assignmentMap;
 
         public static ProjectData Create(ProjectId id)
         {
@@ -18,30 +18,30 @@ namespace Immutable.ProjectModel
         }
 
         private ProjectData(ProjectInformationData information,
-                            ImmutableDictionary<TaskId, TaskData> tasks,
-                            ImmutableDictionary<ResourceId, ResourceData> resources,
-                            ImmutableDictionary<AssignmentId, AssignmentData> assignments)
+                            ImmutableDictionary<TaskId, TaskData> taskMap,
+                            ImmutableDictionary<ResourceId, ResourceData> resourceMap,
+                            ImmutableDictionary<AssignmentId, AssignmentData> assignmentMap)
         {
             _information = information;
-            _tasks = tasks;
-            _resources = resources;
-            _assignments = assignments;
+            _taskMap = taskMap;
+            _resourceMap = resourceMap;
+            _assignmentMap = assignmentMap;
         }
 
-        public ProjectData With(ProjectInformationData information,
-                                ImmutableDictionary<TaskId, TaskData> tasks,
-                                ImmutableDictionary<ResourceId, ResourceData> resources,
-                                ImmutableDictionary<AssignmentId, AssignmentData> assignments)
+        private ProjectData With(ProjectInformationData information,
+                                 ImmutableDictionary<TaskId, TaskData> taskMap,
+                                 ImmutableDictionary<ResourceId, ResourceData> resourceMap,
+                                 ImmutableDictionary<AssignmentId, AssignmentData> assignmentMap)
         {
             if (information == _information &&
-                tasks == _tasks &&
-                resources == _resources &&
-                assignments == _assignments)
+                taskMap == _taskMap &&
+                resourceMap == _resourceMap &&
+                assignmentMap == _assignmentMap)
             {
                 return this;
             }
 
-            return new ProjectData(information, tasks, resources, assignments);
+            return new ProjectData(information, taskMap, resourceMap, assignmentMap);
         }
     }
 }

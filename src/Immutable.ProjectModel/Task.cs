@@ -18,8 +18,6 @@ namespace Immutable.ProjectModel
 
         public Project Project => _project;
 
-        internal TaskData Data => _data;
-
         public TaskId Id => GetValue(TaskFields.Id);
 
         public int Ordinal => GetValue(TaskFields.Ordinal);
@@ -62,15 +60,14 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<Task> PredecessorTasks => PredecessorIds.Select(id => Project.GetTask(id));
 
-        public IEnumerable<Assignment> Assignments => Project.Data.Assignments.Values
-                                                                              .Where(a => a.TaskId == Id)
-                                                                              .Select(a => Project.GetAssignment(a.Id));
+        public IEnumerable<Assignment> Assignments => Project.Data.GetAssignments(Id)
+                                                                  .Select(a => Project.GetAssignment(a));
 
-        public IEnumerable<TaskField> SetFields => Data.SetFields;
+        public IEnumerable<TaskField> SetFields => _data.SetFields;
 
         public bool HasValue(TaskField field)
         {
-            return Data.HasValue(field);
+            return _data.HasValue(field);
         }
 
         public T GetValue<T>(TaskField<T> field)
@@ -85,7 +82,7 @@ namespace Immutable.ProjectModel
 
         public object GetValue(TaskField field)
         {
-            return Data.GetValue(field);
+            return _data.GetValue(field);
         }
 
         public Task SetValue(TaskField field, object value)
