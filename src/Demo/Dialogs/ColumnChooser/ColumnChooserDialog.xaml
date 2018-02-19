@@ -9,7 +9,8 @@
         WindowStartupLocation="CenterOwner"
         Height="300"
         Width="450"
-        Background="{x:Static SystemColors.ControlBrush}">
+        Background="{x:Static SystemColors.ControlBrush}"
+        Loaded="Window_Loaded">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type ListBoxItem}">
@@ -35,7 +36,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBox Grid.Row="0"
+                    <TextBox x:Name="AvailableTextBox"
+                             Grid.Row="0"
                              Margin="0,0,0,4"
                              Text="{Binding Path=AvailableFilter, UpdateSourceTrigger=PropertyChanged}" />
                     <ListBox x:Name="AvailableListBox"

@@ -21,6 +21,11 @@ namespace Demo.Dialogs.ColumnChooser
 
         public IEnumerable<FieldDefinition> SelectedColumns => ViewModel.SelectedColumns.Select(c => c.Field);
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            AvailableTextBox.Focus();
+        }
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Add();
