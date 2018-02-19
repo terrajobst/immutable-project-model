@@ -6,8 +6,10 @@ using System.Linq;
 
 namespace Immutable.ProjectModel
 {
-    internal sealed class ResourceData
+    internal readonly struct ResourceData : IEquatable<ResourceData>
     {
+        private readonly ImmutableDictionary<ResourceField, object> _fields;
+
         public static ResourceData Create(ResourceId id)
         {
             Debug.Assert(!id.IsDefault);
@@ -18,9 +20,11 @@ namespace Immutable.ProjectModel
             return new ResourceData(fields);
         }
 
+        public bool IsDefault => _fields == null;
+
         private ResourceData(ImmutableDictionary<ResourceField, object> fields)
         {
-            Fields = fields;
+            _fields = fields;
         }
 
         public ResourceId Id => GetValue(ResourceFields.Id);
@@ -29,19 +33,9 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<ResourceField> SetFields => ResourceFields.All.Where(HasValue);
 
-        private ImmutableDictionary<ResourceField, object> Fields { get; }
-
-        private ResourceData WithFields(ImmutableDictionary<ResourceField, object> fields)
-        {
-            if (fields == Fields)
-                return this;
-
-            return new ResourceData(fields);
-        }
-
         public bool HasValue(ResourceField field)
         {
-            return Fields.ContainsKey(field);
+            return _fields.ContainsKey(field);
         }
 
         public T GetValue<T>(ResourceField<T> field)
@@ -59,7 +53,7 @@ namespace Immutable.ProjectModel
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (!Fields.TryGetValue(field, out var result))
+            if (!_fields.TryGetValue(field, out var result))
                 return field.DefaultValue;
 
             return result;
@@ -78,8 +72,33 @@ namespace Immutable.ProjectModel
             if (Equals(value, existingValue))
                 return this;
 
-            var fields = Fields.SetItem(field, value);
-            return WithFields(fields);
+            var fields = _fields.SetItem(field, value);
+            return new ResourceData(fields);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ResourceData other && Equals(other);
+        }
+
+        public bool Equals(ResourceData other)
+        {
+            return ReferenceEquals(_fields, other._fields);
+        }
+
+        public override int GetHashCode()
+        {
+            return _fields == null ? 0 : _fields.GetHashCode();
+        }
+
+        public static bool operator ==(ResourceData left, ResourceData right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ResourceData left, ResourceData right)
+        {
+            return !left.Equals(right);
         }
     }
 }

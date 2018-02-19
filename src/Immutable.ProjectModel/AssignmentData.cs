@@ -6,8 +6,10 @@ using System.Linq;
 
 namespace Immutable.ProjectModel
 {
-    internal sealed class AssignmentData
+    internal readonly struct AssignmentData : IEquatable<AssignmentData>
     {
+        private readonly ImmutableDictionary<AssignmentField, object> _fields;
+
         public static AssignmentData Create(AssignmentId id, TaskId taskId, ResourceId resourceId)
         {
             Debug.Assert(!id.IsDefault);
@@ -24,8 +26,10 @@ namespace Immutable.ProjectModel
 
         private AssignmentData(ImmutableDictionary<AssignmentField, object> fields)
         {
-            Fields = fields;
+            _fields = fields;
         }
+
+        public bool IsDefault => _fields == null;
 
         public AssignmentId Id => GetValue(AssignmentFields.Id);
 
@@ -45,11 +49,9 @@ namespace Immutable.ProjectModel
 
         public string ResourceName => GetValue(AssignmentFields.ResourceName);
 
-        private ImmutableDictionary<AssignmentField, object> Fields { get; }
-
         private AssignmentData WithFields(ImmutableDictionary<AssignmentField, object> fields)
         {
-            if (fields == Fields)
+            if (fields == _fields)
                 return this;
 
             return new AssignmentData(fields);
@@ -59,7 +61,7 @@ namespace Immutable.ProjectModel
 
         public bool HasValue(AssignmentField field)
         {
-            return Fields.ContainsKey(field);
+            return _fields.ContainsKey(field);
         }
 
         public T GetValue<T>(AssignmentField<T> field)
@@ -77,7 +79,7 @@ namespace Immutable.ProjectModel
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (!Fields.TryGetValue(field, out var result))
+            if (!_fields.TryGetValue(field, out var result))
                 return field.DefaultValue;
 
             return result;
@@ -96,8 +98,33 @@ namespace Immutable.ProjectModel
             if (Equals(value, existingValue))
                 return this;
 
-            var fields = Fields.SetItem(field, value);
+            var fields = _fields.SetItem(field, value);
             return WithFields(fields);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is AssignmentData other && Equals(other);
+        }
+
+        public bool Equals(AssignmentData other)
+        {
+            return ReferenceEquals(_fields, other._fields);
+        }
+
+        public override int GetHashCode()
+        {
+            return _fields == null ? 0 : _fields.GetHashCode();
+        }
+
+        public static bool operator ==(AssignmentData left, AssignmentData right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AssignmentData left, AssignmentData right)
+        {
+            return !left.Equals(right);
         }
     }
 }

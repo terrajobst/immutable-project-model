@@ -6,8 +6,10 @@ using System.Linq;
 
 namespace Immutable.ProjectModel
 {
-    internal sealed class TaskData
+    internal readonly struct TaskData : IEquatable<TaskData>
     {
+        private readonly ImmutableDictionary<TaskField, object> _fields;
+
         public static TaskData Create(TaskId id)
         {
             Debug.Assert(!id.IsDefault);
@@ -20,8 +22,10 @@ namespace Immutable.ProjectModel
 
         private TaskData(ImmutableDictionary<TaskField, object> fields)
         {
-            Fields = fields;
+            _fields = fields;
         }
+
+        public bool IsDefault => _fields == null;
 
         public TaskId Id => GetValue(TaskFields.Id);
 
@@ -57,19 +61,9 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<TaskField> SetFields => TaskFields.All.Where(HasValue);
 
-        private ImmutableDictionary<TaskField, object> Fields { get; }
-
-        private TaskData WithFields(ImmutableDictionary<TaskField, object> fields)
-        {
-            if (fields == Fields)
-                return this;
-
-            return new TaskData(fields);
-        }
-
         public bool HasValue(TaskField field)
         {
-            return Fields.ContainsKey(field);
+            return _fields.ContainsKey(field);
         }
 
         public T GetValue<T>(TaskField<T> field)
@@ -87,7 +81,7 @@ namespace Immutable.ProjectModel
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (!Fields.TryGetValue(field, out var result))
+            if (!_fields.TryGetValue(field, out var result))
                 return field.DefaultValue;
 
             return result;
@@ -106,7 +100,7 @@ namespace Immutable.ProjectModel
             if (Equals(value, existingValue))
                 return this;
 
-            var fields = Fields.SetItem(field, value);
+            var fields = _fields.SetItem(field, value);
 
             if (field == TaskFields.Duration)
             {
@@ -119,7 +113,32 @@ namespace Immutable.ProjectModel
                     fields = fields.SetItem(TaskFields.IsMilestone, true);
             }
 
-            return WithFields(fields);
+            return new TaskData(fields);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is TaskData other && Equals(other);
+        }
+
+        public bool Equals(TaskData other)
+        {
+            return ReferenceEquals(_fields, other._fields);
+        }
+
+        public override int GetHashCode()
+        {
+            return _fields == null ? 0 : _fields.GetHashCode();
+        }
+
+        public static bool operator ==(TaskData left, TaskData right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(TaskData left, TaskData right)
+        {
+            return !left.Equals(right);
         }
     }
 }

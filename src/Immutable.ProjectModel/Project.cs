@@ -70,7 +70,7 @@ namespace Immutable.ProjectModel
         {
             var assignmentData = Data.Assignments.Values.SingleOrDefault(a => a.TaskId == taskId &&
                                                                               a.ResourceId == resourceId);
-            if (assignmentData == null)
+            if (assignmentData.IsDefault)
                 return null;
 
             return GetAssignment(assignmentData.Id);
