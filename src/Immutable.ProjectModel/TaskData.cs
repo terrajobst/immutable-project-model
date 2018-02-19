@@ -62,8 +62,7 @@ namespace Immutable.ProjectModel
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            if (value == null && !field.Type.IsClass ||
-                value != null && !field.Type.IsAssignableFrom(value.GetType()))
+            if (!field.IsAssignableFrom(value))
                 throw new ArgumentException(nameof(value));
 
             var existingValue = GetValue(field);

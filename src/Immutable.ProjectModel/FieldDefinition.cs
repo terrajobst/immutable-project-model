@@ -42,6 +42,17 @@ namespace Immutable.ProjectModel
 
         public bool IsReadOnly => (Flags & FieldFlags.ReadOnly) == FieldFlags.ReadOnly;
 
+        public bool IsAssignableFrom(object value)
+        {
+            if (value == null)
+            {
+                return Type.IsClass ||
+                       Type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            }
+
+            return Type.IsAssignableFrom(value.GetType());
+        }
+
         public override string ToString() => Name;
     }
 }
