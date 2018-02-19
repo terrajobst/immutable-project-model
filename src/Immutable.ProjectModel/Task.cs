@@ -133,6 +133,16 @@ namespace Immutable.ProjectModel
             return SetValue(TaskFields.Work, work);
         }
 
+        public Task WithStart(DateTimeOffset start)
+        {
+            return SetValue(TaskFields.Start, start);
+        }
+
+        public Task WithFinish(DateTimeOffset finish)
+        {
+            return SetValue(TaskFields.Finish, finish);
+        }
+
         public Task WithConstraintType(ConstraintType constraintType)
         {
             return SetValue(TaskFields.ConstraintType, constraintType);

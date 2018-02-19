@@ -12,8 +12,8 @@ namespace Immutable.ProjectModel
         public static readonly TaskField<string> Name = new TaskField<string>("Name", FieldKinds.Text);
         public static readonly TaskField<TimeSpan> Duration = new TaskField<TimeSpan>("Duration", FieldKinds.Duration);
         public static readonly TaskField<TimeSpan> Work = new TaskField<TimeSpan>("Work", FieldKinds.Work);
-        public static readonly TaskField<DateTimeOffset> Start = new TaskField<DateTimeOffset>("Start", FieldKinds.DateTime, FieldFlags.ReadOnly);
-        public static readonly TaskField<DateTimeOffset> Finish = new TaskField<DateTimeOffset>("Finish", FieldKinds.DateTime, FieldFlags.ReadOnly);
+        public static readonly TaskField<DateTimeOffset> Start = new TaskField<DateTimeOffset>("Start", FieldKinds.DateTime);
+        public static readonly TaskField<DateTimeOffset> Finish = new TaskField<DateTimeOffset>("Finish", FieldKinds.DateTime);
         public static readonly TaskField<DateTimeOffset> EarlyStart = new TaskField<DateTimeOffset>("EarlyStart", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> EarlyFinish = new TaskField<DateTimeOffset>("EarlyFinish", FieldKinds.DateTime, FieldFlags.ReadOnly);
         public static readonly TaskField<DateTimeOffset> LateStart = new TaskField<DateTimeOffset>("LateStart", FieldKinds.DateTime, FieldFlags.ReadOnly);

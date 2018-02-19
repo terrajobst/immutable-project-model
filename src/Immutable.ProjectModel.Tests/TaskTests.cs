@@ -385,6 +385,42 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Start_CreatesConstraint()
+        {
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 19))
+                                 .AddTask()
+                                    .WithDuration(ProjectTime.FromDays(5))
+                                    .WithStart(new DateTime(2018, 2, 20, 9, 0, 0)).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(ProjectTime.FromDays(5))
+                              .AssertStart(new DateTime(2018, 2, 20, 9, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 27, 9, 0, 0))
+                              .AssertConstraintType(ConstraintType.StartNoEarlierThan)
+                              .AssertConstraintDate(new DateTime(2018, 2, 20, 9, 0, 0));
+        }
+
+        [Fact]
+        public void Task_Finish_CreatesConstraint()
+        {
+            var project = Project.Create()
+                                 .WithStartDate(new DateTime(2018, 2, 19))
+                                 .AddTask()
+                                    .WithDuration(ProjectTime.FromDays(5))
+                                    .WithFinish(new DateTime(2018, 2, 28, 15, 0, 0)).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                              .AssertDuration(ProjectTime.FromDays(5))
+                              .AssertStart(new DateTime(2018, 2, 21, 15, 0, 0))
+                              .AssertFinish(new DateTime(2018, 2, 28, 15, 0, 0))
+                              .AssertConstraintType(ConstraintType.FinishNoEarlierThan)
+                              .AssertConstraintDate(new DateTime(2018, 2, 28, 15, 0, 0));
+        }
+
+        [Fact]
         public void Task_EarylyStart_EarylyFinish_LateStart_LateFinish()
         {
             var taskId3 = TaskId.Create();

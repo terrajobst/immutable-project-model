@@ -123,6 +123,14 @@ namespace Immutable.ProjectModel
             {
                 return SetTaskWork(this, id, (TimeSpan)value);
             }
+            else if (field == TaskFields.Start)
+            {
+                return SetTaskStart(this, id, (DateTimeOffset)value);
+            }
+            else if (field == TaskFields.Finish)
+            {
+                return SetTaskFinish(this, id, (DateTimeOffset)value);
+            }
             else if (field == TaskFields.ConstraintType)
             {
                 return SetTaskConstraintType(this, id, (ConstraintType)value);
@@ -278,6 +286,18 @@ namespace Immutable.ProjectModel
             }
 
             return project;
+        }
+
+        private static ProjectData SetTaskStart(ProjectData project, TaskId id, DateTimeOffset value)
+        {
+            return project.Set(TaskFields.ConstraintType, id, ConstraintType.StartNoEarlierThan)
+                          .Set(TaskFields.ConstraintDate, id, value);
+        }
+
+        private static ProjectData SetTaskFinish(ProjectData project, TaskId id, DateTimeOffset value)
+        {
+            return project.Set(TaskFields.ConstraintType, id, ConstraintType.FinishNoEarlierThan)
+                          .Set(TaskFields.ConstraintDate, id, value);
         }
 
         private static ProjectData SetTaskConstraintType(ProjectData project, TaskId id, ConstraintType value)
