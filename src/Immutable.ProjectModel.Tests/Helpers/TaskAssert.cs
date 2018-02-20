@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
+
 using Xunit;
 
 namespace Immutable.ProjectModel.Tests.Helpers
@@ -25,11 +26,19 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return this;
         }
 
-        public TaskAssert AssertField<T>(TaskField<T> field, T value, Func<T, T, bool> checker)
+        public TaskAssert AssertFieldCollection<T>(TaskField field, IEnumerable<T> value)
         {
             var actualValue = _task.GetValue(field);
-            var equals = checker(value, actualValue);
-            Assert.True(equals, $"Task {_task.Ordinal + 1} {field.Name} should have been '{value}' but was '{actualValue}'");
+
+            try
+            {
+                Assert.Equal(value, (IEnumerable<T>)actualValue);
+            }
+            catch (Exception ex)
+            {
+                Assert.True(false, $"Task {_task.Ordinal + 1} {field.Name} {ex.Message}'");
+            }
+
             return this;
         }
 
@@ -110,7 +119,7 @@ namespace Immutable.ProjectModel.Tests.Helpers
 
         public TaskAssert AssertPredecessorIds(ImmutableArray<TaskId> value)
         {
-            return AssertField(TaskFields.PredecessorIds, value, (v, av) => v.SequenceEqual(av));
+            return AssertFieldCollection(TaskFields.PredecessorIds, value);
         }
 
         public TaskAssert AssertResourceNames(string value)
