@@ -20,7 +20,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project;
+                                    .AddPredecessorLink(taskId1).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
@@ -71,7 +71,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project
+                                    .AddPredecessorLink(taskId1).Project
                                  .GetTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(4)).Project;
 
@@ -99,7 +99,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project
+                                    .AddPredecessorLink(taskId1).Project
                                  .GetTask(taskId2)
                                     .WithDuration(TimeSpan.Zero).Project;
 
@@ -198,7 +198,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project
+                                    .AddPredecessorLink(taskId1).Project
                                  .GetTask(taskId2)
                                     .WithWork(ProjectTime.FromHours(120)).Project;
 
@@ -227,7 +227,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project
+                                    .AddPredecessorLink(taskId1).Project
                                  .GetTask(taskId2)
                                     .WithWork(TimeSpan.Zero).Project;
 
@@ -398,7 +398,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(5)).Project
                                  .AddTask()
                                     .WithDuration(ProjectTime.FromDays(3))
-                                    .AddPredecessorId(taskId3).Project
+                                    .AddPredecessorLink(taskId3).Project
                                  .AddTask()
                                     .WithDuration(ProjectTime.FromDays(7)).Project;
 
@@ -465,20 +465,20 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(5)).Project
                                  .AddTask(taskIdB)
                                     .WithDuration(ProjectTime.FromDays(4))
-                                    .AddPredecessorId(taskIdA).Project
+                                    .AddPredecessorLink(taskIdA).Project
                                  .AddTask(taskIdC)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskIdA).Project
+                                    .AddPredecessorLink(taskIdA).Project
                                  .AddTask(taskIdD)
                                     .WithDuration(ProjectTime.FromDays(6))
-                                    .AddPredecessorId(taskIdB).Project
+                                    .AddPredecessorLink(taskIdB).Project
                                  .AddTask(taskIdE)
                                     .WithDuration(ProjectTime.FromDays(3))
-                                    .AddPredecessorId(taskIdC).Project
+                                    .AddPredecessorLink(taskIdC).Project
                                  .AddTask(taskIdF)
                                     .WithDuration(ProjectTime.FromDays(4))
-                                    .AddPredecessorId(taskIdD)
-                                    .AddPredecessorId(taskIdE).Project;
+                                    .AddPredecessorLink(taskIdD)
+                                    .AddPredecessorLink(taskIdE).Project;
 
             ProjectAssert.For(project)
                          .ForTask(taskIdA)
@@ -675,21 +675,21 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Task_PredecessorIds_DetectsCycle_WhenDirect()
+        public void Task_Links_DetectsCycle_WhenDirect()
         {
             var taskId = TaskId.Create();
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
                 Project.Create()
-                        .AddTask(taskId)
-                            .AddPredecessorId(taskId)
+                       .AddTask(taskId)
+                           .AddPredecessorLink(taskId)
             );
 
-            Assert.Equal("Adding 0 as a predecessor would cause a cycle", exception.Message);
+            Assert.Equal("Cannot add a link from task 0 to task 0 as this would cause a cycle.", exception.Message);
         }
 
         [Fact]
-        public void Task_PredecessorIds_DetectsCycle_WhenIndirect()
+        public void Task_Links_DetectsCycle_WhenIndirect()
         {
             var taskId1 = TaskId.Create();
             var taskId2 = TaskId.Create();
@@ -701,23 +701,92 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId1)
                                      .Project
                                  .AddTask(taskId2)
-                                     .AddPredecessorId(taskId1)
+                                     .AddPredecessorLink(taskId1)
                                      .Project
                                  .AddTask(taskId3)
-                                     .AddPredecessorId(taskId2)
+                                     .AddPredecessorLink(taskId2)
                                      .Project
                                  .AddTask(taskId4)
-                                     .AddPredecessorId(taskId3)
+                                     .AddPredecessorLink(taskId3)
                                      .Project
                                  .AddTask(taskId5)
-                                     .AddPredecessorId(taskId4)
+                                     .AddPredecessorLink(taskId4)
                                      .Project;
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
-                project.GetTask(taskId1).AddPredecessorId(taskId5)   
+                project.GetTask(taskId1).AddPredecessorLink(taskId5)
             );
 
-            Assert.Equal("Adding 4 as a predecessor would cause a cycle", exception.Message);
+            Assert.Equal("Cannot add a link from task 4 to task 0 as this would cause a cycle.", exception.Message);
+        }
+
+        [Fact]
+        public void Task_Links_IsUpdated_WhenLinkIsAdded()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTaskLink(taskId1, taskId2);
+
+            var link = project.GetTaskLink(taskId1, taskId2);
+            Assert.NotNull(link);
+
+            var expectedLinks = ImmutableArray.Create(link);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                            .AssertSuccessorLinks(expectedLinks)
+                            .Project
+                         .ForTask(taskId2)
+                            .AssertPredecessorLinks(expectedLinks);
+        }
+
+        [Fact]
+        public void Task_Links_IsUpdated_WhenLinkIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .AddPredecessorLink(taskId1)
+                                    .Project
+                                 .RemoveTaskLink(taskId1, taskId2);
+
+            var expectedLinks = ImmutableArray<TaskLink>.Empty;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId1)
+                            .AssertSuccessorLinks(expectedLinks)
+                            .Project
+                         .ForTask(taskId2)
+                            .AssertPredecessorLinks(expectedLinks);
+        }
+
+        [Fact]
+        public void Task_Links_IsUpdated_WhenTasksIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .AddPredecessorLink(taskId1)
+                                    .Project
+                                 .RemoveTask(taskId1);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId2)
+                              .AssertPredecessorLinks(ImmutableArray<TaskLink>.Empty);
         }
 
         [Fact]
@@ -736,9 +805,9 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId3)
                                     .Project
                                  .AddTask(taskId4)
-                                    .AddPredecessorId(taskId2)
-                                    .AddPredecessorId(taskId1)
-                                    .AddPredecessorId(taskId3)
+                                    .AddPredecessorLink(taskId2)
+                                    .AddPredecessorLink(taskId1)
+                                    .AddPredecessorLink(taskId3)
                                     .Project;
 
             ProjectAssert.For(project)
@@ -762,8 +831,8 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId3)
                                     .Project
                                  .AddTask(taskId4)
-                                    .AddPredecessorId(taskId1)
-                                    .AddPredecessorId(taskId2)
+                                    .AddPredecessorLink(taskId1)
+                                    .AddPredecessorLink(taskId2)
                                     .Project
                                  .GetTask(taskId3)
                                     .WithPredecessors("0,1")
@@ -778,6 +847,28 @@ namespace Immutable.ProjectModel.Tests
                               .Project
                          .ForTask(taskId4)
                               .AssertPredecessors("1,2");
+        }
+
+        [Fact]
+        public void Task_Predecessors_DetectsCycle()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .GetTask(taskId2)
+                                    .WithPredecessors("0")
+                                    .Project;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                project.GetTask(taskId1).WithPredecessors("1")
+            );
+
+            Assert.Equal("Cannot add a link from task 1 to task 0 as this would cause a cycle.", exception.Message);
         }
 
         [Fact]
@@ -806,7 +897,7 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Task_Predecessors_IsUpdated_WhenPrecessorIsRemoved()
+        public void Task_Predecessors_IsUpdated_WhenPredecessorIsRemoved()
         {
             var taskId1 = TaskId.Create();
             var taskId2 = TaskId.Create();
@@ -816,17 +907,17 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId1)
                                     .Project
                                  .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorLink(taskId1)
                                     .Project
                                  .AddTask(taskId3)
-                                    .AddPredecessorId(taskId1)
-                                    .AddPredecessorId(taskId2)
+                                    .AddPredecessorLink(taskId1)
+                                    .AddPredecessorLink(taskId2)
                                     .Project
                                  .GetTask(taskId2)
-                                    .RemovePredecessorId(taskId1)
+                                    .RemovePredecessorLink(taskId1)
                                     .Project
                                  .GetTask(taskId3)
-                                    .RemovePredecessorId(taskId2)
+                                    .RemovePredecessorLink(taskId2)
                                     .Project;
 
             ProjectAssert.For(project)
@@ -835,25 +926,6 @@ namespace Immutable.ProjectModel.Tests
                               .Project
                          .ForTask(taskId3)
                               .AssertPredecessors("0");
-        }
-
-        [Fact]
-        public void Task_Predecessors_IsUpdated_WhenTasksIsRemoved()
-        {
-            var taskId1 = TaskId.Create();
-            var taskId2 = TaskId.Create();
-
-            var project = Project.Create()
-                                 .AddTask(taskId1)
-                                    .Project
-                                 .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
-                                    .Project
-                                 .RemoveTask(taskId1);
-
-            ProjectAssert.For(project)
-                         .ForTask(0)
-                              .AssertPredecessorIds(ImmutableArray<TaskId>.Empty);
         }
 
         [Fact]

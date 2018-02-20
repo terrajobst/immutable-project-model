@@ -21,7 +21,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project;
+                                    .AddPredecessorLink(taskId1).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
@@ -60,7 +60,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project;
+                                    .AddPredecessorLink(taskId1).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)
@@ -88,7 +88,7 @@ namespace Immutable.ProjectModel.Tests
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
                                     .WithDuration(ProjectTime.FromDays(5))
-                                    .AddPredecessorId(taskId1).Project;
+                                    .AddPredecessorLink(taskId1).Project;
 
             ProjectAssert.For(project)
                          .ForTask(0)

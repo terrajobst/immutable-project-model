@@ -117,9 +117,14 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.IsMilestone, value);
         }
 
-        public TaskAssert AssertPredecessorIds(ImmutableArray<TaskId> value)
+        public TaskAssert AssertPredecessorLinks(ImmutableArray<TaskLink> value)
         {
-            return AssertFieldCollection(TaskFields.PredecessorIds, value);
+            return AssertFieldCollection(TaskFields.PredecessorLinks, value);
+        }
+
+        public TaskAssert AssertSuccessorLinks(ImmutableArray<TaskLink> value)
+        {
+            return AssertFieldCollection(TaskFields.SuccessorLinks, value);
         }
 
         public TaskAssert AssertResourceNames(string value)

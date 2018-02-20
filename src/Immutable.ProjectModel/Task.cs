@@ -56,9 +56,17 @@ namespace Immutable.ProjectModel
 
         public string Predecessors => GetValue(TaskFields.Predecessors);
 
-        public ImmutableArray<TaskId> PredecessorIds => GetValue(TaskFields.PredecessorIds);
+        public ImmutableArray<TaskLink> PredecessorLinks => GetValue(TaskFields.PredecessorLinks);
 
-        public IEnumerable<Task> PredecessorTasks => PredecessorIds.Select(id => Project.GetTask(id));
+        public IEnumerable<TaskId> PredecessorIds => PredecessorLinks.Select(l => l.PredecessorId);
+
+        public IEnumerable<Task> PredecessorTasks => PredecessorLinks.Select(l => Project.GetTask(l.PredecessorId));
+
+        public ImmutableArray<TaskLink> SuccessorLinks => GetValue(TaskFields.SuccessorLinks);
+
+        public IEnumerable<TaskId> SuccessorIds => SuccessorLinks.Select(l => l.SuccessorId);
+
+        public IEnumerable<Task> SuccessorTasks => SuccessorLinks.Select(l => Project.GetTask(l.SuccessorId));
 
         public IEnumerable<Assignment> Assignments => Project.Data.GetAssignments(Id)
                                                                   .Select(a => Project.GetAssignment(a));
@@ -126,25 +134,24 @@ namespace Immutable.ProjectModel
             return SetValue(TaskFields.IsMilestone, isMilestone);
         }
 
-        public Task WithPredecessorIds(ImmutableArray<TaskId> predecessorIds)
+        public Task AddPredecessorLink(TaskId taskId)
         {
-            if (predecessorIds == PredecessorIds)
-                return this;
-
-            return SetValue(TaskFields.PredecessorIds, predecessorIds);
+            return Project.AddTaskLink(taskId, Id).GetTask(Id);
         }
 
-        public Task AddPredecessorId(TaskId taskId)
+        public Task RemovePredecessorLink(TaskId taskId)
         {
-            if (PredecessorIds.Contains(taskId))
-                return this;
-
-            return WithPredecessorIds(PredecessorIds.Add(taskId));
+            return _project.RemoveTaskLink(taskId, Id).GetTask(Id);
         }
 
-        public Task RemovePredecessorId(TaskId taskId)
+        public Task AddSuccessorLink(TaskId taskId)
         {
-            return WithPredecessorIds(PredecessorIds.Remove(taskId));
+            return Project.AddTaskLink(Id, taskId).GetTask(Id);
+        }
+
+        public Task RemoveSuccessorLink(TaskId taskId)
+        {
+            return _project.RemoveTaskLink(Id, taskId).GetTask(Id);
         }
 
         public Task WithResourceNames(string value)

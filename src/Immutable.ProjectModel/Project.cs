@@ -38,6 +38,8 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<Task> Tasks => Data.Tasks.Select(GetTask).OrderBy(t => t.Ordinal);
 
+        public IEnumerable<TaskLink> TaskLinks => Data.TaskLinks;
+
         public IEnumerable<Resource> Resources => Data.Resources.Select(GetResource);
 
         public IEnumerable<Assignment> Assignments => Data.Assignments.Select(GetAssignment);

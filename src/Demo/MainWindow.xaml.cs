@@ -46,14 +46,14 @@ namespace Demo
                           .AddTask(implementationTaskId)
                               .WithName("Implementation")
                               .WithDuration(time.FromDays(10))
-                              .AddPredecessorId(designTaskId).Project
+                              .AddPredecessorLink(designTaskId).Project
                           .AddTask(migrationTaskId)
                               .WithName("Migration")
                               .WithDuration(time.FromDays(8)).Project
                           .AddTask(finishTaskId)
                               .WithName("Finish")
-                              .AddPredecessorId(implementationTaskId)
-                              .AddPredecessorId(migrationTaskId).Project
+                              .AddPredecessorLink(implementationTaskId)
+                              .AddPredecessorLink(migrationTaskId).Project
                           .AddResource(immoResourceId)
                               .WithName("Immo").Project
                           .AddResource(thomasResourceId)

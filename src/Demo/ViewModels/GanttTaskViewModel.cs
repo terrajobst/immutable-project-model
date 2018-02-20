@@ -25,7 +25,7 @@ namespace Demo.ViewModels
             Predecessors = new ObservableCollection<Predecessor>();
             Predecessors.CollectionChanged += Predecessors_CollectionChanged;
 
-            UpdatePrecessors();
+            UpdatePredecessors();
         }
 
         public ProjectWorkspace Workspace { get; }
@@ -64,9 +64,13 @@ namespace Demo.ViewModels
 
         public void SetField(TaskField field, object value)
         {
+            UpdateProject(Current.SetValue(field, value).Project);
+        }
+
+        private void UpdateProject(Project project)
+        {
             Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
             {
-                var project = Current.SetValue(field, value).Project;
                 Workspace.ApplyChanges(project);
             }), DispatcherPriority.ApplicationIdle);
         }
@@ -86,12 +90,12 @@ namespace Demo.ViewModels
                     OnPropertyChanged("EndDate");
                 else if (fieldChange.Field == TaskFields.Duration)
                     OnPropertyChanged("Duration");
-                else if (fieldChange.Field == TaskFields.PredecessorIds)
-                    UpdatePrecessors();
+                else if (fieldChange.Field == TaskFields.PredecessorLinks)
+                    UpdatePredecessors();
             }
         }
 
-        private void UpdatePrecessors()
+        private void UpdatePredecessors()
         {
             _syncingPredecessors = true;
 
@@ -118,12 +122,26 @@ namespace Demo.ViewModels
 
             var ordinals = Predecessors.Select(p => p.GanttTaskIndex);
             var taskByOrdinal = Current.Project.Tasks.ToDictionary(t => t.Ordinal);
-            var predecessorIds = ordinals.Select(index => taskByOrdinal[index]).Select(t => t.Id).ToImmutableArray();
 
-            if (predecessorIds.IsEmpty && Current.PredecessorIds.IsEmpty)
+            var newPredecessorIds = ordinals.Select(index => taskByOrdinal[index]).Select(t => t.Id).ToImmutableArray();
+            var oldPredecessorIds = Current.PredecessorIds.ToImmutableArray();
+
+            if (newPredecessorIds.IsEmpty && oldPredecessorIds.IsEmpty)
                 return;
 
-            SetField(TaskFields.PredecessorIds, predecessorIds);
+            var toBeRemoved = oldPredecessorIds.Where(i => !newPredecessorIds.Contains(i));
+            var toBeAdded = newPredecessorIds.Where(i => !oldPredecessorIds.Contains(i));
+
+            var successorId = Current.Id;
+            var project = Current.Project;
+
+            foreach (var predecessorId in toBeRemoved)
+                project = project.RemoveTaskLink(predecessorId, successorId);
+
+            foreach (var predecessorId in toBeAdded)
+                project = project.AddTaskLink(predecessorId, successorId);
+
+            UpdateProject(project);
         }
     }
 }

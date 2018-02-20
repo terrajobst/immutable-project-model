@@ -204,7 +204,7 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId1)
                                     .Project
                                  .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorLink(taskId1)
                                     .Project
                                  .AddResource(resourceId)
                                     .Project
@@ -234,7 +234,7 @@ namespace Immutable.ProjectModel.Tests
                                  .AddTask(taskId1)
                                     .Project
                                  .AddTask(taskId2)
-                                    .AddPredecessorId(taskId1)
+                                    .AddPredecessorLink(taskId1)
                                     .Project
                                  .AddResource(resourceId1)
                                     .Project

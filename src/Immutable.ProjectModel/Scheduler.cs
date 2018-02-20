@@ -21,7 +21,7 @@ namespace Immutable.ProjectModel
             while (toBeScheduled.Count > 0)
             {
                 var taskId = toBeScheduled.Dequeue();
-                var predecessorIds = project.Get(TaskFields.PredecessorIds, taskId);
+                var predecessorIds = project.GetPredecessors(taskId);
                 var allPredecessorsComputed = predecessorIds.All(id => computedTasks.Contains(id));
                 if (!allPredecessorsComputed)
                 {
@@ -77,16 +77,12 @@ namespace Immutable.ProjectModel
                                     .Max();
 
             var computedTasks = new HashSet<TaskId>();
-            var successorsById = project.Tasks
-                                        .SelectMany(s => project.GetPredecessors(s), (s, p) => (predecessor: p, successor: s))
-                                        .ToLookup(t => t.predecessor, t => t.successor);
-
             var toBeScheduled = new Queue<TaskId>(project.Tasks);
 
             while (toBeScheduled.Count > 0)
             {
                 var taskId = toBeScheduled.Dequeue();
-                var successors = successorsById[taskId];
+                var successors = project.GetSuccessors(taskId);
                 var allSuccessorsComputed = successors.All(id => computedTasks.Contains(id));
                 if (!allSuccessorsComputed)
                 {

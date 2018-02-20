@@ -26,7 +26,12 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<TaskId> GetPredecessors(TaskId taskId)
         {
-            return Get(TaskFields.PredecessorIds, taskId);
+            return Get(TaskFields.PredecessorLinks, taskId).Select(l => l.PredecessorId);
+        }
+
+        public IEnumerable<TaskId> GetSuccessors(TaskId taskId)
+        {
+            return Get(TaskFields.SuccessorLinks, taskId).Select(l => l.SuccessorId);
         }
 
         private ProjectData WithTaskMap(ImmutableDictionary<TaskId, TaskData> taskMap)
@@ -57,6 +62,11 @@ namespace Immutable.ProjectModel
             foreach (var assignmentId in project.GetAssignments(taskId))
                 project = project.RemoveAssignment(assignmentId);
 
+            // Remove task links
+
+            foreach (var taskLink in GetTaskLinks(taskId))
+                project = project.RemoveTaskLink(taskLink);
+
             // Remove task
 
             project = project.WithTaskMap(project._taskMap.Remove(taskId));
@@ -74,10 +84,6 @@ namespace Immutable.ProjectModel
                 // Update ordinal
                 var ordinal = i;
                 project = project.SetRaw(TaskFields.Ordinal, id, ordinal);
-
-                // Update predecessor ids
-                var predecessors = project.Get(TaskFields.PredecessorIds, id).Remove(taskId);
-                project = project.Set(TaskFields.PredecessorIds, id, predecessors);
             }
 
             return project;
@@ -111,10 +117,6 @@ namespace Immutable.ProjectModel
             else if (field == TaskFields.Work)
             {
                 return SetTaskWork(this, id, (TimeSpan)value);
-            }
-            else if (field == TaskFields.PredecessorIds)
-            {
-                return SetTaskPredecessorIds(this, id, (ImmutableArray<TaskId>)value);
             }
             else if (field == TaskFields.Predecessors)
             {
@@ -265,34 +267,6 @@ namespace Immutable.ProjectModel
             return project;
         }
 
-        private static ProjectData SetTaskPredecessorIds(ProjectData project, TaskId id, ImmutableArray<TaskId> value)
-        {
-            // Check for cycles
-
-            var queue = new Queue<TaskId>();
-
-            foreach (var predecessorId in value)
-            {
-                queue.Enqueue(predecessorId);
-
-                while (queue.Count > 0)
-                {
-                    var taskId = queue.Dequeue();
-                    if (taskId == id)
-                    {
-                        var predecessorOrdinal = project.Get(TaskFields.Ordinal, predecessorId);
-                        throw new InvalidOperationException($"Adding {predecessorOrdinal} as a predecessor would cause a cycle");
-                    }
-
-                    foreach (var pid in project.GetPredecessors(taskId))
-                        queue.Enqueue(pid);
-                }
-            }
-
-            return project.SetRaw(TaskFields.PredecessorIds, id, value)
-                          .Reset(TaskFields.Predecessors, id);
-        }
-
         private static ProjectData ResetTaskPredecessors(ProjectData project, TaskId id)
         {
             var sb = new StringBuilder();
@@ -315,6 +289,7 @@ namespace Immutable.ProjectModel
             value = value.Trim();
 
             var predecessorsBuilder = ImmutableArray.CreateBuilder<TaskId>();
+            var remainingTaskLinks = project.Get(TaskFields.PredecessorLinks, id).ToList();
 
             if (value.Length > 0)
             {
@@ -331,12 +306,27 @@ namespace Immutable.ProjectModel
                     if (predecessorId.IsDefault)
                         throw new FormatException($"'{predecessorOrdinal}' isn't a valid predecessor");
 
-                    predecessorsBuilder.Add(predecessorId);
+                    var taskLink = project.GetTaskLink(predecessorId, id);
+                    if (taskLink == null)
+                    {
+                        taskLink = TaskLink.Create(predecessorId, id);
+                        if (project.TaskLinkCausesCycle(taskLink))
+                        {
+                            var successorOrdinal = project.Get(TaskFields.Ordinal, taskLink.SuccessorId);
+                            throw new InvalidOperationException($"Cannot add a link from task {predecessorOrdinal} to task {successorOrdinal} as this would cause a cycle.");
+                        }
+
+                        project = project.AddTaskLink(taskLink);
+                    }
+
+                    remainingTaskLinks.Remove(taskLink);
                 }
             }
 
-            var precedessors = predecessorsBuilder.ToImmutable();
-            return project.Set(TaskFields.PredecessorIds, id, precedessors);
+            foreach (var taskLink in remainingTaskLinks)
+                project = project.RemoveTaskLink(taskLink);
+
+            return project;
         }
 
         private static ProjectData ResetTaskResourceNames(ProjectData project, TaskId id)
