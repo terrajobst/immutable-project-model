@@ -134,24 +134,28 @@ namespace Immutable.ProjectModel
             return SetValue(TaskFields.IsMilestone, isMilestone);
         }
 
-        public Task AddPredecessorLink(TaskId taskId)
+        public Task AddPredecessorLink(TaskId predecessorId,
+                                       TaskLinkType type = TaskLinkType.FinishToStart,
+                                       TimeSpan lag = default)
         {
-            return Project.AddTaskLink(taskId, Id).GetTask(Id);
+            return Project.AddTaskLink(predecessorId, Id, type, lag).GetTask(Id);
         }
 
-        public Task RemovePredecessorLink(TaskId taskId)
+        public Task RemovePredecessorLink(TaskId predecessorId)
         {
-            return _project.RemoveTaskLink(taskId, Id).GetTask(Id);
+            return _project.RemoveTaskLink(predecessorId, Id).GetTask(Id);
         }
 
-        public Task AddSuccessorLink(TaskId taskId)
+        public Task AddSuccessorLink(TaskId successorId,
+                                     TaskLinkType type = TaskLinkType.FinishToStart,
+                                     TimeSpan lag = default)
         {
-            return Project.AddTaskLink(Id, taskId).GetTask(Id);
+            return Project.AddTaskLink(Id, successorId, type, lag).GetTask(Id);
         }
 
-        public Task RemoveSuccessorLink(TaskId taskId)
+        public Task RemoveSuccessorLink(TaskId successorId)
         {
-            return _project.RemoveTaskLink(Id, taskId).GetTask(Id);
+            return _project.RemoveTaskLink(Id, successorId).GetTask(Id);
         }
 
         public Task WithResourceNames(string value)
