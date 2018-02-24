@@ -85,13 +85,13 @@ namespace Demo.ViewModels
             foreach (var fieldChange in taskChanges.FieldChanges)
             {
                 if (fieldChange.Field == TaskFields.Name)
-                    OnPropertyChanged("Name");
+                    OnPropertyChanged(nameof(Name));
                 else if (fieldChange.Field == TaskFields.Start)
-                    OnPropertyChanged("StartDate");
+                    OnPropertyChanged(nameof(StartDate));
                 else if (fieldChange.Field == TaskFields.Finish)
-                    OnPropertyChanged("EndDate");
+                    OnPropertyChanged(nameof(EndDate));
                 else if (fieldChange.Field == TaskFields.Duration)
-                    OnPropertyChanged("Duration");
+                    OnPropertyChanged(nameof(Duration));
                 else if (fieldChange.Field == TaskFields.Predecessors)
                     UpdatePredecessors();
             }
