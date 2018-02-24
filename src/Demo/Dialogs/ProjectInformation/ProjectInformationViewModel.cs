@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 using Demo.ViewModels;
 
@@ -34,19 +33,19 @@ namespace Demo.Dialogs.ProjectInformation
 
         public DateTime StartDate
         {
-            get => _project.StartDate.LocalDateTime;
+            get => _project.Start.LocalDateTime;
             set
             {
-                if (_project.StartDate.LocalDateTime != value)
+                if (_project.Start.LocalDateTime != value)
                     UpdateProject(value);
             }
         }
+
+        public DateTime FinishDate => _project.Finish.LocalDateTime;
 
         private async void UpdateProject(DateTime value)
         {
             Project = await Task.Run(() => Project.WithStartDate(value));
         }
-
-        public DateTime FinishDate => _project.Tasks.Select(t => t.Finish.LocalDateTime).DefaultIfEmpty(StartDate).Max();
     }
 }

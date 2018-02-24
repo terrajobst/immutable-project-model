@@ -9,22 +9,28 @@ namespace Immutable.ProjectModel
         {
             Debug.Assert(!id.IsDefault);
 
+            var start = DateTimeOffset.Now.Date;
+            var finish = start;
+
             return new ProjectInformationData(id,
                                               string.Empty,
-                                              DateTimeOffset.Now.Date,
+                                              start,
+                                              finish,
                                               Calendar.Default,
                                               TimeConversion.Default);
         }
 
         private ProjectInformationData(ProjectId id,
                                        string name,
-                                       DateTimeOffset startDate,
+                                       DateTimeOffset start,
+                                       DateTimeOffset finish,
                                        Calendar calendar,
                                        TimeConversion timeConversion)
         {
             Id = id;
             Name = name;
-            StartDate = startDate;
+            Start = start;
+            Finish = finish;
             Calendar = calendar;
             TimeConversion = timeConversion;
         }
@@ -33,38 +39,48 @@ namespace Immutable.ProjectModel
 
         public string Name { get; }
 
-        public DateTimeOffset StartDate { get; }
+        public DateTimeOffset Start { get; }
+
+        public DateTimeOffset Finish { get; }
 
         public Calendar Calendar { get; }
 
         public TimeConversion TimeConversion { get; }
 
         public ProjectInformationData With(string name,
-                                           DateTimeOffset startDate,
+                                           DateTimeOffset start,
+                                           DateTimeOffset finish,
                                            Calendar calendar,
                                            TimeConversion timeConversion)
         {
             if (name == Name &&
-                startDate == StartDate &&
+                start == Start &&
+                finish == Finish &&
                 calendar == Calendar &&
                 timeConversion == TimeConversion)
                 return this;
 
             return new ProjectInformationData(Id,
                                               name,
-                                              startDate,
+                                              start,
+                                              finish,
                                               calendar,
                                               timeConversion);
         }
 
         public ProjectInformationData WithName(string name)
         {
-            return With(name, StartDate, Calendar, TimeConversion);
+            return With(name, Start, Finish, Calendar, TimeConversion);
         }
 
-        public ProjectInformationData WithStartDate(DateTimeOffset startDate)
+        public ProjectInformationData WithStart(DateTimeOffset start)
         {
-            return With(Name, startDate, Calendar, TimeConversion);
+            return With(Name, start, Finish, Calendar, TimeConversion);
+        }
+
+        public ProjectInformationData WithFinish(DateTimeOffset finish)
+        {
+            return With(Name, Start, finish, Calendar, TimeConversion);
         }
 
         public ProjectInformationData WithCalendar(Calendar calendar)
@@ -72,7 +88,7 @@ namespace Immutable.ProjectModel
             if (calendar == null)
                 throw new ArgumentNullException(nameof(calendar));
 
-            return With(Name, StartDate, calendar, TimeConversion);
+            return With(Name, Start, Finish, calendar, TimeConversion);
         }
 
         public ProjectInformationData WithTimeConversion(TimeConversion timeConversion)
@@ -80,7 +96,7 @@ namespace Immutable.ProjectModel
             if (timeConversion == null)
                 throw new ArgumentNullException(nameof(timeConversion));
 
-            return With(Name, StartDate, Calendar, timeConversion);
+            return With(Name, Start, Finish, Calendar, timeConversion);
         }
     }
 }

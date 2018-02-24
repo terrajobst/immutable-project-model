@@ -30,7 +30,7 @@ namespace Immutable.ProjectModel
                 else
                 {
                     var earlyStart = predecessorIds.Select(p => project.Get(TaskFields.EarlyFinish, p))
-                                                   .DefaultIfEmpty(project.Information.StartDate)
+                                                   .DefaultIfEmpty(project.Information.Start)
                                                    .Max();
 
                     var assignmentIds = project.GetAssignments(taskId);
@@ -66,16 +66,17 @@ namespace Immutable.ProjectModel
                 }
             }
 
-            return project;
+            var projectFinish = project.Tasks
+                                       .Select(t => project.Get(TaskFields.EarlyFinish, t))
+                                       .DefaultIfEmpty(project.Information.Start)
+                                       .Max();
+
+            var information = project.Information.WithFinish(projectFinish);
+            return project.WithInformation(information);
         }
 
         private static ProjectData BackwardPass(this ProjectData project)
         {
-            var projectEnd = project.Tasks
-                                    .Select(t => project.Get(TaskFields.EarlyFinish, t))
-                                    .DefaultIfEmpty()
-                                    .Max();
-
             var computedTasks = new HashSet<TaskId>();
             var toBeScheduled = new Queue<TaskId>(project.Tasks);
 
@@ -91,7 +92,7 @@ namespace Immutable.ProjectModel
                 else
                 {
                     var lateFinish = successors.Select(id => project.Get(TaskFields.LateStart, id))
-                                               .DefaultIfEmpty(projectEnd)
+                                               .DefaultIfEmpty(project.Information.Finish)
                                                .Min();
 
                     var assignmentIds = project.GetAssignments(taskId);
@@ -134,11 +135,6 @@ namespace Immutable.ProjectModel
         {
             var calendar = project.Information.Calendar;
 
-            var projectEnd = project.Tasks                                    
-                                    .Select(t => project.Get(TaskFields.EarlyFinish, t))
-                                    .DefaultIfEmpty()
-                                    .Max();
-
             foreach (var taskId in project.Tasks)
             {
                 var earlyStart = project.Get(TaskFields.EarlyStart, taskId);
@@ -172,7 +168,7 @@ namespace Immutable.ProjectModel
 
                 var minumumEarlyStartOfSuccessors = project.GetSuccessors(taskId)
                                                            .Select(t => project.Get(TaskFields.EarlyStart, t))
-                                                           .DefaultIfEmpty(projectEnd)
+                                                           .DefaultIfEmpty(project.Information.Finish)
                                                            .Min();
                 var freeSlack = calendar.GetWork(earlyStart, minumumEarlyStartOfSuccessors) - duration;
                 project = project.SetRaw(TaskFields.FreeSlack, taskId, freeSlack);

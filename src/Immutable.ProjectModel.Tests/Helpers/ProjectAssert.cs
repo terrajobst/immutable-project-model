@@ -88,5 +88,11 @@ namespace Immutable.ProjectModel.Tests.Helpers
             Assert.True(assignment != null, $"The project {_project.Name} doesn't contain an assignment for task {taskId} and resource {resourceId}");
             return new AssignmentAssert(this, assignment);
         }
+
+        public ProjectAssert AssertFinish(DateTimeOffset value)
+        {
+            Assert.Equal(value, _project.Finish);
+            return this;
+        }
     }
 }

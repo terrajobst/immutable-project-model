@@ -30,7 +30,9 @@ namespace Immutable.ProjectModel
 
         public string Name => Data.Information.Name;
 
-        public DateTimeOffset StartDate => Data.Information.StartDate;
+        public DateTimeOffset Start => Data.Information.Start;
+
+        public DateTimeOffset Finish => Data.Information.Finish;
 
         public Calendar Calendar => Data.Information.Calendar;
 
@@ -108,7 +110,7 @@ namespace Immutable.ProjectModel
 
         public Project WithStartDate(DateTimeOffset startDate)
         {
-            var information = Data.Information.WithStartDate(startDate);
+            var information = Data.Information.WithStart(startDate);
             var data = Data.WithInformation(information);
             return UpdateProject(data);
         }
