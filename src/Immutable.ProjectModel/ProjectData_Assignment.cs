@@ -21,18 +21,14 @@ namespace Immutable.ProjectModel
                                                           Get(AssignmentFields.ResourceId, a) == resourcedId);
         }
 
-        public IEnumerable<AssignmentId> GetAssignments(TaskId taskId)
+        public ImmutableArray<AssignmentId> GetAssignments(TaskId taskId)
         {
-            Debug.Assert(!taskId.IsDefault);
-
-            return _assignmentMap.Keys.Where(a => Get(AssignmentFields.TaskId, a) == taskId);
+            return Get(TaskFields.Assignments, taskId);
         }
 
-        public IEnumerable<AssignmentId> GetAssignments(ResourceId resourceId)
+        public ImmutableArray<AssignmentId> GetAssignments(ResourceId resourceId)
         {
-            Debug.Assert(!resourceId.IsDefault);
-
-            return _assignmentMap.Keys.Where(a => Get(AssignmentFields.ResourceId, a) == resourceId);
+            return Get(ResourceFields.Assignments, resourceId);
         }
 
         private ProjectData WithAssignmentMap(ImmutableDictionary<AssignmentId, AssignmentData> assignmentMap)
@@ -54,7 +50,12 @@ namespace Immutable.ProjectModel
             // Add assignment
 
             var assignment = AssignmentData.Create(assignmentId, taskId, resourceId);
-            project = project.WithAssignmentMap(_assignmentMap.Add(assignment.Id, assignment));
+            var taskAssignments = project.Get(TaskFields.Assignments, taskId).Add(assignmentId);
+            var resourceAssignments = project.Get(ResourceFields.Assignments, resourceId).Add(assignmentId);
+
+            project = project.WithAssignmentMap(_assignmentMap.Add(assignment.Id, assignment))
+                             .Set(TaskFields.Assignments, taskId, taskAssignments)
+                             .Set(ResourceFields.Assignments, resourceId, resourceAssignments);
 
             // Initialize Assignment.Work and update Task.Work
 
@@ -112,13 +113,22 @@ namespace Immutable.ProjectModel
                 return this;
 
             var taskId = Get(AssignmentFields.TaskId, assignmentId);
+            var resourceId = Get(AssignmentFields.ResourceId, assignmentId);
             var assignmentWork = Get(AssignmentFields.Work, assignmentId);
             var taskWork = Get(TaskFields.Work, taskId);
+            var taskAssignments = Get(TaskFields.Assignments, taskId).Remove(assignmentId);
+            var resourceAssignments = Get(ResourceFields.Assignments, resourceId).Remove(assignmentId);
 
-            var project = WithAssignmentMap(_assignmentMap.Remove(assignmentId));
+            // Remove assignment from project
 
-            project = project.Set(TaskFields.Work, taskId, taskWork - assignmentWork);
-            project = project.Reset(TaskFields.ResourceNames, taskId);
+            var project = WithAssignmentMap(_assignmentMap.Remove(assignmentId))
+                    .Set(TaskFields.Assignments, taskId, taskAssignments)
+                    .Set(ResourceFields.Assignments, resourceId, resourceAssignments);
+
+            // Update work and resource names
+
+            project = project.Set(TaskFields.Work, taskId, taskWork - assignmentWork)
+                             .Reset(TaskFields.ResourceNames, taskId);
 
             return project;
         }

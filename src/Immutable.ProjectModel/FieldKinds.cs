@@ -5,6 +5,7 @@ namespace Immutable.ProjectModel
     public static partial class FieldKinds
     {
         public static readonly FieldKind AssignmentId = new PassthruFieldKind(typeof(AssignmentId));
+        public static readonly FieldKind AssignmentIdArray = new PassthruFieldKind(typeof(ImmutableArray<AssignmentId>));
         public static readonly FieldKind ResourceId = new PassthruFieldKind(typeof(ResourceId));
         public static readonly FieldKind TaskId = new PassthruFieldKind(typeof(TaskId));
         public static readonly FieldKind TaskLinkArray = new PassthruFieldKind(typeof(ImmutableArray<TaskLink>));

@@ -29,6 +29,7 @@ namespace Immutable.ProjectModel
 
         internal static readonly TaskField<ImmutableArray<TaskLink>> PredecessorLinks = new TaskField<ImmutableArray<TaskLink>>("PredecessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
         internal static readonly TaskField<ImmutableArray<TaskLink>> SuccessorLinks = new TaskField<ImmutableArray<TaskLink>>("SuccessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
+        internal static readonly TaskField<ImmutableArray<AssignmentId>> Assignments = new TaskField<ImmutableArray<AssignmentId>>("Assignments", FieldKinds.AssignmentIdArray, FieldFlags.ReadOnly, ImmutableArray<AssignmentId>.Empty);
 
         public static readonly ImmutableArray<TaskField> All = typeof(TaskFields).GetFields(BindingFlags.Static | BindingFlags.Public)
                                                                                  .Select(f => f.GetValue(null))
