@@ -139,10 +139,6 @@ namespace Immutable.ProjectModel
                                     .DefaultIfEmpty()
                                     .Max();
 
-            var successorsById = project.Tasks                                        
-                                        .SelectMany(s => project.GetPredecessors(s), (s, p) => (predecessor: p, successor: s))
-                                        .ToLookup(t => t.predecessor, t => t.successor);
-
             foreach (var taskId in project.Tasks)
             {
                 var earlyStart = project.Get(TaskFields.EarlyStart, taskId);
@@ -174,9 +170,10 @@ namespace Immutable.ProjectModel
 
                 // Set free slack
 
-                var minumumEarlyStartOfSuccessors = successorsById[taskId].Select(t => project.Get(TaskFields.EarlyStart, t))
-                                                                          .DefaultIfEmpty(projectEnd)
-                                                                          .Min();
+                var minumumEarlyStartOfSuccessors = project.GetSuccessors(taskId)
+                                                           .Select(t => project.Get(TaskFields.EarlyStart, t))
+                                                           .DefaultIfEmpty(projectEnd)
+                                                           .Min();
                 var freeSlack = calendar.GetWork(earlyStart, minumumEarlyStartOfSuccessors) - duration;
                 project = project.SetRaw(TaskFields.FreeSlack, taskId, freeSlack);
             }
