@@ -16,7 +16,6 @@
 * Add constraints
 * Add effort driven
 * Add task type
-* Add other predecessor types
 * Add scheduling from the back
 * Add actual work
 * Add percent complete

@@ -29,9 +29,13 @@ namespace Immutable.ProjectModel
             return UpdateProject(project);
         }
 
-        public Project AddTaskLink(TaskId predecessorId, TaskId successorId)
+        public Project AddTaskLink(TaskId predecessorId,
+                                   TaskId successorId,
+                                   TaskLinkType type = TaskLinkType.FinishToStart,
+                                   TimeSpan lag = default)
         {
-            return AddTaskLink(TaskLink.Create(predecessorId, successorId));
+            var taskLink = TaskLink.Create(predecessorId, successorId, type, lag);
+            return AddTaskLink(taskLink);
         }
 
         public Project RemoveTaskLink(TaskLink taskLink)

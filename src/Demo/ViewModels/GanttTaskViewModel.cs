@@ -11,6 +11,8 @@ using Immutable.ProjectModel;
 
 using Syncfusion.Windows.Controls.Gantt;
 
+using TimeUnit = Immutable.ProjectModel.TimeUnit;
+
 namespace Demo.ViewModels
 {
     internal sealed class GanttTaskViewModel : ViewModel
@@ -103,13 +105,16 @@ namespace Demo.ViewModels
 
             Predecessors.Clear();
 
-            foreach (var task in Current.PredecessorTasks)
+            foreach (var taskLink in Current.PredecessorLinks)
             {
+                var predecessor = Current.Project.GetTask(taskLink.PredecessorId);
+                var lagDays = Current.Project.TimeConversion.ToUnit(taskLink.Lag, TimeUnit.Days);
+
                 var item = new Predecessor()
                 {
-                    GanttTaskIndex = task.Ordinal,
-                    GanttTaskRelationship = GanttTaskRelationship.FinishToStart,
-                    Offset = 0
+                    GanttTaskIndex = predecessor.Ordinal,
+                    GanttTaskRelationship = GetRelationship(taskLink.Type),
+                    Offset = lagDays
                 };
                 Predecessors.Add(item);
             }
@@ -117,6 +122,22 @@ namespace Demo.ViewModels
             _syncingPredecessors = false;
 
             OnPropertyChanged(nameof(Predecessors));
+        }
+
+        private GanttTaskRelationship GetRelationship(TaskLinkType type)
+        {
+            switch (type)
+            {
+                default:
+                case TaskLinkType.FinishToStart:
+                    return GanttTaskRelationship.FinishToStart;
+                case TaskLinkType.StartToStart:
+                    return GanttTaskRelationship.StartToStart;
+                case TaskLinkType.FinishToFinish:
+                    return GanttTaskRelationship.FinishToFinish;
+                case TaskLinkType.StartToFinish:
+                    return GanttTaskRelationship.StartToFinish;
+            }
         }
 
         private void Predecessors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

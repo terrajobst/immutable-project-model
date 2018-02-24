@@ -276,13 +276,40 @@ namespace Immutable.ProjectModel
         {
             var sb = new StringBuilder();
 
-            foreach (var p in project.GetPredecessors(id).OrderBy(p => project.Get(TaskFields.Ordinal, p)))
+            var predecessors = project.Get(TaskFields.PredecessorLinks, id);
+
+            foreach (var p in predecessors.OrderBy(p => project.Get(TaskFields.Ordinal, p.PredecessorId)))
             {
                 if (sb.Length > 0)
                     sb.Append(",");
 
-                var ordinal = project.Get(TaskFields.Ordinal, p);
+                var ordinal = project.Get(TaskFields.Ordinal, p.PredecessorId);
                 sb.Append(ordinal);
+
+                switch (p.Type)
+                {
+                    case TaskLinkType.FinishToStart:
+                        if (p.Lag != TimeSpan.Zero)
+                            sb.Append("FS");
+                        break;
+                    case TaskLinkType.StartToStart:
+                        sb.Append("SS");
+                        break;
+                    case TaskLinkType.FinishToFinish:
+                        sb.Append("FF");
+                        break;
+                    case TaskLinkType.StartToFinish:
+                        sb.Append("SF");
+                        break;
+                }
+
+                if (p.Lag != TimeSpan.Zero)
+                {
+                    if (p.Lag > TimeSpan.Zero)
+                        sb.Append("+");
+                    var lag = project.Information.TimeConversion.FormatDuration(p.Lag);
+                    sb.Append(lag);
+                }
             }
 
             var precedessors = sb.ToString();
@@ -298,31 +325,63 @@ namespace Immutable.ProjectModel
 
             if (value.Length > 0)
             {
-                var predecessorOrdinalParts = value.Split(',');
+                var parts = value.Split(',');
 
-                foreach (var predecessorOrdinalPart in predecessorOrdinalParts)
+                foreach (var part in parts)
                 {
-                    var predecessorOrdinalText = predecessorOrdinalPart.Trim();
+                    var partText = part.Trim();
 
-                    if (!int.TryParse(predecessorOrdinalText, out var predecessorOrdinal))
-                        throw new FormatException($"'{predecessorOrdinalText}' isn't a valid int");
+                    var predecessorText = partText;
+                    var sign = Math.Max(partText.IndexOf('+'), partText.IndexOf('-'));
+                    var lag = TimeSpan.Zero;
+
+                    if (sign >= 0)
+                    {
+                        var lagText = partText.Substring(sign).Trim();
+                        lag = project.Information.TimeConversion.ParseDuration(lagText);
+                        predecessorText = partText.Substring(0, sign).Trim();
+                    }
+
+                    var precessorOrdinalText = predecessorText;
+                    var linkType = (TaskLinkType?) null;
+
+                    if (predecessorText.EndsWith("FS", StringComparison.OrdinalIgnoreCase))
+                        linkType = TaskLinkType.FinishToStart;
+                    else if (predecessorText.EndsWith("SS", StringComparison.OrdinalIgnoreCase))
+                        linkType = TaskLinkType.StartToStart;
+                    else if (predecessorText.EndsWith("FF", StringComparison.OrdinalIgnoreCase))
+                        linkType = TaskLinkType.FinishToFinish;
+                    else if (predecessorText.EndsWith("SF", StringComparison.OrdinalIgnoreCase))
+                        linkType = TaskLinkType.StartToFinish;
+
+                    if (linkType != null)
+                        precessorOrdinalText = predecessorText.Substring(0, predecessorText.Length - 2).Trim();
+                    else if (sign < 0)
+                        linkType = TaskLinkType.FinishToStart;
+                    else
+                        throw new FormatException($"'{partText}' isn't a valid predecessor specification");
+
+                    if (!int.TryParse(precessorOrdinalText, out var predecessorOrdinal))
+                        throw new FormatException($"'{precessorOrdinalText}' isn't a valid int");
 
                     var predecessorId = project.GetTask(predecessorOrdinal);
                     if (predecessorId.IsDefault)
                         throw new FormatException($"'{predecessorOrdinal}' isn't a valid predecessor");
 
-                    var taskLink = project.GetTaskLink(predecessorId, id);
-                    if (taskLink == null)
-                    {
-                        taskLink = TaskLink.Create(predecessorId, id);
-                        if (project.TaskLinkCausesCycle(taskLink))
-                        {
-                            var successorOrdinal = project.Get(TaskFields.Ordinal, taskLink.SuccessorId);
-                            throw new InvalidOperationException($"Cannot add a link from task {predecessorOrdinal} to task {successorOrdinal} as this would cause a cycle.");
-                        }
+                    var taskLink = TaskLink.Create(predecessorId, id, linkType.Value, lag);
 
-                        project = project.AddTaskLink(taskLink);
+                    var existingLink = project.GetTaskLink(predecessorId, id);
+                    if (existingLink != null)
+                    {
+                        project = project.RemoveTaskLink(existingLink);
                     }
+                    else if (project.TaskLinkCausesCycle(taskLink))
+                    {
+                        var successorOrdinal = project.Get(TaskFields.Ordinal, taskLink.SuccessorId);
+                        throw new InvalidOperationException($"Cannot add a link from task {predecessorOrdinal} to task {successorOrdinal} as this would cause a cycle.");
+                    }
+
+                    project = project.AddTaskLink(taskLink);
 
                     remainingTaskLinks.Remove(taskLink);
                 }
