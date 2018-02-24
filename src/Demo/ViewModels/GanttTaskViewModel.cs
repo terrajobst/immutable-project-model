@@ -115,6 +115,8 @@ namespace Demo.ViewModels
             }
 
             _syncingPredecessors = false;
+
+            OnPropertyChanged(nameof(Predecessors));
         }
 
         private void Predecessors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
