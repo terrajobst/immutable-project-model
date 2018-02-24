@@ -92,7 +92,7 @@ namespace Demo.ViewModels
                     OnPropertyChanged("EndDate");
                 else if (fieldChange.Field == TaskFields.Duration)
                     OnPropertyChanged("Duration");
-                else if (fieldChange.Field == TaskFields.PredecessorLinks)
+                else if (fieldChange.Field == TaskFields.Predecessors)
                     UpdatePredecessors();
             }
         }

@@ -24,11 +24,11 @@ namespace Immutable.ProjectModel
         public static readonly TaskField<TimeSpan> FreeSlack = new TaskField<TimeSpan>("FreeSlack", FieldKinds.Duration, FieldFlags.ReadOnly);
         public static readonly TaskField<bool> IsCritical = new TaskField<bool>("IsCritical", FieldKinds.YesNo, FieldFlags.ReadOnly);
         public static readonly TaskField<bool> IsMilestone = new TaskField<bool>("IsMilestone", FieldKinds.YesNo, defaultValue: true);
-        public static readonly TaskField<ImmutableArray<TaskLink>> PredecessorLinks = new TaskField<ImmutableArray<TaskLink>>("PredecessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
-        public static readonly TaskField<ImmutableArray<TaskLink>> SuccessorLinks = new TaskField<ImmutableArray<TaskLink>>("SuccessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
-
         public static readonly TaskField<string> ResourceNames = new TaskField<string>("ResourceNames", FieldKinds.Text);
         public static readonly TaskField<string> Predecessors = new TaskField<string>("Predecessors", FieldKinds.Text);
+
+        internal static readonly TaskField<ImmutableArray<TaskLink>> PredecessorLinks = new TaskField<ImmutableArray<TaskLink>>("PredecessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
+        internal static readonly TaskField<ImmutableArray<TaskLink>> SuccessorLinks = new TaskField<ImmutableArray<TaskLink>>("SuccessorLinks", FieldKinds.TaskLinkArray, FieldFlags.ReadOnly, ImmutableArray<TaskLink>.Empty);
 
         public static readonly ImmutableArray<TaskField> All = typeof(TaskFields).GetFields(BindingFlags.Static | BindingFlags.Public)
                                                                                  .Select(f => f.GetValue(null))
