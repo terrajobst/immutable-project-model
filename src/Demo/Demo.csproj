@@ -56,6 +56,7 @@
     </ApplicationDefinition>
     <Compile Include="Commands\ExitCommand.cs" />
     <Compile Include="Commands\NewCommand.cs" />
+    <Compile Include="Commands\ProjectInformationCommand.cs" />
     <Compile Include="Commands\RedoCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="Commands\UndoRedoCommand.cs" />
@@ -64,6 +65,10 @@
     </Compile>
     <Compile Include="Dialogs\ColumnChooser\ColumnChooserViewModel.cs" />
     <Compile Include="Dialogs\ColumnChooser\ColumnViewModel.cs" />
+    <Compile Include="Dialogs\ProjectInformation\ProjectInformationDialog.xaml.cs">
+      <DependentUpon>ProjectInformationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ProjectInformation\ProjectInformationViewModel.cs" />
     <Compile Include="MainWindow.FieldKindValueConverter.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Services\CommandService.cs" />
@@ -80,6 +85,10 @@
     <Compile Include="ViewModels\TaskGridViewModel.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Dialogs\ColumnChooser\ColumnChooserDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ProjectInformation\ProjectInformationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

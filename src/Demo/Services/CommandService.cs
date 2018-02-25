@@ -11,6 +11,9 @@ namespace Demo.Services
         public NewCommand NewCommand { get; set; }
 
         [Import]
+        public ProjectInformationCommand ProjectInformationCommand { get; set; }
+
+        [Import]
         public ExitCommand ExitCommand { get; set; }
 
         [Import]

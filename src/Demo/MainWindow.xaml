@@ -28,6 +28,9 @@
                 <MenuItem Header="New"
                           Command="{Binding Path=NewCommand}"
                           InputGestureText="Ctrl+N" />
+                <MenuItem Header="Project Information..."
+                          Command="{Binding Path=ProjectInformationCommand}" />
+                <Separator />
                 <MenuItem Header="E_xit"
                           Command="{Binding Path=ExitCommand}" />
             </MenuItem>

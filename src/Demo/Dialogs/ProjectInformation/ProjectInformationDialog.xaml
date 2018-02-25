@@ -1,0 +1,78 @@
+﻿<Window x:Class="Demo.Dialogs.ProjectInformation.ProjectInformationDialog"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Project Information"
+        WindowStyle="SingleBorderWindow"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        Height="300"
+        Width="450"
+        Background="{x:Static SystemColors.ControlBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0"
+                   Grid.Column="0"
+                   MinWidth="100"
+                   Margin="4,4,4,0"
+                   Content="Start Date:" />
+            <DatePicker Grid.Row="0"
+                        Grid.Column="1"
+                        MinWidth="250"
+                        Margin="4,4,4,0"
+                        SelectedDate="{Binding Path=StartDate}" />
+            <Label Grid.Row="1"
+                   Grid.Column="0"
+                   MinWidth="100"
+                   Margin="4,4,4,0"
+                   Content="Finish Date:" />
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Margin="4,4,4,0"
+                     MinWidth="250"
+                     IsReadOnly="True"
+                     Background="{x:Static SystemColors.ControlBrush}"
+                     Text="{Binding Path=FinishDate,Mode=OneWay}" />
+        </Grid>
+
+        <Separator Grid.Row="1"
+                   Margin="8,8,8,0" />
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1"
+                    MinWidth="85"
+                    Margin="8"
+                    Content="OK"
+                    IsDefault="True"
+                    Click="OkButton_Click" />
+            <Button Grid.Column="2"
+                    MinWidth="85"
+                    Margin="8"
+                    Content="Cancel"
+                    IsCancel="True" />
+        </Grid>
+    </Grid>
+</Window>
