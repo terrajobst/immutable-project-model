@@ -21,5 +21,8 @@ namespace Demo.Services
 
         [Import]
         public RedoCommand RedoCommand { get; set; }
+
+        [Import]
+        public AssertTaskCommand AssertTaskCommand { get; set; }
     }
 }

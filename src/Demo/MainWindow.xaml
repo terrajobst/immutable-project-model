@@ -46,6 +46,10 @@
                 <MenuItem Header="Show Schedule Columns"
                           Click="ViewSetScheduleColumnsMenuItem_Click"/>
             </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="Copy Unit Test"
+                          Command="{Binding Path=AssertTaskCommand}" />
+            </MenuItem>
         </Menu>
         <Grid>
             <Grid.RowDefinitions>
