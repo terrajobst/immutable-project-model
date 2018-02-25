@@ -16,7 +16,7 @@ namespace Demo.Dialogs.ColumnChooser
         private string _selectedFilter;
         private string _availableFilter;
 
-        public ColumnChooserViewModel(IEnumerable<FieldDefinition> availableFields, IEnumerable<FieldDefinition> selectedFields)
+        public ColumnChooserViewModel(IEnumerable<FieldDefinition> availableFields, IEnumerable<FieldDefinition> selectedFields, IEnumerable<FieldDefinition> defaultFields)
         {
             AvailableColumns = new ObservableCollection<ColumnViewModel>(availableFields.Select(f => new ColumnViewModel(f)));
             SelectedColumns = new ObservableCollection<ColumnViewModel>();
@@ -34,6 +34,8 @@ namespace Demo.Dialogs.ColumnChooser
 
             var availableView = CollectionViewSource.GetDefaultView(AvailableColumns);
             availableView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
+            DefaultColumns = new ReadOnlyCollection<ColumnViewModel>(defaultFields.Select(f => columns[f]).ToArray());
         }
 
         public void Add()
@@ -90,6 +92,21 @@ namespace Demo.Dialogs.ColumnChooser
             }
         }
 
+        public void Reset()
+        {
+            while (SelectedColumns.Count > 0)
+            {
+                AvailableColumns.Add(SelectedColumns[0]);
+                SelectedColumns.RemoveAt(0);
+            }
+
+            foreach (var column in DefaultColumns)
+            {
+                AvailableColumns.Remove(column);
+                SelectedColumns.Add(column);
+            }
+        }
+
         public string AvailableFilter
         {
             get => _availableFilter;
@@ -129,6 +146,8 @@ namespace Demo.Dialogs.ColumnChooser
                 }
             }
         }
+
+        public ReadOnlyCollection<ColumnViewModel> DefaultColumns { get; }
 
         public ObservableCollection<ColumnViewModel> AvailableColumns { get; }
 

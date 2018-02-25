@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+
 using Immutable.ProjectModel;
 
 namespace Demo.Dialogs.ColumnChooser
 {
     internal sealed partial class ColumnChooserDialog : Window
     {
-        public ColumnChooserDialog(IEnumerable<FieldDefinition> availableFields, IEnumerable<FieldDefinition> selectedFields)
+        public ColumnChooserDialog(IEnumerable<FieldDefinition> availableFields, IEnumerable<FieldDefinition> selectedFields, IEnumerable<FieldDefinition> defaultFields)
         {
             InitializeComponent();
 
-            ViewModel = new ColumnChooserViewModel(availableFields, selectedFields);
+            ViewModel = new ColumnChooserViewModel(availableFields, selectedFields, defaultFields);
             DataContext = ViewModel;
         }
 
@@ -54,6 +54,11 @@ namespace Demo.Dialogs.ColumnChooser
         private void SelectedListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ViewModel.Remove();
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Reset();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

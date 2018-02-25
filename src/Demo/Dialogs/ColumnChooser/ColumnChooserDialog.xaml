@@ -84,19 +84,31 @@
             </Grid>
             <Separator Grid.Row="1"
                        Margin="8,8,8,0" />
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-                <Button MinWidth="85"
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        MinWidth="85"
+                        Margin="8"
+                        Content="Reset"
+                        Click="ResetButton_Click" />
+                <Button Grid.Column="2"
+                        MinWidth="85"
                         Margin="8"
                         Content="OK"
                         IsDefault="True"
                         Click="OkButton_Click" />
-                <Button MinWidth="85"
+                <Button Grid.Column="3"
+                        MinWidth="85"
                         Margin="8"
                         Content="Cancel"
                         IsCancel="True" />
-            </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

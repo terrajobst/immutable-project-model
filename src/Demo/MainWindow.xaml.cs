@@ -308,7 +308,7 @@ namespace Demo
 
         private void TaskGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(TaskFields.All, _taskFields)
+            var dialog = new ColumnChooserDialog(TaskFields.All, _taskFields, TaskFields.Default)
             {
                 Owner = this
             };
@@ -341,7 +341,7 @@ namespace Demo
 
         private void ResourceGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(ResourceFields.All, _resourceFields)
+            var dialog = new ColumnChooserDialog(ResourceFields.All, _resourceFields, ResourceFields.Default)
             {
                 Owner = this
             };
@@ -387,7 +387,7 @@ namespace Demo
 
         private void AssignmentGridSelectColumnsButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ColumnChooserDialog(AssignmentFields.All, _assignmentFields)
+            var dialog = new ColumnChooserDialog(AssignmentFields.All, _assignmentFields, AssignmentFields.Default)
             {
                 Owner = this
             };
