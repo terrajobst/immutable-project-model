@@ -33,6 +33,10 @@
                           Command="{Binding Path=RedoCommand}"
                           InputGestureText="Ctrl+Shift+Z" />
             </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Show Schedule Columns"
+                          Click="ViewSetScheduleColumnsMenuItem_Click"/>
+            </MenuItem>
         </Menu>
         <Grid>
             <Grid.RowDefinitions>

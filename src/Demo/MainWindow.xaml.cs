@@ -287,6 +287,29 @@ namespace Demo
             HighlightChangedCells(AssignmentDataGrid, e.Changes.ChangedAssignments);
         }
 
+        private void ViewSetScheduleColumnsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            _taskFields.Clear();
+            _taskFields.AddRange(new TaskField[] {
+                TaskFields.Ordinal,
+                TaskFields.Name,
+                TaskFields.Duration,
+                TaskFields.Work,
+                TaskFields.Start,
+                TaskFields.Finish,
+                TaskFields.EarlyStart,
+                TaskFields.EarlyFinish,
+                TaskFields.LateStart,
+                TaskFields.LateFinish,
+                TaskFields.StartSlack,
+                TaskFields.FinishSlack,
+                TaskFields.TotalSlack,
+                TaskFields.FreeSlack,
+                TaskFields.IsCritical,
+            });
+            UpdateTaskGridColumns();
+        }
+
         private void TaskGridAddButton_Click(object sender, RoutedEventArgs e)
         {
             var project = _workspace.Current.AddTask().Project;
