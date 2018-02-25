@@ -112,7 +112,7 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.IsCritical, value);
         }
 
-        public TaskAssert AssertIsMilesone(bool value)
+        public TaskAssert AssertIsMilestone(bool value)
         {
             return AssertField(TaskFields.IsMilestone, value);
         }

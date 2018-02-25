@@ -955,10 +955,10 @@ namespace Immutable.ProjectModel.Tests
 
             ProjectAssert.For(project)
                          .ForTask(taskId1)
-                              .AssertIsMilesone(true)
+                              .AssertIsMilestone(true)
                               .Project
                          .ForTask(taskId2)
-                              .AssertIsMilesone(true);
+                              .AssertIsMilestone(true);
         }
 
         [Fact]
@@ -986,10 +986,10 @@ namespace Immutable.ProjectModel.Tests
 
             ProjectAssert.For(project)
                          .ForTask(taskId1)
-                              .AssertIsMilesone(false)
+                              .AssertIsMilestone(false)
                               .Project
                          .ForTask(taskId2)
-                              .AssertIsMilesone(false);
+                              .AssertIsMilestone(false);
         }
 
         [Fact]
@@ -1021,10 +1021,10 @@ namespace Immutable.ProjectModel.Tests
 
             ProjectAssert.For(project)
                          .ForTask(taskId1)
-                              .AssertIsMilesone(true)
+                              .AssertIsMilestone(true)
                               .Project
                          .ForTask(taskId2)
-                              .AssertIsMilesone(true);
+                              .AssertIsMilestone(true);
         }
 
         [Fact]
@@ -1045,7 +1045,7 @@ namespace Immutable.ProjectModel.Tests
 
             ProjectAssert.For(project)
                          .ForTask(taskId)
-                              .AssertIsMilesone(false);
+                              .AssertIsMilestone(false);
         }
     }
 }
