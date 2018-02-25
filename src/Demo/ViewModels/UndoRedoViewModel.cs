@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
@@ -15,7 +17,7 @@ namespace Demo.ViewModels
 
         private bool _isUndoRedoInProgress;
 
-        public UndoRedoViewModel(ProjectWorkspace workspace)
+        public UndoRedoViewModel(WorkspaceService workspace)
         {
             Workspace = workspace;
             Workspace.CurrentChanged += Workspace_CurrentChanged;
@@ -23,7 +25,7 @@ namespace Demo.ViewModels
             _redoCommand = new UndoRedoCommand(this, false);
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public void Reset()
         {

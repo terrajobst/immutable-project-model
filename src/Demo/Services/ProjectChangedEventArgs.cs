@@ -2,7 +2,7 @@
 
 using Immutable.ProjectModel;
 
-namespace Demo.ViewModels
+namespace Demo.Services
 {
     internal sealed class ProjectChangedEventArgs : EventArgs
     {

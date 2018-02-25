@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.Composition.Hosting;
 using System.Windows;
 
 namespace Demo
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    internal sealed partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var catalog = new AssemblyCatalog(GetType().Assembly);
+            var compositionContainer = new CompositionContainer(catalog);
+            var mainWindow = compositionContainer.GetExportedValue<MainWindow>();
+            mainWindow.Show();
+        }
     }
 }

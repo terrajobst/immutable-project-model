@@ -2,13 +2,15 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
 {
     internal sealed class GanttViewModel : ViewModel
     {
-        public GanttViewModel(ProjectWorkspace workspace)
+        public GanttViewModel(WorkspaceService workspace)
         {
             if (workspace == null)
                 throw new ArgumentNullException(nameof(workspace));
@@ -20,7 +22,7 @@ namespace Demo.ViewModels
             Update(workspace.Current, workspace.Current.GetChanges(Project.Create()));
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public Project Current { get; private set; }
 

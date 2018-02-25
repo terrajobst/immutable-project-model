@@ -1,17 +1,16 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 
 using Immutable.ProjectModel;
 
-namespace Demo.ViewModels
+namespace Demo.Services
 {
-    internal sealed class ProjectWorkspace
+    [Export]
+    internal sealed class WorkspaceService
     {
-        public ProjectWorkspace(Project current)
+        public WorkspaceService()
         {
-            if (current == null)
-                throw new ArgumentNullException(nameof(current));
-
-            Current = current;
+            Current = Project.Create();
         }
 
         public Project Current { get; private set; }

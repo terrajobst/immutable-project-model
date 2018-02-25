@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
@@ -10,7 +12,7 @@ namespace Demo.ViewModels
     {
         private Dictionary<AssignmentId, AssignmentGridRowViewModel> _rowMap = new Dictionary<AssignmentId, AssignmentGridRowViewModel>();
 
-        public AssignmentGridViewModel(ProjectWorkspace workspace)
+        public AssignmentGridViewModel(WorkspaceService workspace)
         {
             Workspace = workspace;
             Workspace.CurrentChanged += Workspace_CurrentChanged;
@@ -18,7 +20,7 @@ namespace Demo.ViewModels
             Update(Workspace.Current, Workspace.Current.GetChanges(Project.Create()));
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public ObservableCollection<AssignmentGridRowViewModel> Rows { get; }
 

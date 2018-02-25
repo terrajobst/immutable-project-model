@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Windows;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
 {
     internal sealed class AssignmentGridRowViewModel : ViewModel
     {
-        public AssignmentGridRowViewModel(ProjectWorkspace workspace, AssignmentId assignmentId)
+        public AssignmentGridRowViewModel(WorkspaceService workspace, AssignmentId assignmentId)
         {
             Workspace = workspace;
             AssignmentId = assignmentId;
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public AssignmentId AssignmentId { get; }
 

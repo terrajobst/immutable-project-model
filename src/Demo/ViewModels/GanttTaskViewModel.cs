@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Threading;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 using Syncfusion.Windows.Controls.Gantt;
@@ -15,7 +17,7 @@ namespace Demo.ViewModels
     {
         private bool _syncingPredecessors;
 
-        public GanttTaskViewModel(ProjectWorkspace workspace, TaskId taskId)
+        public GanttTaskViewModel(WorkspaceService workspace, TaskId taskId)
         {
             if (workspace == null)
                 throw new ArgumentNullException(nameof(workspace));
@@ -28,7 +30,7 @@ namespace Demo.ViewModels
             UpdatePredecessors();
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public TaskId TaskId { get; }
 

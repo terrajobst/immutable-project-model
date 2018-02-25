@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Windows;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
 {
     internal sealed class TaskGridRowViewModel : ViewModel
     {
-        public TaskGridRowViewModel(ProjectWorkspace workspace, TaskId taskId)
+        public TaskGridRowViewModel(WorkspaceService workspace, TaskId taskId)
         {
             Workspace = workspace;
             TaskId = taskId;
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public TaskId TaskId { get; }
 

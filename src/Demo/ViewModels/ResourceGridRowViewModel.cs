@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Windows;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
 {
     internal sealed class ResourceGridRowViewModel : ViewModel
     {
-        public ResourceGridRowViewModel(ProjectWorkspace workspace, ResourceId resourceId)
+        public ResourceGridRowViewModel(WorkspaceService workspace, ResourceId resourceId)
         {
             Workspace = workspace;
             ResourceId = resourceId;
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public ResourceId ResourceId { get; }
 

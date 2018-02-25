@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,22 +10,28 @@ using System.Windows.Data;
 using System.Windows.Media;
 
 using Demo.Dialogs.ColumnChooser;
+using Demo.Services;
 using Demo.ViewModels;
 
 using Immutable.ProjectModel;
 
 namespace Demo
 {
-    public partial class MainWindow : Window
+    [Export]
+    internal sealed partial class MainWindow : Window
     {
-        private ProjectWorkspace _workspace;
-        private List<TaskField> _taskFields = new List<TaskField>(TaskFields.Default);
-        private List<ResourceField> _resourceFields = new List<ResourceField>(ResourceFields.Default);
-        private List<AssignmentField> _assignmentFields = new List<AssignmentField>(AssignmentFields.Default);
+        private readonly WorkspaceService _workspace;
+        private readonly List<TaskField> _taskFields = new List<TaskField>(TaskFields.Default);
+        private readonly List<ResourceField> _resourceFields = new List<ResourceField>(ResourceFields.Default);
+        private readonly List<AssignmentField> _assignmentFields = new List<AssignmentField>(AssignmentFields.Default);
 
-        public MainWindow()
+        [ImportingConstructor]
+        public MainWindow(WorkspaceService workspace)
         {
             InitializeComponent();
+
+            _workspace = workspace;
+            _workspace.CurrentChanged += Workspace_CurrentChanged;
         }
 
         private static Project CreateProject()
@@ -251,9 +258,6 @@ namespace Demo
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _workspace = new ProjectWorkspace(Project.Create());
-            _workspace.CurrentChanged += Workspace_CurrentChanged;
-
             var undoRedoViewModel = new UndoRedoViewModel(_workspace);
             UndoRedoPanel.DataContext = undoRedoViewModel;
 

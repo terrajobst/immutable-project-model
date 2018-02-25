@@ -3,20 +3,20 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-using Demo.ViewModels;
+using Demo.Services;
 
 using Immutable.ProjectModel;
 
 namespace Demo
 {
-    public partial class MainWindow
+    internal sealed partial class MainWindow
     {
         private sealed class FieldKindValueConverter : IValueConverter
         {
-            private readonly ProjectWorkspace _workspace;
+            private readonly WorkspaceService _workspace;
             private readonly FieldKind _fieldKind;
 
-            public FieldKindValueConverter(ProjectWorkspace workspace, FieldKind fieldKind)
+            public FieldKindValueConverter(WorkspaceService workspace, FieldKind fieldKind)
             {
                 _workspace = workspace;
                 _fieldKind = fieldKind;

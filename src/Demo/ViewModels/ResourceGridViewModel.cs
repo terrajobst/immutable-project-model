@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Demo.Services;
+
 using Immutable.ProjectModel;
 
 namespace Demo.ViewModels
@@ -10,7 +12,7 @@ namespace Demo.ViewModels
     {
         private Dictionary<ResourceId, ResourceGridRowViewModel> _rowMap = new Dictionary<ResourceId, ResourceGridRowViewModel>();
 
-        public ResourceGridViewModel(ProjectWorkspace workspace)
+        public ResourceGridViewModel(WorkspaceService workspace)
         {
             Workspace = workspace;
             Workspace.CurrentChanged += Workspace_CurrentChanged;
@@ -18,7 +20,7 @@ namespace Demo.ViewModels
             Update(Workspace.Current, Workspace.Current.GetChanges(Project.Create()));
         }
 
-        public ProjectWorkspace Workspace { get; }
+        public WorkspaceService Workspace { get; }
 
         public ObservableCollection<ResourceGridRowViewModel> Rows { get; }
 

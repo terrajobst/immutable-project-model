@@ -38,6 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,12 +60,12 @@
     <Compile Include="Dialogs\ColumnChooser\ColumnChooserViewModel.cs" />
     <Compile Include="Dialogs\ColumnChooser\ColumnViewModel.cs" />
     <Compile Include="MainWindow.FieldKindValueConverter.cs" />
+    <Compile Include="Services\ProjectChangedEventArgs.cs" />
+    <Compile Include="Services\WorkspaceService.cs" />
     <Compile Include="ViewModels\AssignmentGridRowViewModel.cs" />
     <Compile Include="ViewModels\AssignmentGridViewModel.cs" />
     <Compile Include="ViewModels\GanttTaskViewModel.cs" />
     <Compile Include="ViewModels\GanttViewModel.cs" />
-    <Compile Include="ViewModels\ProjectChangedEventArgs.cs" />
-    <Compile Include="ViewModels\ProjectWorkspace.cs" />
     <Compile Include="ViewModels\ResourceGridRowViewModel.cs" />
     <Compile Include="ViewModels\ResourceGridViewModel.cs" />
     <Compile Include="ViewModels\TaskGridRowViewModel.cs" />
