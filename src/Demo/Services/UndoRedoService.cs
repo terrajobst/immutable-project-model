@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Input;
-
-using Demo.Services;
+using System.ComponentModel.Composition;
 
 using Immutable.ProjectModel;
 
-namespace Demo.ViewModels
+namespace Demo.Services
 {
-    internal sealed class UndoRedoViewModel
+    [Export]
+    internal sealed class UndoRedoService
     {
         private readonly Stack<Project> _undoStack = new Stack<Project>();
         private readonly Stack<Project> _redoStack = new Stack<Project>();
-        private readonly UndoRedoCommand _undoCommand;
-        private readonly UndoRedoCommand _redoCommand;
 
         private bool _isUndoRedoInProgress;
 
-        public UndoRedoViewModel(WorkspaceService workspace)
+        [ImportingConstructor]
+        public UndoRedoService(WorkspaceService workspace)
         {
             Workspace = workspace;
             Workspace.CurrentChanged += Workspace_CurrentChanged;
-            _undoCommand = new UndoRedoCommand(this, true);
-            _redoCommand = new UndoRedoCommand(this, false);
         }
 
         public WorkspaceService Workspace { get; }
@@ -31,12 +27,8 @@ namespace Demo.ViewModels
         {
             _undoStack.Clear();
             _redoStack.Clear();
-            UpdateCommandState();
+            OnStateChanged();
         }
-
-        public ICommand UndoCommand => _undoCommand;
-
-        public ICommand RedoCommand => _redoCommand;
 
         public bool CanUndo => _undoStack.Count > 0;
 
@@ -61,7 +53,7 @@ namespace Demo.ViewModels
                 _isUndoRedoInProgress = false;
             }
 
-            UpdateCommandState();
+            OnStateChanged();
         }
 
         public void Redo()
@@ -83,13 +75,12 @@ namespace Demo.ViewModels
                 _isUndoRedoInProgress = false;
             }
 
-            UpdateCommandState();
+            OnStateChanged();
         }
 
-        private void UpdateCommandState()
+        private void OnStateChanged()
         {
-            _undoCommand.Changed();
-            _redoCommand.Changed();
+            StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void Workspace_CurrentChanged(object sender, ProjectChangedEventArgs e)
@@ -100,39 +91,9 @@ namespace Demo.ViewModels
             _undoStack.Push(e.OldProject);
             _redoStack.Clear();
 
-            UpdateCommandState();
+            OnStateChanged();
         }
 
-        private sealed class UndoRedoCommand : ICommand
-        {
-            private readonly UndoRedoViewModel _parent;
-            private readonly bool _isUndo;
-
-            public UndoRedoCommand(UndoRedoViewModel parent, bool isUndo)
-            {
-                _parent = parent;
-                _isUndo = isUndo;
-            }
-
-            public void Changed()
-            {
-                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-            }
-
-            public void Execute(object parameter)
-            {
-                if (_isUndo)
-                    _parent.Undo();
-                else
-                    _parent.Redo();
-            }
-
-            public bool CanExecute(object parameter)
-            {
-                return _isUndo ? _parent.CanUndo : _parent.CanRedo;
-            }
-
-            public event EventHandler CanExecuteChanged;
-        }
+        public event EventHandler StateChanged;
     }
 }

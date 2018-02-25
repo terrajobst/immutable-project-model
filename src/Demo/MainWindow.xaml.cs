@@ -21,17 +21,21 @@ namespace Demo
     internal sealed partial class MainWindow : Window
     {
         private readonly WorkspaceService _workspace;
+        private readonly CommandService _commandService;
+        private readonly UndoRedoService _undoRedoService;
         private readonly List<TaskField> _taskFields = new List<TaskField>(TaskFields.Default);
         private readonly List<ResourceField> _resourceFields = new List<ResourceField>(ResourceFields.Default);
         private readonly List<AssignmentField> _assignmentFields = new List<AssignmentField>(AssignmentFields.Default);
 
         [ImportingConstructor]
-        public MainWindow(WorkspaceService workspace)
+        public MainWindow(WorkspaceService workspace, CommandService commandService, UndoRedoService undoRedoService)
         {
             InitializeComponent();
 
             _workspace = workspace;
             _workspace.CurrentChanged += Workspace_CurrentChanged;
+            _commandService = commandService;
+            _undoRedoService = undoRedoService;
         }
 
         private static Project CreateProject()
@@ -258,8 +262,7 @@ namespace Demo
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var undoRedoViewModel = new UndoRedoViewModel(_workspace);
-            UndoRedoPanel.DataContext = undoRedoViewModel;
+            DataContext = _commandService;
 
             GanttControl.DataContext = new GanttViewModel(_workspace);
 
@@ -273,7 +276,7 @@ namespace Demo
             AssignmentDataGrid.DataContext = new AssignmentGridViewModel(_workspace);
 
             _workspace.ApplyChanges(CreateProject());
-            undoRedoViewModel.Reset();
+            _undoRedoService.Reset();
         }
 
         private void Workspace_CurrentChanged(object sender, ProjectChangedEventArgs e)

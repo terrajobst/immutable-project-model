@@ -11,20 +11,29 @@
         Height="600"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
-    <DockPanel>
-        <StackPanel x:Name="UndoRedoPanel"
-                    DockPanel.Dock="Top"
-                    Orientation="Horizontal"
-                    Background="AliceBlue">
-            <Button Margin="4"
-                    MinWidth="85"
-                    Content="Undo"
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl"
+                    Key="Z"
                     Command="{Binding Path=UndoCommand}" />
-            <Button Margin="0,4,4,4"
-                    MinWidth="85"
-                    Content="Redo"
+        <KeyBinding Modifiers="Ctrl+Shift"
+                    Key="Z"
                     Command="{Binding Path=RedoCommand}" />
-        </StackPanel>
+    </Window.InputBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit"
+                          Command="{Binding Path=ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo"
+                          Command="{Binding Path=UndoCommand}"
+                          InputGestureText="Ctrl+Z" />
+                <MenuItem Header="_Redo"
+                          Command="{Binding Path=RedoCommand}"
+                          InputGestureText="Ctrl+Shift+Z" />
+            </MenuItem>
+        </Menu>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />

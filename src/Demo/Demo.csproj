@@ -54,13 +54,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\RedoCommand.cs" />
+    <Compile Include="Commands\UndoCommand.cs" />
+    <Compile Include="Commands\UndoRedoCommand.cs" />
     <Compile Include="Dialogs\ColumnChooser\ColumnChooserDialog.xaml.cs">
       <DependentUpon>ColumnChooserDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ColumnChooser\ColumnChooserViewModel.cs" />
     <Compile Include="Dialogs\ColumnChooser\ColumnViewModel.cs" />
     <Compile Include="MainWindow.FieldKindValueConverter.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Services\CommandService.cs" />
     <Compile Include="Services\ProjectChangedEventArgs.cs" />
+    <Compile Include="Services\UndoRedoService.cs" />
     <Compile Include="Services\WorkspaceService.cs" />
     <Compile Include="ViewModels\AssignmentGridRowViewModel.cs" />
     <Compile Include="ViewModels\AssignmentGridViewModel.cs" />
@@ -70,7 +77,6 @@
     <Compile Include="ViewModels\ResourceGridViewModel.cs" />
     <Compile Include="ViewModels\TaskGridRowViewModel.cs" />
     <Compile Include="ViewModels\TaskGridViewModel.cs" />
-    <Compile Include="ViewModels\UndoRedoViewModel.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Dialogs\ColumnChooser\ColumnChooserDialog.xaml">
       <SubType>Designer</SubType>
