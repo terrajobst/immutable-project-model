@@ -38,6 +38,12 @@ namespace Demo
             _undoRedoService = undoRedoService;
         }
 
+        public IEnumerable<TaskField> SelectedTaskFields => _taskFields;
+
+        public IEnumerable<ResourceField> SelectedResourceFields => _resourceFields;
+
+        public IEnumerable<AssignmentField> SelectedAssignmentFields => _assignmentFields;
+
         private static Project CreateProject()
         {
             var time = TimeConversion.Default;
