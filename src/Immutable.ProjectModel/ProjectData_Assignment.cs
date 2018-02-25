@@ -106,6 +106,8 @@ namespace Immutable.ProjectModel
         {
             Debug.Assert(!assignmentId.IsDefault);
 
+            // Avoid cascading errors when we remove assignments that don't exist
+
             if (!_assignmentMap.ContainsKey(assignmentId))
                 return this;
 

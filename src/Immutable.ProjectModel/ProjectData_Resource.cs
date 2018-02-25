@@ -46,6 +46,11 @@ namespace Immutable.ProjectModel
 
             var project = this;
 
+            // Avoid cascading errors when we remove resources that don't exist
+
+            if (!_resourceMap.ContainsKey(resourceId))
+                return project;
+
             // Remove assignments
 
             foreach (var assignmentId in project.GetAssignments(resourceId))

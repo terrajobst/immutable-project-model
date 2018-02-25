@@ -57,6 +57,11 @@ namespace Immutable.ProjectModel
 
             var project = this;
 
+            // Avoid cascading errors when we remove tasks that don't exist
+
+            if (!_taskMap.ContainsKey(taskId))
+                return project;
+
             // Remove assignments
 
             foreach (var assignmentId in project.GetAssignments(taskId))
