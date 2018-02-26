@@ -10,6 +10,18 @@
   parameter names so that we can just throw `ArgumentExceptions` and not feel
   too bad about it.
 
+## Calendars
+
+* `Calendar` needs an id
+* Tasks have an associated calendar (by default none)
+* Resources have an associated calendar (when they are created they will default
+  to the project calendar)
+* When scheduling an assignment, we need to intersect the task and the resource
+  calendar (unless the task ignores the resource calendar)
+* If the default work week for both calendars have no overlap, we ignore the
+  resource calendar and just use the task calendar. It seems there is a private
+  field on the assignment that carries that information.  
+
 ## Basics
 
 * Add hierarchical tasks
