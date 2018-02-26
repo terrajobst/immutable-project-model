@@ -60,8 +60,8 @@ namespace Demo.ViewModels
 
         public TimeSpan Duration
         {
-            get => Current.GetValue(TaskFields.Duration);
-            set => SetField(TaskFields.Duration, value);
+            get => TimeSpan.FromDays(Current.Project.TimeConversion.ToUnit(Current.GetValue(TaskFields.Duration), TimeUnit.Days));
+            set { }
         }
 
         public ObservableCollection<Predecessor> Predecessors { get; }
