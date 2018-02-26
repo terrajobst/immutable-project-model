@@ -91,7 +91,8 @@ namespace Immutable.ProjectModel
 
             // Update Task.ResourceNames
 
-            project = project.Reset(TaskFields.ResourceNames, taskId);
+            project = project.Reset(TaskFields.ResourceNames, taskId)
+                             .Reset(TaskFields.ResourceInitials, taskId);
 
             return project;
         }
@@ -128,7 +129,8 @@ namespace Immutable.ProjectModel
             // Update work and resource names
 
             project = project.Set(TaskFields.Work, taskId, taskWork - assignmentWork)
-                             .Reset(TaskFields.ResourceNames, taskId);
+                             .Reset(TaskFields.ResourceNames, taskId)
+                             .Reset(TaskFields.ResourceInitials, taskId);
 
             return project;
         }
@@ -187,7 +189,8 @@ namespace Immutable.ProjectModel
             var taskId = project.Get(AssignmentFields.TaskId, id);
 
             return project.SetRaw(AssignmentFields.Units, id, value)
-                          .Reset(TaskFields.ResourceNames, taskId);
+                          .Reset(TaskFields.ResourceNames, taskId)
+                          .Reset(TaskFields.ResourceInitials, taskId);
         }
     }
 }

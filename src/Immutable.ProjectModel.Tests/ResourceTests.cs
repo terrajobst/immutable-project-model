@@ -21,6 +21,21 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Resource_Name_InitializedFromInitials()
+        {
+            var resourceId = ResourceId.Create();
+            var project = Project.Create()
+                                 .AddResource(resourceId)
+                                    .WithInitials("Immo")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForResource(resourceId)
+                             .AssertName("Immo")
+                             .AssertInitials("Immo");
+        }
+
+        [Fact]
         public void Resource_Initials_Set()
         {
             var resourceId = ResourceId.Create();

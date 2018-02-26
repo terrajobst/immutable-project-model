@@ -131,6 +131,10 @@ namespace Immutable.ProjectModel
             {
                 return SetTaskResourceNames(this, id, (string)value);
             }
+            else if (field == TaskFields.ResourceInitials)
+            {
+                return SetTaskResourceInitials(this, id, (string)value);
+            }
             else
             {
                 return SetRaw(field, id, value);
@@ -155,6 +159,10 @@ namespace Immutable.ProjectModel
             else if (field == TaskFields.ResourceNames)
             {
                 return ResetTaskResourceNames(this, id);
+            }
+            else if (field == TaskFields.ResourceInitials)
+            {
+                return ResetTaskResourceInitials(this, id);
             }
             else
             {
@@ -395,12 +403,36 @@ namespace Immutable.ProjectModel
 
         private static ProjectData ResetTaskResourceNames(ProjectData project, TaskId id)
         {
+            return ResetTaskResourceNamesOrInitials(project, id, isInitials: false);
+        }
+
+        private static ProjectData SetTaskResourceNames(ProjectData project, TaskId id, string value)
+        {
+            return SetTaskResourceNamesOrInitials(project, id, value, isInitials: false);
+        }
+
+        private static ProjectData ResetTaskResourceInitials(ProjectData project, TaskId id)
+        {
+            return ResetTaskResourceNamesOrInitials(project, id, isInitials: true);
+        }
+
+        private static ProjectData SetTaskResourceInitials(ProjectData project, TaskId id, string value)
+        {
+            return SetTaskResourceNamesOrInitials(project, id, value, isInitials: true);
+        }
+
+        private static ProjectData ResetTaskResourceNamesOrInitials(ProjectData project, TaskId id, bool isInitials)
+        {
+            var resourceField = isInitials ? ResourceFields.Initials : ResourceFields.Name;
+            var taskField = isInitials ? TaskFields.ResourceInitials : TaskFields.ResourceNames;
+
             var sb = new StringBuilder();
 
             foreach (var a in project.GetAssignments(id)
-                                     .OrderBy(a => project.Get(AssignmentFields.ResourceName, a)))
+                                     .OrderBy(a => project.Get(resourceField, project.Get(AssignmentFields.ResourceId, a))))
             {
-                var resourceName = project.Get(AssignmentFields.ResourceName, a);
+                var resourceId = project.Get(AssignmentFields.ResourceId, a);
+                var resourceName = project.Get(resourceField, resourceId);
                 var units = project.Get(AssignmentFields.Units, a);
 
                 if (sb.Length > 0)
@@ -417,11 +449,13 @@ namespace Immutable.ProjectModel
             }
 
             var resourceNames = sb.ToString();
-            return project.SetRaw(TaskFields.ResourceNames, id, resourceNames);
+            return project.SetRaw(taskField, id, resourceNames);
         }
 
-        private static ProjectData SetTaskResourceNames(ProjectData project, TaskId id, string value)
+        private static ProjectData SetTaskResourceNamesOrInitials(ProjectData project, TaskId id, string value, bool isInitials)
         {
+            var field = isInitials ? ResourceFields.Initials : ResourceFields.Name;
+
             value = value.Trim();
 
             var remainingAssignmentIds = project.GetAssignments(id).ToList();
@@ -432,17 +466,17 @@ namespace Immutable.ProjectModel
 
                 foreach (var resourcePart in resourceParts)
                 {
-                    var name = resourcePart.Trim();
+                    var initials = resourcePart.Trim();
                     var units = 1.0;
-                    var openBracket = name.IndexOf("[");
+                    var openBracket = initials.IndexOf("[");
                     if (openBracket >= 0)
                     {
-                        var closeBracket = name.IndexOf("]");
+                        var closeBracket = initials.IndexOf("]");
 
                         if (closeBracket < openBracket)
-                            throw new FormatException("Missing ']' in resource name");
+                            throw new FormatException("Missing ']'");
 
-                        var percentageText = name.Substring(openBracket + 1, closeBracket - openBracket - 1).Trim();
+                        var percentageText = initials.Substring(openBracket + 1, closeBracket - openBracket - 1).Trim();
 
                         if (percentageText.EndsWith("%"))
                             percentageText = percentageText.Substring(0, percentageText.Length - 1).Trim();
@@ -450,15 +484,15 @@ namespace Immutable.ProjectModel
                         if (!double.TryParse(percentageText, out var percentage))
                             throw new FormatException($"'{percentageText}' isn't a valid percentage");
 
-                        name = name.Substring(0, openBracket).Trim();
+                        initials = initials.Substring(0, openBracket).Trim();
                         units = percentage / 100.0;
                     }
 
-                    var resourceId = project.GetResources(name).FirstOrDefault();
+                    var resourceId = project.GetResources(initials, isInitials).FirstOrDefault();
                     if (resourceId.IsDefault)
                     {
                         resourceId = ResourceId.Create();
-                        project = project.AddResource(resourceId).Set(ResourceFields.Name, resourceId, name);
+                        project = project.AddResource(resourceId).Set(field, resourceId, initials);
                     }
 
                     var assignmentId = project.GetAssignment(id, resourceId);

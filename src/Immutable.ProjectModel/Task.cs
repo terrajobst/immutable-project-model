@@ -54,6 +54,8 @@ namespace Immutable.ProjectModel
 
         public string ResourceNames => GetValue(TaskFields.ResourceNames);
 
+        public string ResourceInitials => GetValue(TaskFields.ResourceInitials);
+
         public string Predecessors => GetValue(TaskFields.Predecessors);
 
         public ImmutableArray<TaskLink> PredecessorLinks => GetValue(TaskFields.PredecessorLinks);
@@ -161,6 +163,11 @@ namespace Immutable.ProjectModel
         public Task WithResourceNames(string value)
         {
             return SetValue(TaskFields.ResourceNames, value);
+        }
+
+        public Task WithResourceInitials(string value)
+        {
+            return SetValue(TaskFields.ResourceInitials, value);
         }
 
         public Task WithPredecessors(string value)

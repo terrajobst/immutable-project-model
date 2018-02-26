@@ -675,6 +675,156 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_ResourceInitials_IsOrderedByName()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId1)
+                                    .WithInitials("Zzz")
+                                    .Project
+                                 .AddResource(resourceId2)
+                                    .WithInitials("Aaa")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId1)
+                                    .Project
+                                 .AddAssignment(taskId, resourceId2)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials("Aaa, Zzz");
+        }
+
+        [Fact]
+        public void Task_ResourceInitials_IsUpdated_WhenResourceInitialIsChanged()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .GetResource(resourceId)
+                                    .WithInitials("X")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials("X");
+        }
+
+        [Fact]
+        public void Task_ResourceInitials_IsUpdated_WhenResourceIsRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .RemoveResource(resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials(string.Empty);
+        }
+
+        [Fact]
+        public void Task_ResourceInitials_IsUpdated_WhenAssignmentUnitsChange()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .GetAssignment(taskId, resourceId)
+                                    .WithUnits(.5)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials("R [50%]");
+        }
+
+        [Fact]
+        public void Task_ResourceInitials_IsUpdated_WhenAssignmentIsRemoved()
+        {
+            var taskId = TaskId.Create();
+            var resourceId = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId)
+                                    .WithName("Resource")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId)
+                                    .Project
+                                 .RemoveAssignment(taskId, resourceId);
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials(string.Empty);
+        }
+
+        [Fact]
+        public void Task_ResourceInitials_Set()
+        {
+            var taskId = TaskId.Create();
+            var resourceId1 = ResourceId.Create();
+            var resourceId2 = ResourceId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId)
+                                    .Project
+                                 .AddResource(resourceId1)
+                                    .WithName("Xxx")
+                                    .Project
+                                 .AddResource(resourceId2)
+                                    .WithName("Yyy")
+                                    .Project
+                                 .AddAssignment(taskId, resourceId1)
+                                    .Project
+                                 .GetTask(taskId)
+                                    .WithResourceInitials("X [10%], Y, Zzz")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId)
+                              .AssertResourceInitials("X [10%], Y, Zzz")
+                              .Project
+                         .HasResource(r => r.Initials == "X")
+                         .HasResource(r => r.Initials == "Y")
+                         .HasResource(r => r.Initials == "Zzz")
+                         .ForAssignment(taskId, resourceId1)
+                              .AssertUnits(.10)
+                              .Project
+                         .HasAssignment(taskId, resourceId1)
+                         .HasAssignment(taskId, resourceId2);
+        }
+
+        [Fact]
         public void Task_Links_DetectsCycle_WhenDirect()
         {
             var taskId = TaskId.Create();

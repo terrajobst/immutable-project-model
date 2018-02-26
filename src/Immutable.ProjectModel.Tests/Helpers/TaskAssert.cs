@@ -132,6 +132,11 @@ namespace Immutable.ProjectModel.Tests.Helpers
             return AssertField(TaskFields.ResourceNames, value);
         }
 
+        public TaskAssert AssertResourceInitials(string value)
+        {
+            return AssertField(TaskFields.ResourceInitials, value);
+        }
+
         public TaskAssert AssertPredecessors(string value)
         {
             return AssertField(TaskFields.Predecessors, value);

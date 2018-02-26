@@ -12,9 +12,10 @@ namespace Immutable.ProjectModel
 
         public IEnumerable<ResourceId> Resources => _resourceMap.Keys;
 
-        public IEnumerable<ResourceId> GetResources(string name)
+        public IEnumerable<ResourceId> GetResources(string name, bool useInitials = false)
         {
-            return _resourceMap.Keys.Where(r => string.Equals(Get(ResourceFields.Name, r), name, StringComparison.OrdinalIgnoreCase));
+            var field = useInitials ? ResourceFields.Initials : ResourceFields.Name;
+            return _resourceMap.Keys.Where(r => string.Equals(Get(field, r), name, StringComparison.OrdinalIgnoreCase));
         }
 
         public IEnumerable<ResourceId> GetResources(TaskId taskId)
@@ -80,6 +81,10 @@ namespace Immutable.ProjectModel
             {
                 return SetResourceName(this, id, (string)value);
             }
+            else if (field == ResourceFields.Initials)
+            {
+                return SetResourceInitials(this, id, (string)value);
+            }
             else
             {
                 return SetRaw(field, id, value);
@@ -108,6 +113,18 @@ namespace Immutable.ProjectModel
 
             foreach (var taskId in project.GetTasks(id))
                 project = project.Reset(TaskFields.ResourceNames, taskId);
+
+            return project;
+        }
+
+        private static ProjectData SetResourceInitials(ProjectData project, ResourceId id, string value)
+        {
+            project = project.SetRaw(ResourceFields.Initials, id, value);
+
+            // Update Task.ResourceInitials
+
+            foreach (var taskId in project.GetTasks(id))
+                project = project.Reset(TaskFields.ResourceInitials, taskId);
 
             return project;
         }
