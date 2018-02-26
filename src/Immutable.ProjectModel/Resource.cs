@@ -21,6 +21,8 @@ namespace Immutable.ProjectModel
 
         public string Name => GetValue(ResourceFields.Name);
 
+        public string Initials => GetValue(ResourceFields.Initials);
+
         public IEnumerable<Assignment> Assignments => Project.Data.GetAssignments(Id)
                                                                   .Select(a => Project.GetAssignment(a));
 
@@ -65,6 +67,14 @@ namespace Immutable.ProjectModel
                 throw new ArgumentNullException(nameof(name));
 
             return SetValue(ResourceFields.Name, name);
+        }
+
+        public Resource WithInitials(string initials)
+        {
+            if (initials == null)
+                throw new ArgumentNullException(nameof(initials));
+
+            return SetValue(ResourceFields.Initials, initials);
         }
     }
 }

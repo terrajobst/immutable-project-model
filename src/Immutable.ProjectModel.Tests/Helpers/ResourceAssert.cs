@@ -26,5 +26,10 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             return AssertField(ResourceFields.Name, value);
         }
+
+        public ResourceAssert AssertInitials(string value)
+        {
+            return AssertField(ResourceFields.Initials, value);
+        }
     }
 }

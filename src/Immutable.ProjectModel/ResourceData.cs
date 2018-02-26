@@ -71,6 +71,17 @@ namespace Immutable.ProjectModel
                 return this;
 
             var fields = _fields.SetItem(field, value);
+
+            if (field == ResourceFields.Name && !HasValue(ResourceFields.Initials))
+            {
+                var name = (string)value;
+                if (name != null && name.Length > 0)
+                {
+                    var initials = name.Substring(0, 1);
+                    fields = fields.SetItem(ResourceFields.Initials, initials);
+                }
+            }
+
             return new ResourceData(fields);
         }
 

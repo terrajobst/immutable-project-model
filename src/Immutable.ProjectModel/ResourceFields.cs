@@ -8,6 +8,7 @@ namespace Immutable.ProjectModel
     {
         public static readonly ResourceField<ResourceId> Id = new ResourceField<ResourceId>("Id", FieldKinds.ResourceId, FieldFlags.ReadOnly);
         public static readonly ResourceField<string> Name = new ResourceField<string>("Name", FieldKinds.Text);
+        public static readonly ResourceField<string> Initials = new ResourceField<string>("Initials", FieldKinds.Text);
 
         internal static readonly ResourceField<ImmutableArray<AssignmentId>> Assignments = new ResourceField<ImmutableArray<AssignmentId>>("Assignments", FieldKinds.AssignmentIdArray, FieldFlags.ReadOnly, ImmutableArray<AssignmentId>.Empty);
 
@@ -17,7 +18,8 @@ namespace Immutable.ProjectModel
                                                                                          .ToImmutableArray();
 
         public static readonly ImmutableArray<ResourceField> Default = ImmutableArray.Create<ResourceField>(
-            Name
+            Name,
+            Initials
         );
     }
 }
