@@ -141,5 +141,10 @@ namespace Immutable.ProjectModel.Tests.Helpers
         {
             return AssertField(TaskFields.Predecessors, value);
         }
+
+        public TaskAssert AssertSuccessors(string value)
+        {
+            return AssertField(TaskFields.Successors, value);
+        }
     }
 }

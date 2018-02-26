@@ -1079,6 +1079,145 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Task_Successors_IsOrderedByOrdinal()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+            var taskId4 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .Project
+                                 .AddTask(taskId4)
+                                    .AddSuccessorLink(taskId2)
+                                    .AddSuccessorLink(taskId1)
+                                    .AddSuccessorLink(taskId3)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId4)
+                              .AssertSuccessors("0,1,2");
+        }
+
+        [Fact]
+        public void Task_Successors_Set()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+            var taskId4 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .Project
+                                 .AddTask(taskId4)
+                                    .AddSuccessorLink(taskId1)
+                                    .AddSuccessorLink(taskId2)
+                                    .Project
+                                 .GetTask(taskId3)
+                                    .WithSuccessors("0,1")
+                                    .Project
+                                 .GetTask(taskId4)
+                                    .WithSuccessors("1,2")
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId3)
+                              .AssertSuccessors("0,1")
+                              .Project
+                         .ForTask(taskId4)
+                              .AssertSuccessors("1,2");
+        }
+
+        [Fact]
+        public void Task_Successors_DetectsCycle()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .Project
+                                 .GetTask(taskId2)
+                                    .WithSuccessors("0")
+                                    .Project;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                project.GetTask(taskId1).WithSuccessors("1")
+            );
+
+            Assert.Equal("Cannot add a link from task 0 to task 1 as this would cause a cycle.", exception.Message);
+        }
+
+        [Fact]
+        public void Task_Successors_IsUpdated_WhenOrdinalIsUpdated()
+        {
+            var taskId0 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId0)
+                                    .Project
+                                 .AddTask()
+                                    .Project
+                                 .AddTask()
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .WithSuccessors("0,1")
+                                    .Project
+                                 .GetTask(taskId0)
+                                    .WithOrdinal(3)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId3)
+                              .AssertSuccessors("0,3");
+        }
+
+        [Fact]
+        public void Task_Successors_IsUpdated_WhenSuccessorIsRemoved()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+            var taskId3 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .AddTask(taskId1)
+                                    .Project
+                                 .AddTask(taskId2)
+                                    .AddSuccessorLink(taskId1)
+                                    .Project
+                                 .AddTask(taskId3)
+                                    .AddSuccessorLink(taskId1)
+                                    .AddSuccessorLink(taskId2)
+                                    .Project
+                                 .GetTask(taskId2)
+                                    .RemoveSuccessorLink(taskId1)
+                                    .Project
+                                 .GetTask(taskId3)
+                                    .RemoveSuccessorLink(taskId2)
+                                    .Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(taskId2)
+                              .AssertSuccessors(string.Empty)
+                              .Project
+                         .ForTask(taskId3)
+                              .AssertSuccessors("0");
+        }
+
+        [Fact]
         public void Task_IsMilestone_IsUpdated_WhenDurationChanges_FromNonZero_ToZero()
         {
             var taskId1 = TaskId.Create();

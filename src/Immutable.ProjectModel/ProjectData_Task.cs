@@ -127,6 +127,10 @@ namespace Immutable.ProjectModel
             {
                 return SetTaskPredecessors(this, id, (string)value);
             }
+            else if (field == TaskFields.Successors)
+            {
+                return SetTaskSuccessors(this, id, (string)value);
+            }
             else if (field == TaskFields.ResourceNames)
             {
                 return SetTaskResourceNames(this, id, (string)value);
@@ -155,6 +159,10 @@ namespace Immutable.ProjectModel
             if (field == TaskFields.Predecessors)
             {
                 return ResetTaskPredecessors(this, id);
+            }
+            else if (field == TaskFields.Successors)
+            {
+                return ResetTaskSuccessors(this, id);
             }
             else if (field == TaskFields.ResourceNames)
             {
@@ -193,14 +201,14 @@ namespace Immutable.ProjectModel
                 var taskId = orderedTaskIds[i];
                 var ordinal = i;
 
-                project = project.SetRaw(TaskFields.Ordinal, taskId, ordinal)
-                                 .Reset(TaskFields.Predecessors, taskId);
+                project = project.SetRaw(TaskFields.Ordinal, taskId, ordinal);
             }
 
-            // Then we can update all predecessors
+            // Then we can update all predecessors/successors
 
             foreach (var taskId in orderedTaskIds)
-                project = project.Reset(TaskFields.Predecessors, taskId);
+                project = project.Reset(TaskFields.Predecessors, taskId)
+                                 .Reset(TaskFields.Successors, taskId);
 
             return project;
         }
@@ -282,16 +290,43 @@ namespace Immutable.ProjectModel
 
         private static ProjectData ResetTaskPredecessors(ProjectData project, TaskId id)
         {
+            return ResetTaskPredecessorsOrSuccessors(project, id, isSuccessors: false);
+        }
+
+        private static ProjectData SetTaskPredecessors(ProjectData project, TaskId id, string value)
+        {
+            return SetTaskPredecessorsOrSuccessors(project, id, value, isSuccessors: false);
+        }
+
+        private static ProjectData ResetTaskSuccessors(ProjectData project, TaskId id)
+        {
+            return ResetTaskPredecessorsOrSuccessors(project, id, isSuccessors: true);
+        }
+
+        private static ProjectData SetTaskSuccessors(ProjectData project, TaskId id, string value)
+        {
+            return SetTaskPredecessorsOrSuccessors(project, id, value, isSuccessors: true);
+        }
+
+        private static ProjectData ResetTaskPredecessorsOrSuccessors(ProjectData project, TaskId id, bool isSuccessors)
+        {
+            TaskId GetPredecessor(TaskLink l) => l.PredecessorId;
+            TaskId GetSuccessor(TaskLink l) => l.SuccessorId;
+
+            var getTask = isSuccessors ? (Func<TaskLink, TaskId>)GetSuccessor : GetPredecessor;
+            var field = isSuccessors ? TaskFields.Successors : TaskFields.Predecessors;
+            var linkField = isSuccessors ? TaskFields.SuccessorLinks : TaskFields.PredecessorLinks;
+
             var sb = new StringBuilder();
 
-            var predecessors = project.Get(TaskFields.PredecessorLinks, id);
+            var predecessors = project.Get(linkField, id);
 
-            foreach (var p in predecessors.OrderBy(p => project.Get(TaskFields.Ordinal, p.PredecessorId)))
+            foreach (var p in predecessors.OrderBy(p => project.Get(TaskFields.Ordinal, getTask(p))))
             {
                 if (sb.Length > 0)
                     sb.Append(",");
 
-                var ordinal = project.Get(TaskFields.Ordinal, p.PredecessorId);
+                var ordinal = project.Get(TaskFields.Ordinal, getTask(p));
                 sb.Append(ordinal);
 
                 switch (p.Type)
@@ -321,15 +356,17 @@ namespace Immutable.ProjectModel
             }
 
             var precedessors = sb.ToString();
-            return project.SetRaw(TaskFields.Predecessors, id, precedessors);
+            return project.SetRaw(field, id, precedessors);
         }
 
-        private static ProjectData SetTaskPredecessors(ProjectData project, TaskId id, string value)
+        private static ProjectData SetTaskPredecessorsOrSuccessors(ProjectData project, TaskId id, string value, bool isSuccessors)
         {
+            var linkField = isSuccessors ? TaskFields.SuccessorLinks : TaskFields.PredecessorLinks;
+
             value = value.Trim();
 
             var predecessorsBuilder = ImmutableArray.CreateBuilder<TaskId>();
-            var remainingTaskLinks = project.Get(TaskFields.PredecessorLinks, id).ToList();
+            var remainingTaskLinks = project.Get(linkField, id).ToList();
 
             if (value.Length > 0)
             {
@@ -339,7 +376,7 @@ namespace Immutable.ProjectModel
                 {
                     var partText = part.Trim();
 
-                    var predecessorText = partText;
+                    var taskText = partText;
                     var sign = Math.Max(partText.IndexOf('+'), partText.IndexOf('-'));
                     var lag = TimeSpan.Zero;
 
@@ -347,45 +384,49 @@ namespace Immutable.ProjectModel
                     {
                         var lagText = partText.Substring(sign).Trim();
                         lag = project.Information.TimeConversion.ParseDuration(lagText);
-                        predecessorText = partText.Substring(0, sign).Trim();
+                        taskText = partText.Substring(0, sign).Trim();
                     }
 
-                    var precessorOrdinalText = predecessorText;
-                    var linkType = (TaskLinkType?) null;
+                    var taskOrdinalText = taskText;
+                    var linkType = (TaskLinkType?)null;
 
-                    if (predecessorText.EndsWith("FS", StringComparison.OrdinalIgnoreCase))
+                    if (taskText.EndsWith("FS", StringComparison.OrdinalIgnoreCase))
                         linkType = TaskLinkType.FinishToStart;
-                    else if (predecessorText.EndsWith("SS", StringComparison.OrdinalIgnoreCase))
+                    else if (taskText.EndsWith("SS", StringComparison.OrdinalIgnoreCase))
                         linkType = TaskLinkType.StartToStart;
-                    else if (predecessorText.EndsWith("FF", StringComparison.OrdinalIgnoreCase))
+                    else if (taskText.EndsWith("FF", StringComparison.OrdinalIgnoreCase))
                         linkType = TaskLinkType.FinishToFinish;
-                    else if (predecessorText.EndsWith("SF", StringComparison.OrdinalIgnoreCase))
+                    else if (taskText.EndsWith("SF", StringComparison.OrdinalIgnoreCase))
                         linkType = TaskLinkType.StartToFinish;
 
                     if (linkType != null)
-                        precessorOrdinalText = predecessorText.Substring(0, predecessorText.Length - 2).Trim();
+                        taskOrdinalText = taskText.Substring(0, taskText.Length - 2).Trim();
                     else if (sign < 0)
                         linkType = TaskLinkType.FinishToStart;
                     else
-                        throw new FormatException($"'{partText}' isn't a valid predecessor specification");
+                        throw new FormatException($"'{partText}' isn't a valid value");
 
-                    if (!int.TryParse(precessorOrdinalText, out var predecessorOrdinal))
-                        throw new FormatException($"'{precessorOrdinalText}' isn't a valid int");
+                    if (!int.TryParse(taskOrdinalText, out var taskOrdinal))
+                        throw new FormatException($"'{taskOrdinalText}' isn't a valid int");
 
-                    var predecessorId = project.GetTask(predecessorOrdinal);
-                    if (predecessorId.IsDefault)
-                        throw new FormatException($"'{predecessorOrdinal}' isn't a valid predecessor");
+                    var taskId = project.GetTask(taskOrdinal);
+                    if (taskId.IsDefault)
+                        throw new FormatException($"'{taskOrdinal}' isn't a valid task");
 
-                    var taskLink = TaskLink.Create(predecessorId, id, linkType.Value, lag);
+                    var predecessorId = isSuccessors ? id : taskId;
+                    var successorId = isSuccessors ? taskId : id;
 
-                    var existingLink = project.GetTaskLink(predecessorId, id);
+                    var taskLink = TaskLink.Create(predecessorId, successorId, linkType.Value, lag);
+
+                    var existingLink = project.GetTaskLink(predecessorId, successorId);
                     if (existingLink != null)
                     {
                         project = project.RemoveTaskLink(existingLink);
                     }
                     else if (project.TaskLinkCausesCycle(taskLink))
                     {
-                        var successorOrdinal = project.Get(TaskFields.Ordinal, taskLink.SuccessorId);
+                        var predecessorOrdinal = project.Get(TaskFields.Ordinal, predecessorId);
+                        var successorOrdinal = project.Get(TaskFields.Ordinal, successorId);
                         throw new InvalidOperationException($"Cannot add a link from task {predecessorOrdinal} to task {successorOrdinal} as this would cause a cycle.");
                     }
 

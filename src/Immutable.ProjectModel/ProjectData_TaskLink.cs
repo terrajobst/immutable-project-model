@@ -90,7 +90,8 @@ namespace Immutable.ProjectModel
 
             project = project.SetRaw(TaskFields.PredecessorLinks, taskLink.SuccessorId, predescessorLinks)
                              .SetRaw(TaskFields.SuccessorLinks, taskLink.PredecessorId, successorLinks)
-                             .Reset(TaskFields.Predecessors, taskLink.SuccessorId);
+                             .Reset(TaskFields.Predecessors, taskLink.SuccessorId)
+                             .Reset(TaskFields.Successors, taskLink.PredecessorId);
 
             return project;
         }
@@ -112,7 +113,8 @@ namespace Immutable.ProjectModel
 
             project = project.SetRaw(TaskFields.PredecessorLinks, taskLink.SuccessorId, predescessorLinks)
                              .SetRaw(TaskFields.SuccessorLinks, taskLink.PredecessorId, successorLinks)
-                             .Reset(TaskFields.Predecessors, taskLink.SuccessorId);
+                             .Reset(TaskFields.Predecessors, taskLink.SuccessorId)
+                             .Reset(TaskFields.Successors, taskLink.PredecessorId);
 
             return project;
         }

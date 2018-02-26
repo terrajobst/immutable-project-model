@@ -19,7 +19,6 @@
 * Add scheduling from the back
 * Add actual work
 * Add percent complete
-* Add successors
 
 ## Settings
 

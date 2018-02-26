@@ -58,6 +58,8 @@ namespace Immutable.ProjectModel
 
         public string Predecessors => GetValue(TaskFields.Predecessors);
 
+        public string Successors => GetValue(TaskFields.Successors);
+
         public ImmutableArray<TaskLink> PredecessorLinks => GetValue(TaskFields.PredecessorLinks);
 
         public IEnumerable<TaskId> PredecessorIds => PredecessorLinks.Select(l => l.PredecessorId);
@@ -173,6 +175,11 @@ namespace Immutable.ProjectModel
         public Task WithPredecessors(string value)
         {
             return SetValue(TaskFields.Predecessors, value);
+        }
+
+        public Task WithSuccessors(string value)
+        {
+            return SetValue(TaskFields.Successors, value);
         }
     }
 }
