@@ -21,5 +21,10 @@ namespace Immutable.ProjectModel.Tests.Helpers
             Assert.True(equals, $"Resource {_resource.Id} {field.Name} should have been '{value}' but was '{actualValue}'");
             return this;
         }
+
+        public ResourceAssert AssertName(string value)
+        {
+            return AssertField(ResourceFields.Name, value);
+        }
     }
 }
