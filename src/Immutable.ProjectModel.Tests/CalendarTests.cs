@@ -16,7 +16,7 @@ namespace Immutable.ProjectModel.Tests
             var taskId2 = TaskId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .WithStart(new DateTime(2018, 1, 29))
                                  .AddTask(taskId1)
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddTask(taskId2)
@@ -54,7 +54,7 @@ namespace Immutable.ProjectModel.Tests
             var calendar = Calendar.Default.WithWorkingWeek(sixDayWorkWeek);
 
             var project = Project.Create()                                 
-                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .WithStart(new DateTime(2018, 1, 29))
                                  .WithCalendar(calendar)
                                  .AddTask(taskId1)
                                     .WithDuration(ProjectTime.FromDays(10)).Project
@@ -82,7 +82,7 @@ namespace Immutable.ProjectModel.Tests
             var taskId2 = TaskId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 1))
+                                 .WithStart(new DateTime(2018, 2, 1))
                                  .WithCalendar(Calendar.TwentyFourSeven)
                                  .AddTask(taskId1)
                                     .WithDuration(ProjectTime.FromDays(10)).Project

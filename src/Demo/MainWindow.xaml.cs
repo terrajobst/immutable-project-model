@@ -56,7 +56,7 @@ namespace Demo
 
             return Project.Create()
                           .WithName("Some Software Project")
-                          .WithStartDate(new DateTimeOffset(2018, 1, 29, 0, 0, 0, DateTimeOffset.Now.Offset))
+                          .WithStart(new DateTimeOffset(2018, 1, 29, 0, 0, 0, DateTimeOffset.Now.Offset))
                           .AddTask(designTaskId)
                               .WithName("Design")
                               .WithDuration(time.FromDays(5)).Project

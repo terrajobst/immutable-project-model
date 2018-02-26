@@ -12,7 +12,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .WithStart(new DateTime(2018, 2, 5))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2))
                                     .Project

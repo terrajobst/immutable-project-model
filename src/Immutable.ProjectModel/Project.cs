@@ -108,9 +108,9 @@ namespace Immutable.ProjectModel
             return UpdateProject(data);
         }
 
-        public Project WithStartDate(DateTimeOffset startDate)
+        public Project WithStart(DateTimeOffset start)
         {
-            var information = Data.Information.WithStart(startDate);
+            var information = Data.Information.WithStart(start);
             var data = Data.WithInformation(information);
             return UpdateProject(data);
         }

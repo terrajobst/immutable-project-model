@@ -13,7 +13,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -52,7 +52,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -91,7 +91,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -130,7 +130,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -169,7 +169,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -210,7 +210,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -252,7 +252,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -294,7 +294,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -335,7 +335,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -377,7 +377,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -419,7 +419,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask()
                                     .WithDuration(ProjectTime.FromDays(5)).Project
                                  .AddTask(taskId)
@@ -475,7 +475,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask()
                                     .WithDuration(ProjectTime.FromDays(5)).Project
                                  .AddTask(taskId)
@@ -531,7 +531,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -572,7 +572,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()
@@ -614,7 +614,7 @@ namespace Immutable.ProjectModel.Tests
         {
             var taskId = TaskId.Create();
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 26, 8, 0, 0))
+                                 .WithStart(new DateTime(2018, 2, 26, 8, 0, 0))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(2)).Project
                                  .AddTask()

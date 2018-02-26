@@ -45,7 +45,7 @@ namespace Demo.Dialogs.ProjectInformation
 
         private async void UpdateProject(DateTime value)
         {
-            Project = await Task.Run(() => Project.WithStartDate(value));
+            Project = await Task.Run(() => Project.WithStart(value));
         }
     }
 }

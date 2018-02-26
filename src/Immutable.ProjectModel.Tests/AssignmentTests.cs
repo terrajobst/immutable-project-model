@@ -15,7 +15,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .WithStart(new DateTime(2018, 1, 29))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddResource(resourceId).Project
@@ -40,7 +40,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 1, 29))
+                                 .WithStart(new DateTime(2018, 1, 29))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(10))
                                     .WithWork(ProjectTime.FromHours(40)).Project
@@ -67,7 +67,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId2 = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .WithStart(new DateTime(2018, 2, 5))
                                  .AddTask(taskId).Project
                                  .AddResource(resourceId1).Project
                                  .AddResource(resourceId2).Project
@@ -104,7 +104,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId3 = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .WithStart(new DateTime(2018, 2, 5))
                                  .AddTask(taskId)
                                     .WithDuration(ProjectTime.FromDays(10)).Project
                                  .AddResource(resourceId1).Project
@@ -148,7 +148,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .WithStart(new DateTime(2018, 2, 5))
                                  .AddTask(taskId)
                                     .WithName("Some Task")
                                     .Project
@@ -171,7 +171,7 @@ namespace Immutable.ProjectModel.Tests
             var resourceId = ResourceId.Create();
 
             var project = Project.Create()
-                                 .WithStartDate(new DateTime(2018, 2, 5))
+                                 .WithStart(new DateTime(2018, 2, 5))
                                  .AddTask(taskId)
                                     .WithName("Some Task")
                                     .Project
