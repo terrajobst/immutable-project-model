@@ -26,6 +26,30 @@ namespace Immutable.ProjectModel
             return Create(dayOfWeek, eigthToFive);
         }
 
+        public static WorkingDay CreateNightShift(DayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case DayOfWeek.Sunday:
+                    return CreateNonWorking(DayOfWeek.Sunday);
+                case DayOfWeek.Monday:
+                    return Create(dayOfWeek, ImmutableArray.Create(
+                        WorkingTime.Create(TimeSpan.FromHours(23), TimeSpan.FromHours(24))
+                    ));
+                default:
+                    return Create(dayOfWeek, ImmutableArray.Create(
+                        WorkingTime.Create(TimeSpan.FromHours(0), TimeSpan.FromHours(3)),
+                        WorkingTime.Create(TimeSpan.FromHours(4), TimeSpan.FromHours(8)),
+                        WorkingTime.Create(TimeSpan.FromHours(23), TimeSpan.FromHours(24))
+                    ));
+                case DayOfWeek.Saturday:
+                    return Create(dayOfWeek, ImmutableArray.Create(
+                        WorkingTime.Create(TimeSpan.FromHours(0), TimeSpan.FromHours(3)),
+                        WorkingTime.Create(TimeSpan.FromHours(4), TimeSpan.FromHours(8))
+                    ));
+            }
+        }
+
         public static WorkingDay CreateTwentyFour(DayOfWeek dayOfWeek)
         {
             var twentyFour = ImmutableArray.Create(

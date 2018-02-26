@@ -76,6 +76,34 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
+        public void Calendar_NightShift()
+        {
+            var taskId1 = TaskId.Create();
+            var taskId2 = TaskId.Create();
+
+            var project = Project.Create()
+                                 .WithStart(new DateTime(2018, 2, 1))
+                                 .WithCalendar(Calendar.NightShift)
+                                 .AddTask(taskId1)
+                                    .WithDuration(ProjectTime.FromDays(10)).Project
+                                 .AddTask(taskId2)
+                                    .WithDuration(ProjectTime.FromDays(5))
+                                    .AddPredecessorLink(taskId1).Project;
+
+            ProjectAssert.For(project)
+                         .ForTask(0)
+                             .AssertDuration(ProjectTime.FromDays(10))
+                             .AssertStart(new DateTime(2018, 2, 1, 0, 0, 0))
+                             .AssertFinish(new DateTime(2018, 2, 15, 0, 0, 0))
+                             .AssertWork(ProjectTime.FromDays(0)).Project
+                         .ForTask(1)
+                             .AssertDuration(ProjectTime.FromDays(5))
+                             .AssertStart(new DateTime(2018, 2, 15, 0, 0, 0))
+                             .AssertFinish(new DateTime(2018, 2, 22, 0, 0, 0))
+                             .AssertWork(ProjectTime.FromDays(0));
+        }
+
+        [Fact]
         public void Calendar_TwentyFourSeven()
         {
             var taskId1 = TaskId.Create();

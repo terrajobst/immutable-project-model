@@ -18,6 +18,7 @@ namespace Immutable.ProjectModel
     public sealed class Calendar
     {
         public static Calendar Default = new Calendar(WorkingWeek.Default);
+        public static Calendar NightShift = new Calendar(WorkingWeek.NightShift);
         public static Calendar TwentyFourSeven = new Calendar(WorkingWeek.TwentyFourSeven);
 
         private Calendar(WorkingWeek workingWeek)
