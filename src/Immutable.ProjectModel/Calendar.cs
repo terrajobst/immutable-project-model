@@ -17,29 +17,45 @@ namespace Immutable.ProjectModel
     // the range apart (start..exception1, exception1..exception2, and so on).
     public sealed class Calendar
     {
-        public static Calendar Default = new Calendar(WorkingWeek.Default);
-        public static Calendar NightShift = new Calendar(WorkingWeek.NightShift);
-        public static Calendar TwentyFourSeven = new Calendar(WorkingWeek.TwentyFourSeven);
+        public static Calendar Default = new Calendar("Standard", WorkingWeek.Default);
+        public static Calendar NightShift = new Calendar("Night Shift", WorkingWeek.NightShift);
+        public static Calendar TwentyFourSeven = new Calendar("24 Hours", WorkingWeek.TwentyFourSeven);
 
-        private Calendar(WorkingWeek workingWeek)
+        private Calendar(string name, WorkingWeek workingWeek)
         {
+            Name = name;
             WorkingWeek = workingWeek;
         }
 
+        public string Name { get; }
+
         public WorkingWeek WorkingWeek { get; }
 
-        public Calendar WithWorkingWeek(WorkingWeek workingWeek)
+        public Calendar With(string name, WorkingWeek workingWeek)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
             if (workingWeek == null)
                 throw new ArgumentNullException(nameof(workingWeek));
 
             if (workingWeek.IsNonWorking)
                 throw new ArgumentException("Cannot use a non-working week as the default week.", nameof(workingWeek));
 
-            if (workingWeek == WorkingWeek)
+            if (name == Name && workingWeek == WorkingWeek)
                 return this;
 
-            return new Calendar(workingWeek);
+            return new Calendar(name, workingWeek);
+        }
+
+        public Calendar WithName(string name)
+        {
+            return With(name, WorkingWeek);
+        }
+
+        public Calendar WithWorkingWeek(WorkingWeek workingWeek)
+        {
+            return With(Name, workingWeek);
         }
 
         public DateTimeOffset FindWorkStart(DateTimeOffset date)

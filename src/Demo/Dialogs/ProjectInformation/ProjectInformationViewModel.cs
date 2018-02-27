@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Immutable;
 using Demo.ViewModels;
 
 using Immutable.ProjectModel;
@@ -20,7 +20,7 @@ namespace Demo.Dialogs.ProjectInformation
         public Project Project
         {
             get => _project;
-            set
+            private set
             {
                 if (_project != value)
                 {
@@ -43,9 +43,29 @@ namespace Demo.Dialogs.ProjectInformation
 
         public DateTime FinishDate => _project.Finish.LocalDateTime;
 
+        public Calendar Calendar
+        {
+            get => _project.Calendar;
+            set
+            {
+                if (_project.Calendar != value)
+                    UpdateProject(value);
+            }
+        }
+
+        public ImmutableArray<Calendar> Calendars
+        {
+            get => _project.Calendars;
+        }
+
         private async void UpdateProject(DateTime value)
         {
             Project = await Task.Run(() => Project.WithStart(value));
+        }
+
+        private async void UpdateProject(Calendar calendar)
+        {
+            Project = await Task.Run(() => Project.WithCalendar(calendar));
         }
     }
 }

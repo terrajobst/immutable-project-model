@@ -28,6 +28,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Label Grid.Row="0"
                    Grid.Column="0"
@@ -51,6 +52,18 @@
                      IsReadOnly="True"
                      Background="{x:Static SystemColors.ControlBrush}"
                      Text="{Binding Path=FinishDate,Mode=OneWay}" />
+            <Label Grid.Row="2"
+                   Grid.Column="0"
+                   MinWidth="100"
+                   Margin="4,4,4,0"
+                   Content="Calendar:" />
+            <ComboBox Grid.Row="2"
+                      Grid.Column="1"
+                      Margin="4,4,4,0"
+                      MinWidth="250"
+                      ItemsSource="{Binding Path=Calendars}"
+                      DisplayMemberPath="Name"
+                      SelectedItem="{Binding Path=Calendar}" />
         </Grid>
 
         <Separator Grid.Row="1"

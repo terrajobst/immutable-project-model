@@ -37,13 +37,6 @@ namespace Immutable.ProjectModel.Tests
         }
 
         [Fact]
-        public void Calendar_WithWorkingWeek_RejectsNonWorkingWeek()
-        {
-            var week = WorkingWeek.NonWorking;
-            Assert.Throws<ArgumentException>(() => Calendar.Default.WithWorkingWeek(week));
-        }
-
-        [Fact]
         public void Calendar_SixDayWorkWeek()
         {
             var taskId1 = TaskId.Create();
@@ -129,6 +122,30 @@ namespace Immutable.ProjectModel.Tests
                               .AssertStart(new DateTime(2018, 2, 4, 8, 0, 0))
                               .AssertFinish(new DateTime(2018, 2, 6, 0, 0, 0))
                               .AssertWork(TimeSpan.Zero);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("New Name")]
+        public void Calendar_Name_Set(string name)
+        {
+            var calendar = Calendar.Default.WithName(name);
+            Assert.Equal(name, calendar.Name);
+        }
+
+        [Fact]
+        public void Calendar_Name_Set_Throws_WhenNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Calendar.Default.WithName(null));
+            Assert.Throws<ArgumentNullException>(() => Calendar.Default.With(null, Calendar.Default.WorkingWeek));
+        }
+
+        [Fact]
+        public void Calendar_WithWorkingWeek_RejectsNonWorkingWeek()
+        {
+            var week = WorkingWeek.NonWorking;
+            Assert.Throws<ArgumentException>(() => Calendar.Default.WithWorkingWeek(week));
+            Assert.Throws<ArgumentException>(() => Calendar.Default.With(Calendar.Default.Name, week));
         }
 
         [Theory]
